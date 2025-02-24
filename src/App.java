@@ -1,45 +1,76 @@
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.io.IOException;
 
 public class App {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-      ArrayList<String> genre = new ArrayList<String>();
+        FileInputStream fileInputStream;
+        DataInputStream dataInputStream;
 
-      genre.add("Science Fition");
-      genre.add("Space");
-      ArrayList<String> stars = new ArrayList<String>();
+        try {
+            
+            fileInputStream = new FileInputStream("src/database/forbes_billionaires.csv");
+            dataInputStream = new DataInputStream(fileInputStream);
 
-      stars.add("Chris Wood");
-      stars.add("Mark Hamill");
+            System.out.println(dataInputStream.readUTF());
 
-      LocalDate date = LocalDate.of(2004, 5, 13);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-      // "Interstellar", 2004, genre, 6.5, "The war for Eternia begins again in what may be the final battle between He-Man and Skeletor. A new...", stars, 21062, 121
 
-      Movie movie = new Movie("Interstellar", date, genre, 5.3, "The war for Eternia begins again in what may be the final battle between He-Man and Skeletor. A new...", stars, 21.026, 125);
+
+
+
+/*
+        Test test = new Test(5, "Enzo", 1.23);
 
         FileOutputStream fileOutputStream;
         DataOutputStream dataOutputStream;
+
+        // 
+
+        FileInputStream fileInputStream;
+        DataInputStream dataInputStream;
+
         byte[] bt;
 
-         try {
+        try {
             fileOutputStream = new FileOutputStream("teste.db");
             dataOutputStream = new DataOutputStream(fileOutputStream);
 
-            bt = movie.toByteArray();
+            bt = test.toByteArray();
 
-            dataOutputStream.writeInt(bt.length);
-            dataOutputStream.write(bt);
+            dataOutputStream.writeInt(bt.length); // Byte para guardar tamanho do Objeto
+            dataOutputStream.write(bt); // Insere objeto
 
             fileOutputStream.close();
-         } catch (Exception e) {
-            System.err.println(e);
-         }
 
+            //
 
+            fileInputStream = new FileInputStream("teste.db");
+            dataInputStream = new DataInputStream(fileInputStream);
+
+            int len = dataInputStream.readInt(); // Lê tamanho do primeiro Objeto
+
+            bt = new byte[len]; // Byte do tamanho do Objeto
+
+            dataInputStream.read(bt);
+
+            Test testTmp = new Test();
+
+            testTmp.fromByteArray(bt);
+
+            System.out.println(testTmp.num);
+            
+        } catch (Exception e) {
+            
+        }
+*/
     }
 }
