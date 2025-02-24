@@ -1,10 +1,8 @@
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+
+import service.DAO;
 
 public class App {
 
@@ -13,6 +11,7 @@ public class App {
         String file = "src/database/forbes_billionaires.csv";
         BufferedReader reader = null;
         String line = "";
+
 
         try {
 
@@ -24,11 +23,15 @@ public class App {
 
                 String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
+                DAO.insert(row);
+
                 for (String i : row) {
                     System.out.print(i + " - ");
                 }
                 System.out.println();
+
                 break;
+                
             }
 
             reader.close();
