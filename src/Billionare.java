@@ -9,14 +9,17 @@ public class Billionare {
     private int rank;
     private int age;
     private String residence;
+    private String citizenship;
     private String status;
     private int children;
     private String education;
     private Boolean selfMade;
     private LocalDate birthdate;
-    
+
     public Billionare(String name, Double netWorth, String country, ArrayList<String> source, int rank, int age,
-            String residence, String status, int children, String education, Boolean selfMade, LocalDate birthdate) {
+            String residence, String citizenship, String status, int children, String education, Boolean selfMade,
+            LocalDate birthdate) {
+
         this.name = name;
         this.netWorth = netWorth;
         this.country = country;
@@ -24,10 +27,12 @@ public class Billionare {
         this.rank = rank;
         this.age = age;
         this.residence = residence;
+        this.citizenship = citizenship;
         this.status = status;
         this.children = children;
         this.education = education;
         this.selfMade = selfMade;
         this.birthdate = birthdate;
     }
+
 }

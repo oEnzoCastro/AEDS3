@@ -3,6 +3,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 public class Test {
     protected int id;
@@ -20,6 +21,13 @@ public class Test {
         this.text = "";
         this.num = 0.0;
     }
+
+    public String toString(){
+        DecimalFormat df= new DecimalFormat("#,##0.00");
+        return "ID:"+ id  +
+                "\nText:"+ text  +
+                "\nNum:"+ df.format(num) + "\n";
+    }
     
     public byte[] toByteArray() throws IOException {
 
@@ -27,6 +35,8 @@ public class Test {
 
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
+        dataOutputStream.writeInt(id);
+        dataOutputStream.writeUTF(text);
         dataOutputStream.writeDouble(num);
 
         return byteArrayOutputStream.toByteArray();
@@ -37,6 +47,8 @@ public class Test {
 
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
+        id = dataInputStream.readInt();
+        text = dataInputStream.readUTF();
         num = dataInputStream.readDouble();
     }
 
