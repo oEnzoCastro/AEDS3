@@ -48,8 +48,8 @@ public class DAO {
             dataOutputStream = new DataOutputStream(fileOutputStream);
 
             bt = billionaire.toByteArray();
-            dataOutputStream.writeInt(8); // Byte para guardar tamanho do Objeto
-            dataOutputStream.writeInt(bt.length); // Byte para guardar tamanho do Objeto
+            dataOutputStream.writeChar(0); // Lápide do objeto
+            dataOutputStream.writeInt(bt.length); // Byte para guardar tamanho do objeto
             dataOutputStream.write(bt); // Insere objeto
 
         } catch (Exception e) {
