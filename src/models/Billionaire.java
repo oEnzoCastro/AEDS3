@@ -1,4 +1,5 @@
 package models;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class Billionaire {
 
     public Billionaire() {
 
-        this.name = "Enzo";
+        this.name = "";
         this.netWorth = 0.0;
         this.country = "";
         this.source = null;
@@ -56,7 +57,7 @@ public class Billionaire {
         this.birthdate = null;
     }
 
-    public byte[] toByteArray() throws IOException{
+    public byte[] toByteArray() throws IOException {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -65,7 +66,7 @@ public class Billionaire {
         dataOutputStream.writeUTF(name);
         dataOutputStream.writeDouble(netWorth);
         dataOutputStream.writeUTF(country);
-        dataOutputStream.writeUTF(""); // !!!
+        dataOutputStream.writeUTF("ARRAY"); // !!!
         dataOutputStream.writeInt(rank);
         dataOutputStream.writeDouble(age);
         dataOutputStream.writeUTF(residence);
@@ -75,7 +76,6 @@ public class Billionaire {
         dataOutputStream.writeUTF(education);
         dataOutputStream.writeBoolean(selfMade);
         dataOutputStream.writeUTF(""); // !!!
-
 
         return byteArrayOutputStream.toByteArray();
     }

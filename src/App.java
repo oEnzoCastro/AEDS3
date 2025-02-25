@@ -1,44 +1,19 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
-import service.DAO;
+import util.readCSV;
 
 public class App {
 
     public static void main(String[] args) throws IOException {
 
-        String file = "src/database/forbes_billionaires.csv";
-        BufferedReader reader = null;
-        String line = "";
+        FileOutputStream fileOutputStream = null;
 
+        fileOutputStream = new FileOutputStream("teste.db"); // Arquivo de banco de dados a inserir
 
-        try {
+        readCSV.read(fileOutputStream);
 
-            reader = new BufferedReader(new FileReader(file));
-
-            reader.readLine();
-
-            while ((line = reader.readLine()) != null) {
-
-                String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-
-                DAO.insert(row);
-
-                for (String i : row) {
-                    System.out.print(i + " - ");
-                }
-                System.out.println();
-
-                break;
-                
-            }
-
-            reader.close();
-
-        } catch (Exception e) {
-
-        }
+        fileOutputStream.close(); // Salva BD apenas no fim do programa
 
         /*
          * 
