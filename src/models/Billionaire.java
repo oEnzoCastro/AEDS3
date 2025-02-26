@@ -1,12 +1,18 @@
 package models;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 
 public class Billionaire {
+    private int id;
     private String name;
     private Double netWorth;
     private String country;
@@ -21,10 +27,32 @@ public class Billionaire {
     private Boolean selfMade;
     private LocalDate birthdate;
 
-    public Billionaire(String name, Double netWorth, String country, ArrayList<String> source, int rank, Double age,
+    public String toString() {
+        DecimalFormat df = new DecimalFormat("#,##0.00");
+        return "\nID:" + id +
+                "\nNome:" + name +
+                "\nNetWorth:" + df.format(netWorth) +
+                "\nCountry:" + country +
+                "\nSource: " + source.toString() +
+                "\nRank: " + rank +
+                "\nAge: " + df.format(age) +
+                "\nResidence: " + residence +
+                "\nCitizenship: " + citizenship +
+                "\nStatus: " + status +
+                "\nChildren: " + df.format(children) +
+                "\nEducation: " + education +
+                "\nSelfmade: " + selfMade +
+                "\nBirthdate: " + birthdate
+                
+                ;
+    }
+
+    public Billionaire(int id, String name, Double netWorth, String country, ArrayList<String> source, int rank,
+            Double age,
             String residence, String citizenship, String status, Double children, String education, Boolean selfMade,
             LocalDate birthdate) {
 
+        this.id = id;
         this.name = name;
         this.netWorth = netWorth;
         this.country = country;
@@ -42,10 +70,11 @@ public class Billionaire {
 
     public Billionaire() {
 
+        this.id = -1;
         this.name = "";
         this.netWorth = 0.0;
         this.country = "";
-        this.source = null;
+        this.source = new ArrayList<String>();
         this.rank = -1;
         this.age = 0.0;
         this.residence = "";
@@ -63,6 +92,8 @@ public class Billionaire {
 
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
+
+        dataOutputStream.writeInt(id);
         dataOutputStream.writeUTF(name);
         dataOutputStream.writeDouble(netWorth);
         dataOutputStream.writeUTF(country);
@@ -78,9 +109,42 @@ public class Billionaire {
         dataOutputStream.writeDouble(children);
         dataOutputStream.writeUTF(education);
         dataOutputStream.writeBoolean(selfMade);
-        dataOutputStream.writeUTF(""); // !!!
+        dataOutputStream.writeLong(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
+
+        // LocalDate timestampToLocalDate =
+        // Instant.ofEpochSecond(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()).atZone(ZoneId.systemDefault()).toLocalDate();
 
         return byteArrayOutputStream.toByteArray();
+    }
+
+    public void fromByteArray(byte[] bt) throws IOException {
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bt);
+
+        DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
+
+        dataInputStream.readInt(); // Lapide
+
+        id = dataInputStream.readInt();
+        name = dataInputStream.readUTF();
+
+        netWorth = dataInputStream.readDouble();
+        country = dataInputStream.readUTF();
+        int arraySize = dataInputStream.readInt();
+        source.clear();
+        for (int i = 0; i < arraySize; i++) {
+            source.add(dataInputStream.readUTF());
+        }
+        rank = dataInputStream.readInt();
+        age = dataInputStream.readDouble();
+        residence = dataInputStream.readUTF();
+        citizenship = dataInputStream.readUTF();
+        status = dataInputStream.readUTF();
+        children = dataInputStream.readDouble();
+        education = dataInputStream.readUTF();
+        selfMade = dataInputStream.readBoolean();
+        birthdate = Instant.ofEpochSecond(dataInputStream.readLong()).atZone(ZoneId.systemDefault()).toLocalDate();
+
     }
 
 }
