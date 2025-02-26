@@ -17,11 +17,15 @@ public class DAO {
             String name = row[0];
             Double netWorth = Double.parseDouble(row[1]); // String -> Double
             String country = row[2];
-            String[] sourceArray = row[3].split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            row[3] = row[3].replace("\"", ""); // Remove "" do array
+            row[3] = row[3].replace(" ", ""); // Remove espaços em branco para evitar [0]=Tesla, [1]= SpaceX (Com espaço
+                                              // antes)
+            String[] sourceArray = row[3].split(","); // Splita o Array
             ArrayList<String> source = new ArrayList<String>();
             for (String i : sourceArray) {
                 source.add(i);
             }
+
             int rank = Integer.parseInt(row[4]); // String -> Int
             Double age = Double.parseDouble(row[5]); // String(Float) -> Double !!!
             String residence = row[6];
@@ -48,7 +52,7 @@ public class DAO {
             dataOutputStream = new DataOutputStream(fileOutputStream);
 
             bt = billionaire.toByteArray();
-            dataOutputStream.writeInt(8); // Byte para guardar tamanho do Objeto
+            dataOutputStream.writeChar(0); // Lápide do objeto
             dataOutputStream.writeInt(bt.length); // Byte para guardar tamanho do Objeto
             dataOutputStream.write(bt); // Insere objeto
 

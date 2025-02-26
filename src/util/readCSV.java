@@ -31,8 +31,6 @@ public class readCSV {
                 // }
                 // System.out.println();
 
-                break;
-
             }
 
             reader.close();

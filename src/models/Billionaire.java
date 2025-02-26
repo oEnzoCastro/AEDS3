@@ -66,7 +66,10 @@ public class Billionaire {
         dataOutputStream.writeUTF(name);
         dataOutputStream.writeDouble(netWorth);
         dataOutputStream.writeUTF(country);
-        dataOutputStream.writeUTF("ARRAY"); // !!!
+        dataOutputStream.writeInt(source.size()); // Tamanho do array (Quantidade, não bits !Mudar para BITS!)
+        for (int i = 0; i < source.size(); i++) {
+            dataOutputStream.writeUTF(source.get(i)); // adiciona cada elemento do array
+        }
         dataOutputStream.writeInt(rank);
         dataOutputStream.writeDouble(age);
         dataOutputStream.writeUTF(residence);
