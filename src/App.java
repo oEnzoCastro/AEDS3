@@ -13,15 +13,10 @@ public class App {
 
         FileOutputStream fileOutputStream = new FileOutputStream(file); // Arquivo de banco de dados a inserir
         DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
-
+        
         dataOutputStream.writeInt(0);
-
+        
         int lastId = readCSV.getAll(fileOutputStream);
-
-        RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw"); // Atualiza cabeçalho último ID
-        randomAccessFile.seek(0);
-        randomAccessFile.writeInt(lastId);
-        randomAccessFile.close();
 
         fileOutputStream.close(); // Salva BD apenas no fim do programa
 

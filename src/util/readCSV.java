@@ -5,7 +5,6 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.RandomAccessFile;
 
 import DAO.DAO;
 import models.Billionaire;
@@ -55,28 +54,20 @@ public class readCSV {
 
         FileInputStream fileInputStream;
         DataInputStream dataInputStream;
-        try (        RandomAccessFile raf = new RandomAccessFile(file, "rw");){
-            raf.seek(4);
-            while(raf.getFilePointer() < raf.length()){
-                long start = raf.getFilePointer();
-                byte lapide = raf.readByte();
-                int tam = raf.readInt();
 
-                if(lapide == 1){
-                    raf.seek(start + tam);
-                }
-                //int idAtual = raf.readInt();
-            }
-            //fileInputStream = new FileInputStream(file);
-            //dataInputStream = new DataInputStream(fileInputStream);
+        try {
 
-           // len = dataInputStream.readInt(); // Lê tamanho do primeiro Objeto
-            //bt = new byte[len]; // Byte do tamanho do Objeto
-           // dataInputStream.read(bt);
-            //billionaireTmp.fromByteArray(bt);
-            //System.out.println("Billionaire = " + billionaireTmp);
 
-            //fileInputStream.close();
+            fileInputStream = new FileInputStream(file);
+            dataInputStream = new DataInputStream(fileInputStream);
+
+            len = dataInputStream.readInt(); // Lê tamanho do primeiro Objeto
+            bt = new byte[len]; // Byte do tamanho do Objeto
+            dataInputStream.read(bt);
+            billionaireTmp.fromByteArray(bt);
+            System.out.println("Billionaire = " + billionaireTmp);
+
+            fileInputStream.close();
 
         } catch (Exception e) {
             System.err.println("Erro: " + e);
