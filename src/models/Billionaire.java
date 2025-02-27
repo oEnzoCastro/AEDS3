@@ -14,42 +14,42 @@ import java.util.ArrayList;
 public class Billionaire {
     private int id;
     private String name;
-    private Double netWorth;
+    private float netWorth;
     private String country;
     private ArrayList<String> source;
     private int rank;
-    private Double age;
+    private int age;
     private String residence;
     private String citizenship;
     private String status;
-    private Double children;
+    private int children;
     private String education;
     private Boolean selfMade;
     private LocalDate birthdate;
 
     public String toString() {
         DecimalFormat df = new DecimalFormat("#,##0.00");
-        return "\nID:" + id +
+        return "\nId:" + id +
                 "\nNome:" + name +
                 "\nNetWorth:" + df.format(netWorth) +
                 "\nCountry:" + country +
                 "\nSource: " + source.toString() +
                 "\nRank: " + rank +
-                "\nAge: " + df.format(age) +
+                "\nAge: " + age +
                 "\nResidence: " + residence +
                 "\nCitizenship: " + citizenship +
                 "\nStatus: " + status +
-                "\nChildren: " + df.format(children) +
+                "\nChildren: " + children +
                 "\nEducation: " + education +
                 "\nSelfmade: " + selfMade +
                 "\nBirthdate: " + birthdate
-                
-                ;
+
+        ;
     }
 
-    public Billionaire(int id, String name, Double netWorth, String country, ArrayList<String> source, int rank,
-            Double age,
-            String residence, String citizenship, String status, Double children, String education, Boolean selfMade,
+    public Billionaire(int id, String name, float netWorth, String country, ArrayList<String> source, int rank,
+            int age,
+            String residence, String citizenship, String status, int children, String education, Boolean selfMade,
             LocalDate birthdate) {
 
         this.id = id;
@@ -72,15 +72,15 @@ public class Billionaire {
 
         this.id = -1;
         this.name = "";
-        this.netWorth = 0.0;
+        this.netWorth = 0;
         this.country = "";
         this.source = new ArrayList<String>();
         this.rank = -1;
-        this.age = 0.0;
+        this.age = 0;
         this.residence = "";
         this.citizenship = "";
         this.status = "";
-        this.children = 0.0;
+        this.children = 0;
         this.education = "";
         this.selfMade = false;
         this.birthdate = null;
@@ -92,29 +92,90 @@ public class Billionaire {
 
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
+        dataOutputStream.writeInt(getByteSize()); // Chama função que retorna tamanho total do objeto
 
         dataOutputStream.writeInt(id);
         dataOutputStream.writeUTF(name);
-        dataOutputStream.writeDouble(netWorth);
-        dataOutputStream.writeUTF(country);
-        dataOutputStream.writeInt(source.size()); // Tamanho do array (Quantidade, não bits !Mudar para BITS!)
+        dataOutputStream.writeFloat(netWorth);
+
+        String countryTmp = country;
+        
+        while (countryTmp.length() < 20) {
+            countryTmp += " ";
+        }
+
+        dataOutputStream.writeUTF(countryTmp.substring(0, 20));
+        dataOutputStream.writeInt(source.size()); // Tamanho do array (Quantidade, não bits)
         for (int i = 0; i < source.size(); i++) {
             dataOutputStream.writeUTF(source.get(i)); // adiciona cada elemento do array
         }
         dataOutputStream.writeInt(rank);
-        dataOutputStream.writeDouble(age);
+        dataOutputStream.writeInt(age);
         dataOutputStream.writeUTF(residence);
         dataOutputStream.writeUTF(citizenship);
         dataOutputStream.writeUTF(status);
-        dataOutputStream.writeDouble(children);
+        dataOutputStream.writeInt(children);
         dataOutputStream.writeUTF(education);
         dataOutputStream.writeBoolean(selfMade);
         dataOutputStream.writeLong(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
 
-        // LocalDate timestampToLocalDate =
-        // Instant.ofEpochSecond(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()).atZone(ZoneId.systemDefault()).toLocalDate();
-
         return byteArrayOutputStream.toByteArray();
+    }
+
+    public int getByteSize() {
+
+        int size = 0;
+
+        size += Integer.BYTES; // Id (INT)
+
+        size += getUTFSize(name); // Name (UTF8)
+
+        size += Float.BYTES; // NetWorth (FLOAT)
+
+        size += getUTFSize(country); // Country (UTF8)
+
+        size += Integer.BYTES; // Source (Array [UTF8])
+
+        size += Integer.BYTES; // Rank (INT)
+
+        size += Integer.BYTES; // Age (INT)
+
+        size += getUTFSize(residence); // Residence (UTF8)
+
+        size += getUTFSize(citizenship); // Citizenship (UTF8)
+
+        size += getUTFSize(status); // Status (UTF8)
+
+        size += Integer.BYTES; // Children (INT)
+
+        size += getUTFSize(education); // Education (UTF8)
+
+        size += Byte.BYTES; // SelfMade (BOOLEAN)
+
+        size += Long.BYTES; // Birthdate (UNIX TIMESTAMP / LONG)
+
+
+        System.out.println(size);
+
+        return size;
+    }
+
+    public int getUTFArraySize(ArrayList<String> array) {
+
+        int utfArraySize = Integer.BYTES;
+
+        for (String i : array) {
+            utfArraySize += getUTFSize(i);
+        }
+
+        return utfArraySize;
+    }
+
+    public int getUTFSize(String text) {
+
+        int utfSize = text.length();
+
+        return utfSize + 2;
     }
 
     public void fromByteArray(byte[] bt) throws IOException {
@@ -128,7 +189,7 @@ public class Billionaire {
         id = dataInputStream.readInt();
         name = dataInputStream.readUTF();
 
-        netWorth = dataInputStream.readDouble();
+        netWorth = dataInputStream.readFloat();
         country = dataInputStream.readUTF();
         int arraySize = dataInputStream.readInt();
         source.clear();
@@ -136,11 +197,11 @@ public class Billionaire {
             source.add(dataInputStream.readUTF());
         }
         rank = dataInputStream.readInt();
-        age = dataInputStream.readDouble();
+        age = dataInputStream.readInt();
         residence = dataInputStream.readUTF();
         citizenship = dataInputStream.readUTF();
         status = dataInputStream.readUTF();
-        children = dataInputStream.readDouble();
+        children = dataInputStream.readInt();
         education = dataInputStream.readUTF();
         selfMade = dataInputStream.readBoolean();
         birthdate = Instant.ofEpochSecond(dataInputStream.readLong()).atZone(ZoneId.systemDefault()).toLocalDate();
