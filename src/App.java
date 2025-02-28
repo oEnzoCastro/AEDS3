@@ -1,7 +1,9 @@
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import services.ReadCSV;
+import services.CSVtoDB;
 
 public class App {
 
@@ -9,13 +11,13 @@ public class App {
 
         /* --- Read CSV --- */
 
-        String file= "src/database/billlionaines.db";
+        String file = "src/database/billlionaines.db";
 
         FileOutputStream fileOutputStream = new FileOutputStream(file); // Arquivo de banco de dados a inserir
-        
+
         // dataOutputStream.writeInt(0);
-        
-        int lastId = ReadCSV.createAll(fileOutputStream); // Read CSV -> Write BD
+
+        int lastId = CSVtoDB.createAll(fileOutputStream); // Read CSV -> Write BD
 
         System.out.println("Last ID: " + lastId);
 
@@ -23,7 +25,15 @@ public class App {
 
         /* --- Read BD --- */
 
-        ReadCSV.get();
+        try {
+
+            FileInputStream fileInputStream = new FileInputStream(file);
+
+            CSVtoDB.get(fileInputStream);
+
+        } catch (Exception e) {
+            System.err.println("Erro na Main: " + e);
+        }
 
     }
 }

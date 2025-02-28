@@ -99,7 +99,7 @@ public class Billionaire {
         dataOutputStream.writeFloat(netWorth);
 
         String countryTmp = country;
-        
+
         while (countryTmp.length() < 20) {
             countryTmp += " ";
         }
@@ -154,9 +154,6 @@ public class Billionaire {
 
         size += Long.BYTES; // Birthdate (UNIX TIMESTAMP / LONG)
 
-
-        System.out.println(size);
-
         return size;
     }
 
@@ -184,7 +181,14 @@ public class Billionaire {
 
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
-        dataInputStream.readInt(); // Lapide
+        System.out.println(dataInputStream.readInt());
+        System.out.println(dataInputStream.readUTF());
+        System.out.println(dataInputStream.readFloat());
+        System.out.println(dataInputStream.readUTF());
+        for (int i = 0; i < dataInputStream.readInt(); i++) {
+            System.out.println(dataInputStream.readUTF());
+        }
+        System.out.println(dataInputStream.readInt());
 
         id = dataInputStream.readInt();
         name = dataInputStream.readUTF();

@@ -1,12 +1,14 @@
 package services;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 
 import DAO.DAO;
 
-public class ReadCSV {
+public class CSVtoDB {
     public static int createAll(FileOutputStream fileOutputStream) {
 
         String file = "src/database/forbes_billionaires.csv";
@@ -25,12 +27,10 @@ public class ReadCSV {
             while ((line = reader.readLine()) != null) {
 
                 String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-                
+
                 DAO.create(row, fileOutputStream);
 
                 id = Integer.parseInt(row[0]);
-                
-                break;
 
             }
 
@@ -43,7 +43,9 @@ public class ReadCSV {
         return id;
     }
 
-    public static void get() {
+    public static void get(FileInputStream fileInputStream) {
+
+        DAO.read(fileInputStream);
 
     }
 
