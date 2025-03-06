@@ -181,7 +181,29 @@ public class Billionaire {
 
     public int getUTFSize(String text) {
 
-        int utfSize = text.length();
+        int textSize = text.length();
+
+        int utfSize = 0;
+
+        // Le Caracter por caracter para ler latin char e/ou caracteres diferentes
+        for (int i = 0; i < textSize; i++) {
+            // Latin
+            if (text.charAt(i) >= 123 && text.charAt(i) <= 255) {
+
+                utfSize = utfSize + 2;
+
+                // Outros
+            } else if (text.charAt(i) >= 255) {
+
+                utfSize = utfSize + 3;
+
+                // Char normal
+            } else {
+
+                utfSize++;
+
+            }
+        }
 
         return utfSize + 2;
     }
@@ -205,6 +227,7 @@ public class Billionaire {
         // Tamanho Source - Int
         int tamanhoSource = dataInputStream.readInt();
         // Source Element - 2 Bytes Size + String !!!
+        source.clear();
         for (int i = 0; i < tamanhoSource; i++) {
             source.add(dataInputStream.readUTF());
         }
@@ -223,6 +246,7 @@ public class Billionaire {
         // Tamanho Education - Int
         int tamanhoEducation = dataInputStream.readInt();
         // Education - 2 Bytes Size + String !!!
+        education.clear();
         for (int i = 0; i < tamanhoEducation; i++) {
             education.add(dataInputStream.readUTF());
         }
@@ -230,6 +254,53 @@ public class Billionaire {
         selfMade = dataInputStream.readBoolean();
         // Birthdate - Long (8 Bytes)
         birthdate = Instant.ofEpochSecond(dataInputStream.readLong()).atZone(ZoneId.systemDefault()).toLocalDate();
+
+    }
+
+    public void jumpElement(byte[] bt) throws IOException {
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bt);
+
+        DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
+
+        // Lapide - Char
+        // Tamanho Objeto - Int
+        // Id - Int
+        dataInputStream.readInt();
+        // Name - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // NetWorth - Float (43 31 00 00 = 177)
+        dataInputStream.readFloat();
+        // Country - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // Tamanho Source - Int
+        int tamanhoSource = dataInputStream.readInt();
+        // Source Element - 2 Bytes Size + String !!!
+        for (int i = 0; i < tamanhoSource; i++) {
+            dataInputStream.readUTF();
+        }
+        // Rank - Int
+        dataInputStream.readInt();
+        // Age - Int
+        dataInputStream.readInt();
+        // Residence - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // Citizenship - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // Status - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // Children - Int
+        dataInputStream.readInt();
+        // Tamanho Education - Int
+        int tamanhoEducation = dataInputStream.readInt();
+        // Education - 2 Bytes Size + String !!!
+        for (int i = 0; i < tamanhoEducation; i++) {
+            dataInputStream.readUTF();
+        }
+        // Self Made - Boolean (1 Byte)
+        dataInputStream.readBoolean();
+        // Birthdate - Long (8 Bytes)
+        dataInputStream.readLong();
 
     }
 

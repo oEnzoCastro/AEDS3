@@ -20,8 +20,6 @@ public class DAO {
             float netWorth = Float.parseFloat(row[2]); // String -> Double
             String country = row[3];
             row[4] = row[4].replace("\"", ""); // Remove "" do array
-            row[4] = row[4].replace(" ", ""); // Remove espaços em branco para evitar [0]=Tesla, [1]= SpaceX (Com espaço
-                                              // antes)
             String[] sourceArray = row[4].split(","); // Splita o Array
             ArrayList<String> source = new ArrayList<String>();
             for (String i : sourceArray) {
@@ -74,19 +72,19 @@ public class DAO {
 
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 
-            lapide = dataInputStream.readChar(); // Ler Lapide
-            len = dataInputStream.readInt(); // Ler Tamanho Obj
-            bt = new byte[len];
-            dataInputStream.read(bt);
-            billionaireTmp.fromByteArray(bt);
-            System.out.println(billionaireTmp);
+            for (int i = 0; i < 2755; i++) {
+                lapide = dataInputStream.readChar(); // Ler Lapide
+                if (lapide == '*') {
 
-            lapide = dataInputStream.readChar(); // Ler Lapide
-            len = dataInputStream.readInt(); // Ler Tamanho Obj
-            bt = new byte[len];
-            dataInputStream.read(bt);
-            billionaireTmp.fromByteArray(bt);
-            System.out.println(billionaireTmp);
+                } else {
+
+                }
+                len = dataInputStream.readInt(); // Ler Tamanho Obj
+                bt = new byte[len];
+                dataInputStream.read(bt);
+                billionaireTmp.fromByteArray(bt);
+                System.out.println(billionaireTmp);
+            }
 
         } catch (Exception e) {
             System.err.println("Erro Read: " + e);
