@@ -25,15 +25,15 @@ public class App {
 
         /* --- Read BD --- */
 
-        try {
+        // try {
 
-            FileInputStream fileInputStream = new FileInputStream(file);
+        // FileInputStream fileInputStream = new FileInputStream(file);
 
-            CSVtoDB.get(fileInputStream);
+        // CSVtoDB.get(fileInputStream);
 
-        } catch (Exception e) {
-            System.err.println("Erro na Main: " + e);
-        }
+        // } catch (Exception e) {
+        // System.err.println("Erro na Main: " + e);
+        // }
 
     }
 }

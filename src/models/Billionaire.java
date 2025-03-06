@@ -23,7 +23,7 @@ public class Billionaire {
     private String citizenship;
     private String status;
     private int children;
-    private String education;
+    private ArrayList<String> education;
     private Boolean selfMade;
     private LocalDate birthdate;
 
@@ -40,17 +40,16 @@ public class Billionaire {
                 "\nCitizenship: " + citizenship +
                 "\nStatus: " + status +
                 "\nChildren: " + children +
-                "\nEducation: " + education +
+                "\nEducation: " + education.toString() +
                 "\nSelfmade: " + selfMade +
                 "\nBirthdate: " + birthdate
 
         ;
     }
 
-    public Billionaire(int id, String name, float netWorth, String country, ArrayList<String> source, int rank,
-            int age,
-            String residence, String citizenship, String status, int children, String education, Boolean selfMade,
-            LocalDate birthdate) {
+    public Billionaire(int id, String name, float netWorth, String country, ArrayList<String> source, int rank, int age,
+            String residence, String citizenship, String status, int children, ArrayList<String> education,
+            Boolean selfMade, LocalDate birthdate) {
 
         this.id = id;
         this.name = name;
@@ -81,7 +80,7 @@ public class Billionaire {
         this.citizenship = "";
         this.status = "";
         this.children = 0;
-        this.education = "";
+        this.education = new ArrayList<String>();
         this.selfMade = false;
         this.birthdate = null;
     }
@@ -92,67 +91,12 @@ public class Billionaire {
 
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
-        dataOutputStream.writeInt(getByteSize()); // Chama função que retorna tamanho total do objeto
-
-        dataOutputStream.writeInt(id);
-        dataOutputStream.writeUTF(name);
-        dataOutputStream.writeFloat(netWorth);
-
-        String countryTmp = country;
-
-        while (countryTmp.length() < 20) {
-            countryTmp += " ";
-        }
-
-        dataOutputStream.writeUTF(countryTmp.substring(0, 20));
-        dataOutputStream.writeInt(source.size()); // Tamanho do array (Quantidade, não bits)
-        for (int i = 0; i < source.size(); i++) {
-            dataOutputStream.writeUTF(source.get(i)); // adiciona cada elemento do array
-        }
-        dataOutputStream.writeInt(rank);
-        dataOutputStream.writeInt(age);
-        dataOutputStream.writeUTF(residence);
-        dataOutputStream.writeUTF(citizenship);
-        dataOutputStream.writeUTF(status);
-        dataOutputStream.writeInt(children);
-        dataOutputStream.writeUTF(education);
-        dataOutputStream.writeBoolean(selfMade);
-        dataOutputStream.writeLong(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
-
         return byteArrayOutputStream.toByteArray();
     }
 
     public int getByteSize() {
 
         int size = 0;
-
-        size += Integer.BYTES; // Id (INT)
-
-        size += getUTFSize(name); // Name (UTF8)
-
-        size += Float.BYTES; // NetWorth (FLOAT)
-
-        size += getUTFSize(country); // Country (UTF8)
-
-        size += Integer.BYTES; // Source (Array [UTF8])
-
-        size += Integer.BYTES; // Rank (INT)
-
-        size += Integer.BYTES; // Age (INT)
-
-        size += getUTFSize(residence); // Residence (UTF8)
-
-        size += getUTFSize(citizenship); // Citizenship (UTF8)
-
-        size += getUTFSize(status); // Status (UTF8)
-
-        size += Integer.BYTES; // Children (INT)
-
-        size += getUTFSize(education); // Education (UTF8)
-
-        size += Byte.BYTES; // SelfMade (BOOLEAN)
-
-        size += Long.BYTES; // Birthdate (UNIX TIMESTAMP / LONG)
 
         return size;
     }
@@ -206,7 +150,7 @@ public class Billionaire {
         citizenship = dataInputStream.readUTF();
         status = dataInputStream.readUTF();
         children = dataInputStream.readInt();
-        education = dataInputStream.readUTF();
+        // education = dataInputStream.readUTF();
         selfMade = dataInputStream.readBoolean();
         birthdate = Instant.ofEpochSecond(dataInputStream.readLong()).atZone(ZoneId.systemDefault()).toLocalDate();
 

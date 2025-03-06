@@ -33,7 +33,16 @@ public class DAO {
             String citizenship = row[8];
             String status = row[9];
             int children = Integer.parseInt(row[10]); // String(Float) -> Double !!!
-            String education = row[11];
+
+            row[11] = row[11].replace("\"", ""); // Remove "" do array
+            row[11] = row[11].replace(" ", ""); // Remove espaços em branco para evitar [0]=Tesla, [1]= SpaceX (Com
+                                                // espaço
+                                                // antes)
+            String[] educationArray = row[11].split(","); // Splita o Array
+            ArrayList<String> education = new ArrayList<String>();
+            for (String i : educationArray) {
+                education.add(i);
+            }
             Boolean self_made = Boolean.parseBoolean(row[12]); // String -> Boolean
             LocalDate birthdate = LocalDate.parse(row[13]); // String -> LocalDate !!!
 
@@ -48,7 +57,7 @@ public class DAO {
             DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
 
             bt = billionaire.toByteArray();
-            dataOutputStream.writeChar('|');
+            // dataOutputStream.writeChar('|'); Lapide
             dataOutputStream.write(bt); // Insere objeto
 
         } catch (Exception e) {
