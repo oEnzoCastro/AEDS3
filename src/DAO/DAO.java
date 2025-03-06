@@ -35,9 +35,6 @@ public class DAO {
             int children = Integer.parseInt(row[10]); // String(Float) -> Double !!!
 
             row[11] = row[11].replace("\"", ""); // Remove "" do array
-            row[11] = row[11].replace(" ", ""); // Remove espaços em branco para evitar [0]=Tesla, [1]= SpaceX (Com
-                                                // espaço
-                                                // antes)
             String[] educationArray = row[11].split(","); // Splita o Array
             ArrayList<String> education = new ArrayList<String>();
             for (String i : educationArray) {
@@ -57,7 +54,6 @@ public class DAO {
             DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
 
             bt = billionaire.toByteArray();
-            // dataOutputStream.writeChar('|'); Lapide
             dataOutputStream.write(bt); // Insere objeto
 
         } catch (Exception e) {
@@ -79,15 +75,17 @@ public class DAO {
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 
             lapide = dataInputStream.readChar(); // Ler Lapide
-
             len = dataInputStream.readInt(); // Ler Tamanho Obj
-
             bt = new byte[len];
-
             dataInputStream.read(bt);
-
             billionaireTmp.fromByteArray(bt);
+            System.out.println(billionaireTmp);
 
+            lapide = dataInputStream.readChar(); // Ler Lapide
+            len = dataInputStream.readInt(); // Ler Tamanho Obj
+            bt = new byte[len];
+            dataInputStream.read(bt);
+            billionaireTmp.fromByteArray(bt);
             System.out.println(billionaireTmp);
 
         } catch (Exception e) {
