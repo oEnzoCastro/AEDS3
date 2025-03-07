@@ -76,7 +76,7 @@ public class DAO {
         dataInputStream.read(bt);
 
         // Confere se o objeto está inativo, se sim, retornar null
-        if (lapide != '*') {
+        if (lapide == '*') {
             return null;
         }
 

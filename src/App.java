@@ -9,7 +9,7 @@ public class App {
 
         boolean isRunning = true;
         Scanner scan = new Scanner(System.in);
-        String file = "src/database/billlionaines.db";
+        String file = "src/database/billionaires.db";
 
         // MENU
         while (isRunning == true) {
@@ -31,7 +31,7 @@ public class App {
             switch (option) {
                 case 1:
                     // Create from CSV
-                    CRUD.createAll(file);
+                    CRUD.createAll();
                     break;
 
                 case 2:

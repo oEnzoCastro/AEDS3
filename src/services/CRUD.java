@@ -10,16 +10,12 @@ import DAO.DAO;
 import models.Billionaire;
 
 public class CRUD {
-    public static int createAll(String file) {
-
-        
-        /* --- Read CSV --- */
-
-
-        
-        // dataOutputStream.writeInt(0);
+    public static int createAll() {
         
         String line = "";
+
+        String file = "src/database/billionaires.db";
+        String fileCSV = "src/database/forbes_billionaires.csv";
         
         int id = -1;
         
@@ -29,7 +25,7 @@ public class CRUD {
 
             FileOutputStream fileOutputStream = new FileOutputStream(file); // Arquivo de banco de dados a inserir
 
-            reader = new BufferedReader(new FileReader(file));
+            reader = new BufferedReader(new FileReader(fileCSV));
 
             reader.readLine(); // Ler primeira linha
 
@@ -44,7 +40,7 @@ public class CRUD {
             }
 
             reader.close();
-            fileOutputStream.close(); // Salva BD apenas no fim do programa para não reescrever
+            fileOutputStream.close();
 
         } catch (Exception e) {
             System.err.println("Erro ReadCSV.createAll: " + e);

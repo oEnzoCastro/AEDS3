@@ -95,7 +95,7 @@ public class Billionaire {
 
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
-        dataOutputStream.writeChar('*');
+        dataOutputStream.writeChar(' ');
         // Print Size Object
         dataOutputStream.writeInt(getByteSize());
         // int id;
