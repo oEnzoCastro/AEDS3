@@ -1,13 +1,15 @@
 package services;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 
 import DAO.DAO;
+import models.Billionaire;
 
-public class CSVtoDB {
+public class CRUD {
     public static int createAll(FileOutputStream fileOutputStream) {
 
         String file = "src/database/forbes_billionaires.csv";
@@ -44,7 +46,33 @@ public class CSVtoDB {
 
     public static void get(FileInputStream fileInputStream, int id) {
 
-        DAO.read(fileInputStream, id);
+        boolean found = false;
+
+        try {
+
+            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+
+            Billionaire billionaireTmp;
+
+            while (dataInputStream.available() > 0) {
+
+                billionaireTmp = DAO.read(fileInputStream, dataInputStream);
+
+                // Verifica se é o ID procurado
+                if (billionaireTmp.getId() == id) {
+                    System.out.println(billionaireTmp);
+                    found = true;
+                }
+
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro Read: " + e);
+        }
+        if(!found){
+            System.out.println("Objeto não encontrado");
+        }
+
 
     }
 

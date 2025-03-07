@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -60,44 +61,28 @@ public class DAO {
 
     }
 
-    public static void read(FileInputStream fileInputStream, int searchId) {
+    public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream) throws IOException {
+
+        Billionaire billionaireTmp = new Billionaire();
 
         byte[] bt;
         int len;
         char lapide;
 
-        Billionaire billionaireTmp = new Billionaire();
-        boolean found = false;
+        lapide = dataInputStream.readChar(); // Ler Lapide
+        len = dataInputStream.readInt(); // Ler Tamanho Obj
 
-        try {
+        bt = new byte[len];
+        dataInputStream.read(bt);
 
-            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
-
-            while (dataInputStream.available() > 0) {
-                lapide = dataInputStream.readChar(); // Ler Lapide
-                len = dataInputStream.readInt(); // Ler Tamanho Obj
-
-                bt = new byte[len];
-                dataInputStream.read(bt);
-
-                if (lapide != '*') {
-                    continue;
-                }
-
-                billionaireTmp.fromByteArray(bt);
-                if (billionaireTmp.getId() == searchId) { // Verifica se é o ID procurado
-                    System.out.println(billionaireTmp);
-                    found = true;
-                    break;
-                }
-            }
-
-        } catch (Exception e) {
-            System.err.println("Erro Read: " + e);
+        // Confere se o objeto está inativo, se sim, retornar null
+        if (lapide != '*') {
+            return null;
         }
-        if(!found){
-            System.out.println("Objeto não encontrado");
-        }
+
+        billionaireTmp.fromByteArray(bt);
+
+        return billionaireTmp;
     }
 
 }
