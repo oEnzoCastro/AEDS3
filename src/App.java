@@ -28,9 +28,11 @@ public class App {
 
             option = scan.nextInt();
 
+            int id = -1;
             switch (option) {
                 case 1:
                     // Create from CSV
+                    clearScreen(); // Clear terminal
                     CRUD.createAll();
                     break;
 
@@ -41,28 +43,43 @@ public class App {
                 case 3:
                     // Read
                     System.out.print("ID: ");
-                    int id = scan.nextInt();
+                    id = scan.nextInt();
                     System.out.println();
 
+                    clearScreen(); // Clear terminal
                     CRUD.get(id, file);
                     break;
 
                 case 4:
                     // Update
+                    System.out.print("ID: ");
+                    id = scan.nextInt();
+                    System.out.println();
+
+                    clearScreen(); // Clear terminal
+                    // CRUD.update(id, file); -TODO
                     break;
 
                 case 5:
                     // Delete
+                    System.out.print("ID: ");
+                    id = scan.nextInt();
+                    System.out.println();
+
+                    clearScreen(); // Clear terminal
+                    CRUD.delete(id, file);
                     break;
 
                 case 6:
                     // Exit
+                    clearScreen(); // Clear terminal
                     System.out.println("Programa Encerrado!");
                     isRunning = false;
                     break;
 
                 default:
                     // Opção Inválida
+                    clearScreen(); // Clear terminal
                     System.err.println("Opção Inválida");
                     break;
             }
@@ -71,6 +88,11 @@ public class App {
 
         scan.close();
 
+    }
+
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");  
+        System.out.flush(); 
     }
 
 }

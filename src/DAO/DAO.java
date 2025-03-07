@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -57,7 +58,8 @@ public class DAO {
 
     }
 
-    public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream) throws IOException {
+    public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream)
+            throws IOException {
 
         Billionaire billionaireTmp = new Billionaire();
 
@@ -71,14 +73,55 @@ public class DAO {
         bt = new byte[len];
         dataInputStream.read(bt);
 
+        billionaireTmp.fromByteArray(bt);
+
         // Confere se o objeto está inativo, se sim, retornar null
         if (lapide == '*') {
             return null;
         }
 
-        billionaireTmp.fromByteArray(bt);
-
         return billionaireTmp;
+    }
+
+    public static boolean delete(int id, String file) {
+        try {
+
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
+            randomAccessFile.seek(Integer.BYTES);
+
+            while (randomAccessFile.getFilePointer() < randomAccessFile.length()) {
+
+                char lapide = randomAccessFile.readChar(); // Lapide
+                int size = randomAccessFile.readInt(); // Object Size
+
+                // Id (User Input) == Id (Database)
+                if (id == randomAccessFile.readInt()) {
+                    // Caso o objeto já tenha sido removido
+                    if (lapide == '*') {
+                        System.err.println("Objeto já foi removido!");
+                        randomAccessFile.close();
+                        return false;
+                    }
+
+                    // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
+                    randomAccessFile.seek(randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
+                    randomAccessFile.writeChar('*');
+
+                    randomAccessFile.close();
+                    return true;
+                }
+
+                randomAccessFile.skipBytes(size - Integer.BYTES);
+
+            }
+
+            randomAccessFile.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false; // Algum erro aconteceu
     }
 
 }

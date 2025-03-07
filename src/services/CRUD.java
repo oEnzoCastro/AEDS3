@@ -46,6 +46,7 @@ public class CRUD {
 
             }
 
+
             // RandomAccessFile aponta para 1° posição e escreve o último ID inserido
             randomAccessFile.seek(0);
             randomAccessFile.writeInt(id);
@@ -54,6 +55,8 @@ public class CRUD {
             randomAccessFile.close();
             reader.close();
             fileOutputStream.close();
+
+            System.out.println("CSV convertido para Database!");
 
         } catch (Exception e) {
             System.err.println("Erro ReadCSV.createAll: " + e);
@@ -81,24 +84,33 @@ public class CRUD {
 
                 billionaireTmp = DAO.read(fileInputStream, dataInputStream);
 
-                // Verifica se é o ID procurado
-                if (billionaireTmp.getId() == id) {
+                // Verifica se é o ID procurado (Só possivel conferir o ID se o Objeto estiver ativo)
+                if (billionaireTmp != null && billionaireTmp.getId() == id) {
                     System.out.println(billionaireTmp);
                     found = true;
                 }
 
             }
 
+            if (!found) {
+                System.out.println("Bilionário não encontrado");
+            }
+
         } catch (Exception e) {
             System.err.println("Erro Read: " + e);
-        }
-        if (!found) {
-            System.out.println("Objeto não encontrado");
         }
 
     }
 
-    public static void delete(int id) {
+    public static void delete(int id, String file) {
+
+        boolean isDeleted = DAO.delete(id, file);
+
+        if (isDeleted == true) {
+            System.out.println("Bilionário Deletado!");
+        } else {
+            System.out.println("Bilionário não deletado!");
+        }
 
     }
 
