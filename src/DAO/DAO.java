@@ -48,12 +48,8 @@ public class DAO {
 
             // Write
 
-            byte[] bt;
-
             DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
-
-            bt = billionaire.toByteArray();
-            dataOutputStream.write(bt); // Insere objeto
+            dataOutputStream.write(billionaire.toByteArray()); // Insere objeto
 
         } catch (Exception e) {
             System.err.println("Error -> DAO.create: " + e);
