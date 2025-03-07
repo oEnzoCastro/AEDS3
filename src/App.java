@@ -1,6 +1,5 @@
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Scanner;
 
 import services.CRUD;
 
@@ -9,6 +8,8 @@ public class App {
     public static void main(String[] args) throws IOException {
 
         boolean isRunning = true;
+        Scanner scan = new Scanner(System.in);
+        String file = "src/database/billlionaines.db";
 
         // MENU
         while (isRunning == true) {
@@ -21,39 +22,54 @@ public class App {
             System.out.println("4. Update");
             System.out.println("5. Delete");
             System.out.println("6. Exit");
+            System.out.println("----------------------------------");
 
             int option = -1;
 
+            option = scan.nextInt();
 
+            switch (option) {
+                case 1:
+                    // Create from CSV
+                    CRUD.createAll(file);
+                    break;
+
+                case 2:
+                    // Create
+                    break;
+
+                case 3:
+                    // Read
+                    System.out.print("ID: ");
+                    int id = scan.nextInt();
+                    System.out.println();
+
+                    CRUD.get(id, file);
+                    break;
+
+                case 4:
+                    // Update
+                    break;
+
+                case 5:
+                    // Delete
+                    break;
+
+                case 6:
+                    // Exit
+                    System.out.println("Programa Encerrado!");
+                    isRunning = false;
+                    break;
+
+                default:
+                    // Opção Inválida
+                    System.err.println("Opção Inválida");
+                    break;
+            }
 
         }
 
-        /* --- Read CSV --- */
-
-        String file = "src/database/billlionaines.db";
-
-        FileOutputStream fileOutputStream = new FileOutputStream(file); // Arquivo de banco de dados a inserir
-
-        // dataOutputStream.writeInt(0);
-
-        int lastId = CRUD.createAll(fileOutputStream); // Read CSV -> Write BD
-
-        System.out.println("Last ID: " + lastId);
-
-        fileOutputStream.close(); // Salva BD apenas no fim do programa para não reescrever
-
-        /* --- Read BD --- */
-
-        try {
-            int id = 2755;
-
-            FileInputStream fileInputStream = new FileInputStream(file);
-
-            CRUD.get(fileInputStream, id);
-
-        } catch (Exception e) {
-            System.err.println("Erro na Main: " + e);
-        }
+        scan.close();
 
     }
 

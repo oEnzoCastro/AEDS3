@@ -10,16 +10,24 @@ import DAO.DAO;
 import models.Billionaire;
 
 public class CRUD {
-    public static int createAll(FileOutputStream fileOutputStream) {
+    public static int createAll(String file) {
 
-        String file = "src/database/forbes_billionaires.csv";
+        
+        /* --- Read CSV --- */
+
+
+        
+        // dataOutputStream.writeInt(0);
+        
         String line = "";
-
+        
         int id = -1;
-
+        
         BufferedReader reader = null;
-
+        
         try {
+
+            FileOutputStream fileOutputStream = new FileOutputStream(file); // Arquivo de banco de dados a inserir
 
             reader = new BufferedReader(new FileReader(file));
 
@@ -36,6 +44,7 @@ public class CRUD {
             }
 
             reader.close();
+            fileOutputStream.close(); // Salva BD apenas no fim do programa para não reescrever
 
         } catch (Exception e) {
             System.err.println("Erro ReadCSV.createAll: " + e);
@@ -44,11 +53,13 @@ public class CRUD {
         return id;
     }
 
-    public static void get(FileInputStream fileInputStream, int id) {
+    public static void get(int id, String file) {
 
         boolean found = false;
 
         try {
+
+            FileInputStream fileInputStream = new FileInputStream(file);
 
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 
@@ -69,10 +80,9 @@ public class CRUD {
         } catch (Exception e) {
             System.err.println("Erro Read: " + e);
         }
-        if(!found){
+        if (!found) {
             System.out.println("Objeto não encontrado");
         }
-
 
     }
 
