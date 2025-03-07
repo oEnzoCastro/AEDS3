@@ -27,6 +27,10 @@ public class Billionaire {
     private Boolean selfMade;
     private LocalDate birthdate;
 
+    public int getId(){
+        return id;
+    }
+
     public String toString() {
         DecimalFormat df = new DecimalFormat("#,##0.00");
         return "\nId:" + id +

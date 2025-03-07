@@ -60,36 +60,44 @@ public class DAO {
 
     }
 
-    public static void read(FileInputStream fileInputStream) {
+    public static void read(FileInputStream fileInputStream, int searchId) {
 
         byte[] bt;
         int len;
         char lapide;
 
         Billionaire billionaireTmp = new Billionaire();
+        boolean found = false;
 
         try {
 
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 
-            for (int i = 0; i < 2755; i++) {
+            while (dataInputStream.available() > 0) {
                 lapide = dataInputStream.readChar(); // Ler Lapide
-                if (lapide == '*') {
-
-                } else {
-
-                }
                 len = dataInputStream.readInt(); // Ler Tamanho Obj
+
                 bt = new byte[len];
                 dataInputStream.read(bt);
+
+                if (lapide != '*') {
+                    continue;
+                }
+
                 billionaireTmp.fromByteArray(bt);
-                System.out.println(billionaireTmp);
+                if (billionaireTmp.getId() == searchId) { // Verifica se é o ID procurado
+                    System.out.println(billionaireTmp);
+                    found = true;
+                    break;
+                }
             }
 
         } catch (Exception e) {
             System.err.println("Erro Read: " + e);
         }
-
+        if(!found){
+            System.out.println("Objeto não encontrado");
+        }
     }
 
 }

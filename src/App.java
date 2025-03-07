@@ -26,10 +26,11 @@ public class App {
         /* --- Read BD --- */
 
         try {
+            int id = 2000;
 
             FileInputStream fileInputStream = new FileInputStream(file);
 
-            CSVtoDB.get(fileInputStream);
+            CSVtoDB.get(fileInputStream, id);
 
         } catch (Exception e) {
             System.err.println("Erro na Main: " + e);

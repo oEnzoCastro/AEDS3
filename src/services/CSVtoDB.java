@@ -42,9 +42,9 @@ public class CSVtoDB {
         return id;
     }
 
-    public static void get(FileInputStream fileInputStream) {
+    public static void get(FileInputStream fileInputStream, int id) {
 
-        DAO.read(fileInputStream);
+        DAO.read(fileInputStream, id);
 
     }
 
