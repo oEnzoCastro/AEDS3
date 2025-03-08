@@ -19,6 +19,7 @@ public class CRUD {
 
         String file = "src/database/billionaires.db";
         String fileCSV = "src/database/forbes_billionaires.csv";
+        // String fileCSV = "src/database/BillionairesCSV.csv"; (Database com 10.000 linhas inseridas pelo ChatGPT)
 
         int id = -1;
 
@@ -107,7 +108,7 @@ public class CRUD {
 
         Scanner scan = new Scanner(System.in);
 
-        
+        scan.close();
 
     }
 
