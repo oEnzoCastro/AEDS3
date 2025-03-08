@@ -57,7 +57,7 @@ public class App {
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    // CRUD.update(id, file); -TODO
+                    CRUD.update(id, file);
                     break;
 
                 case 5:

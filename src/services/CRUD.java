@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
+import java.util.Scanner;
 
 import DAO.DAO;
 import models.Billionaire;
@@ -99,6 +100,14 @@ public class CRUD {
         } catch (Exception e) {
             System.err.println("Erro Read: " + e);
         }
+
+    }
+
+    public static void update(int id, String file) {
+
+        Scanner scan = new Scanner(System.in);
+
+        
 
     }
 
