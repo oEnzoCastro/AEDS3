@@ -95,6 +95,7 @@ public class Billionaire {
 
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
+        // Lapide
         dataOutputStream.writeChar(' ');
         // Print Size Object
         dataOutputStream.writeInt(getByteSize());

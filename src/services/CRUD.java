@@ -6,8 +6,8 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Scanner;
 
 import DAO.DAO;
 import models.Billionaire;
@@ -67,7 +67,7 @@ public class CRUD {
         return id;
     }
 
-    public static void get(int id, String file) {
+    public static Billionaire get(int id, String file) {
 
         boolean found = false;
 
@@ -88,27 +88,59 @@ public class CRUD {
 
                 // Verifica se é o ID procurado (Só possivel conferir o ID se o Objeto estiver ativo)
                 if (billionaireTmp != null && billionaireTmp.getId() == id) {
-                    System.out.println(billionaireTmp);
                     found = true;
+                    return billionaireTmp;
                 }
 
             }
 
             if (!found) {
                 System.out.println("Bilionário não encontrado");
+                return null;
             }
-
+            
         } catch (Exception e) {
             System.err.println("Erro Read: " + e);
         }
-
+        return null;
     }
 
     public static void update(int id, String file) {
 
-        Scanner scan = new Scanner(System.in);
+        Billionaire billionaire = get(id, file);
 
-        scan.close();
+        if (billionaire == null) {
+            System.out.println("Bilinário Indisponível!");
+        } else {
+            Billionaire newBillionaire = BillionaireService.updateBillionaire(billionaire);
+
+            try {
+
+                RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
+                if (newBillionaire.getByteSize() < billionaire.getByteSize()) {
+                    
+                    DAO.delete(id, file); // Insere Lapide no billionaire
+
+                    randomAccessFile.seek(randomAccessFile.length()); // Move ponteiro para fim do arquivo
+                    
+                    // Inserir newBillionaire
+
+                    byte[] bt = newBillionaire.toByteArray();
+                    randomAccessFile.write(bt);
+
+
+                } else {
+                    // Add newBillionaire no lugar do billionaire
+                }
+
+                randomAccessFile.close();
+
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+
+        }
 
     }
 

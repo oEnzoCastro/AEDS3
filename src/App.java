@@ -47,7 +47,7 @@ public class App {
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    CRUD.get(id, file);
+                    System.out.println(CRUD.get(id, file));
                     break;
 
                 case 4:

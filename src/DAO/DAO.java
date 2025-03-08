@@ -58,8 +58,7 @@ public class DAO {
 
     }
 
-    public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream)
-            throws IOException {
+    public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream) throws IOException {
 
         Billionaire billionaireTmp = new Billionaire();
 
@@ -83,6 +82,16 @@ public class DAO {
         return billionaireTmp;
     }
 
+    public static void update(Billionaire newBillionaire) {
+
+        try {
+            newBillionaire.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+    }
+
     public static boolean delete(int id, String file) {
         try {
 
@@ -99,17 +108,16 @@ public class DAO {
                 if (id == randomAccessFile.readInt()) {
                     // Caso o objeto já tenha sido removido
                     if (lapide == '*') {
-                        System.err.println("Objeto já foi removido!");
+
+                    } else {
+                        
+                        // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
+                        randomAccessFile.seek(randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
+                        randomAccessFile.writeChar('*');
+                        
                         randomAccessFile.close();
-                        return false;
+                        return true;
                     }
-
-                    // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
-                    randomAccessFile.seek(randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
-                    randomAccessFile.writeChar('*');
-
-                    randomAccessFile.close();
-                    return true;
                 }
 
                 randomAccessFile.skipBytes(size - Integer.BYTES);
