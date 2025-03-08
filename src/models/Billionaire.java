@@ -308,4 +308,8 @@ public class Billionaire {
 
     }
 
+    public int compareTo(Billionaire other) {
+        return Integer.compare(this.id, other.id); // Ordem crescente por ID
+    }
+    
 }
