@@ -6,9 +6,64 @@ import java.util.*;
 import models.Billionaire;
 
 public class Sorting {
+
+    private static int max_Memory = 50;
+
     public static void sort(){
+        String file = "src/database/billionaires.db";
+        String temp1 = "src/database/temp1.db";
+        String temp2 = "src/database/temp2.db";
+        String temp3 = "src/database/temp3.db";
+        String temp4 = "src/database/temp4.db";
+        
         distribuicao();
-        intercalacao();
+        int lastwrite = intercalacao();
+        try {
+            // Lê o ultimo id inserido no arquivo original e salva
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+            randomAccessFile.seek(0);
+            int ultimoId = randomAccessFile.readInt();
+            randomAccessFile.close();
+
+            new File(file).delete(); // Apaga o arquivo original desordenado
+
+            String finalFile = lastwrite == 1 ? temp1 : temp3; // Encontra o arquivo com os dados ordenados
+
+            FileInputStream finalInputStream = new FileInputStream(finalFile);
+            DataInputStream finalDataInputStream = new DataInputStream(finalInputStream);
+
+            FileOutputStream finalOutputStream = new FileOutputStream(file);
+            DataOutputStream finalDataOutputStream = new DataOutputStream(finalOutputStream);
+
+            finalDataOutputStream.writeInt(ultimoId); // Escreve o cabeçalho
+
+            // Transfere os dados do arquivo temporario para o final
+            while (finalDataInputStream.available() > 0) {
+                char lapide = finalDataInputStream.readChar();
+                int len = finalDataInputStream.readInt();
+                byte[] bt = new byte[len];
+                finalDataInputStream.read(bt);
+                Billionaire b = new Billionaire();
+                b.fromByteArray(bt);
+                byte[] tmp = b.toByteArray();
+                if (lapide != '*') {
+                    finalDataOutputStream.write(tmp);
+                }
+            }
+    
+            finalDataInputStream.close();
+            finalDataOutputStream.close();
+    
+            // Deletando arquivos temporários
+            new File(temp1).delete();
+            new File(temp2).delete();
+            new File(temp3).delete();
+            new File(temp4).delete();
+    
+            System.out.println("Ordenação concluída! Arquivo salvo em: " + file);
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar arquivo final: " + e);
+        }
     }
 
     private static void distribuicao() {
@@ -31,12 +86,10 @@ public class Sorting {
             List<Billionaire> billionaires = new ArrayList<>();
             boolean writeTemp1 = true;
 
-            int num = 50; // Número de registros lidos
-
             while (dataInputStream.available() > 0) {
                 billionaires.clear();
 
-                for (int i = 0; i < num; i++) { // Lê até 50 registros
+                for (int i = 0; i < max_Memory; i++) { // Lê até 50 registros
                     if (dataInputStream.available() <= 0) break; // Evita ler além do arquivo se ele tiver acabado
 
                     char lapide = dataInputStream.readChar(); // Ler Lapide
@@ -72,106 +125,113 @@ public class Sorting {
         }
     }
 
-    private static void intercalacao() {
+    private static int intercalacao() {
         String temp1 = "src/database/temp1.db";
         String temp2 = "src/database/temp2.db";
         String temp3 = "src/database/temp3.db";
         String temp4 = "src/database/temp4.db";
     
-        try {
-            FileInputStream fileInputStream1 = new FileInputStream(temp1);
-            DataInputStream dataInputStream1 = new DataInputStream(fileInputStream1);
-    
-            FileInputStream fileInputStream2 = new FileInputStream(temp2);
-            DataInputStream dataInputStream2 = new DataInputStream(fileInputStream2);
-    
-            FileOutputStream fileOutputStream1 = new FileOutputStream(temp3);
-            DataOutputStream dataOutputStream1 = new DataOutputStream(fileOutputStream1);
-    
-            FileOutputStream fileOutputStream2 = new FileOutputStream(temp4);
-            DataOutputStream dataOutputStream2 = new DataOutputStream(fileOutputStream2);
-    
-            boolean writeTemp3 = true; // Alterna entre temp3 e temp4
-            List<Billionaire> list1 = new ArrayList<>();
-            List<Billionaire> list2 = new ArrayList<>();
-    
-            while (dataInputStream1.available() > 0 || dataInputStream2.available() > 0) {
-                list1.clear();
-                list2.clear();
-    
-                // Lê até 50 registros do temp1
-                for (int i = 0; i < 50 && dataInputStream1.available() > 0; i++) {
-                    char lapide = dataInputStream1.readChar();
-                    int len = dataInputStream1.readInt();
-                    byte[] bt = new byte[len];
-                    dataInputStream1.read(bt);
-    
-                    if (lapide != '*') {
-                        Billionaire b = new Billionaire();
-                        b.fromByteArray(bt);
-                        list1.add(b);
-                    }
-                }
-    
-                // Lê até 50 registros do temp2
-                for (int i = 0; i < 50 && dataInputStream2.available() > 0; i++) {
-                    char lapide = dataInputStream2.readChar();
-                    int len = dataInputStream2.readInt();
-                    byte[] bt = new byte[len];
-                    dataInputStream2.read(bt);
-    
-                    if (lapide != '*') {
-                        Billionaire b = new Billionaire();
-                        b.fromByteArray(bt);
-                        list2.add(b);
-                    }
-                }
-    
-                // Lista para armazenar os 100 registros ordenados
-                List<Billionaire> mergedList = new ArrayList<>();
-                int i = 0, j = 0;
-    
-                // Intercalação dos registros de list1 e list2
-                while (i < list1.size() && j < list2.size()) {
-                    if (list1.get(i).getId() < list2.get(j).getId()) {
-                        mergedList.add(list1.get(i++));
-                    } else {
-                        mergedList.add(list2.get(j++));
-                    }
-                }
-    
-                // Adiciona os registros restantes de list1
-                while (i < list1.size()) {
-                    mergedList.add(list1.get(i++));
-                }
-    
-                // Adiciona os registros restantes de list2
-                while (j < list2.size()) {
-                    mergedList.add(list2.get(j++));
-                }
-    
-                // Escreve os 100 registros ordenados em um dos arquivos temp3 ou temp4
-                DataOutputStream outputStream = writeTemp3 ? dataOutputStream1 : dataOutputStream2;
-                for (Billionaire b : mergedList) {
-                    byte[] tmp = b.toByteArray();
-                    outputStream.writeChar(' '); // Marca lápide válida
-                    outputStream.writeInt(tmp.length);
-                    outputStream.write(tmp);
-                }
-    
-                writeTemp3 = !writeTemp3; // Alterna os arquivos de saída
-            }
-    
-            dataInputStream1.close();
-            dataInputStream2.close();
-            dataOutputStream1.close();
-            dataOutputStream2.close();
-    
-        } catch (Exception e) {
-            System.err.println("Erro Sorting.intercalacao: " + e);
-        }
-    }    
+        boolean inicialRead = true; // Para saber em quais arquivos ler e em quais escrever
+        int segmento = max_Memory; // Tamanho inicial do segmento ordenado
+        boolean hasData;
+        int lastwrite = -1; // Para saber qual o ulitmo arquivo escrito para saber onde está o arquivo ordenado final
 
+        do {
+            hasData = false; // Controle se ainda existe dados nos arquivos
+            boolean wroteData = false; // Controle se algum dado foi escrito
+    
+            try {
+                // Seleção dos arquivos
+                FileInputStream fileInputStream1 = new FileInputStream(inicialRead ? temp1 : temp3);
+                DataInputStream dataInputStream1 = new DataInputStream(fileInputStream1);
+    
+                FileInputStream fileInputStream2 = new FileInputStream(inicialRead ? temp2 : temp4);
+                DataInputStream dataInputStream2 = new DataInputStream(fileInputStream2);
+    
+                FileOutputStream fileOutputStream1 = new FileOutputStream(inicialRead ? temp3 : temp1);
+                DataOutputStream dataOutputStream1 = new DataOutputStream(fileOutputStream1);
+    
+                FileOutputStream fileOutputStream2 = new FileOutputStream(inicialRead ? temp4 : temp2);
+                DataOutputStream dataOutputStream2 = new DataOutputStream(fileOutputStream2);
+                
+                // Em qual arquivo começar escrevendo
+                boolean writeToFirst = true;
+    
+                Billionaire b1 = null, b2 = null;
+                boolean hasB1 = false, hasB2 = false;
+    
+                while (dataInputStream1.available() > 0 || dataInputStream2.available() > 0) { // Enquanto ainda existir dados em um dos arquivos de input
+                    DataOutputStream outputStream = writeToFirst ? dataOutputStream1 : dataOutputStream2;
+                    int countB1 = 0, countB2 = 0; // Count do segmento do primeiro arquivo e do segundo arquivo
+                    while ((countB1 < segmento || countB2 < segmento) && (dataInputStream1.available() > 0 || dataInputStream2.available() > 0)) { // Ainda existem numeros ordenados do arquivo 1 ou do 2 e tem dados disponiveis no arquivo 1 ou 2
+                        if (!hasB1 && countB1 < segmento && dataInputStream1.available() > 0) { // Se não tem um registro do arquivo 1 salvo e ainda tem registros no segmento ordenado do arquivo 1 e ele não acabou
+                             // Ler e salvar registro do arquivo 1
+                            char lapide = dataInputStream1.readChar();
+                            int len = dataInputStream1.readInt();
+                            byte[] bt = new byte[len];
+                            dataInputStream1.readFully(bt);
+                            if (lapide != '*') {
+                                b1 = new Billionaire();
+                                b1.fromByteArray(bt);
+                                hasB1 = true;
+                                countB1++; 
+                            }
+                        }
+    
+                        if (!hasB2 && countB2 < segmento && dataInputStream2.available() > 0) { // Se não tem um registro do arquivo 2 salvo e ainda tem registros no segmento ordenado do arquivo2 e ele não acabou
+                            // Ler e salvar registro do arquivo 2
+                            char lapide = dataInputStream2.readChar();
+                            int len = dataInputStream2.readInt();
+                            byte[] bt = new byte[len];
+                            dataInputStream2.readFully(bt);
+                            if (lapide != '*') {
+                                b2 = new Billionaire();
+                                b2.fromByteArray(bt);
+                                hasB2 = true;
+                                countB2++;
+                            }
+                        }
+    
+                        if (hasB1 && (!hasB2 || b1.getId() < b2.getId())) { // Se existe o registro do arquivo 1 e ou não existe do arquivo 2 ou o id de 1 é menor que o de 2
+                            // Escreve no outro arquivo o registro do arquivo 1
+                            byte[] tmp = b1.toByteArray();
+                            outputStream.write(tmp);
+                            hasB1 = false; // Avisa que b1 foi usado
+                            wroteData = true;
+                            lastwrite = inicialRead ? 3 : 1; // Diz qual o ultimo arquivo que foi escrito
+                        } else if (hasB2) {
+                            // Escreve no outro arquivo o registro do arquivo 2
+                            byte[] tmp = b2.toByteArray();
+                            outputStream.write(tmp);
+                            hasB2 = false;  // Avisa que b2 foi usado
+                            wroteData = true;
+                            lastwrite = inicialRead ? 3 : 1; // Diz qual o ultimo arquivo que foi escrito
+                        }
+                        writeToFirst = !writeToFirst;
+                    } 
+    
+                }
+    
+                dataInputStream1.close();
+                dataInputStream2.close();
+                dataOutputStream1.close();
+                dataOutputStream2.close();
+    
+                inicialRead = !inicialRead;
+                segmento *= 2; // Dobra o tamanho do segmento em cada iteração
+                
+                if(!wroteData){
+                    break;
+                }
+            } catch (Exception e) {
+                System.err.println("Erro em Sorting.intercalacao: " + e);
+                break;
+            }
+        } while (hasData); // Enquanto ainda existe dados
+
+        return lastwrite; // Retorna o ultimo arquivo escrito (que sera o ordenado)
+    }
+    
     private static void quickSort(List<Billionaire> list, int low, int high) {
         if (low < high) {
             int pi = partition(list, low, high);
