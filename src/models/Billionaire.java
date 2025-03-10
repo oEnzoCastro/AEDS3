@@ -11,46 +11,51 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 
+import services.BillionaireService;
+
 public class Billionaire {
     private int id;
     private String name;
-    private Double netWorth;
+    private float netWorth;
     private String country;
     private ArrayList<String> source;
     private int rank;
-    private Double age;
+    private int age;
     private String residence;
     private String citizenship;
     private String status;
-    private Double children;
-    private String education;
+    private int children;
+    private ArrayList<String> education;
     private Boolean selfMade;
     private LocalDate birthdate;
 
+    public int getId() {
+        return id;
+    }
+
     public String toString() {
         DecimalFormat df = new DecimalFormat("#,##0.00");
-        return "\nID:" + id +
+        return "\nId:" + id +
                 "\nNome:" + name +
                 "\nNetWorth:" + df.format(netWorth) +
                 "\nCountry:" + country +
                 "\nSource: " + source.toString() +
                 "\nRank: " + rank +
-                "\nAge: " + df.format(age) +
+                "\nAge: " + age +
                 "\nResidence: " + residence +
                 "\nCitizenship: " + citizenship +
                 "\nStatus: " + status +
-                "\nChildren: " + df.format(children) +
-                "\nEducation: " + education +
+                "\nChildren: " + children +
+                "\nEducation: " + education.toString() +
                 "\nSelfmade: " + selfMade +
                 "\nBirthdate: " + birthdate
-                
-                ;
+
+        ;
     }
 
-    public Billionaire(int id, String name, Double netWorth, String country, ArrayList<String> source, int rank,
-            Double age,
-            String residence, String citizenship, String status, Double children, String education, Boolean selfMade,
-            LocalDate birthdate) {
+    public Billionaire(int id, String name, float netWorth, String country, ArrayList<String> source, int rank, int age,
+            String residence, String citizenship, String status, int children, ArrayList<String> education,
+            Boolean selfMade, LocalDate birthdate) {
 
         this.id = id;
         this.name = name;
@@ -72,16 +77,16 @@ public class Billionaire {
 
         this.id = -1;
         this.name = "";
-        this.netWorth = 0.0;
+        this.netWorth = 0;
         this.country = "";
         this.source = new ArrayList<String>();
         this.rank = -1;
-        this.age = 0.0;
+        this.age = 0;
         this.residence = "";
         this.citizenship = "";
         this.status = "";
-        this.children = 0.0;
-        this.education = "";
+        this.children = 0;
+        this.education = new ArrayList<String>();
         this.selfMade = false;
         this.birthdate = null;
     }
@@ -92,29 +97,173 @@ public class Billionaire {
 
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
-
+        // Lapide
+        dataOutputStream.writeChar(' ');
+        // Print Size Object
+        dataOutputStream.writeInt(getByteSize());
+        // int id;
         dataOutputStream.writeInt(id);
+        // String name;
         dataOutputStream.writeUTF(name);
-        dataOutputStream.writeDouble(netWorth);
+        // float netWorth;
+        dataOutputStream.writeFloat(netWorth);
+        // String country;
         dataOutputStream.writeUTF(country);
-        dataOutputStream.writeInt(source.size()); // Tamanho do array (Quantidade, não bits !Mudar para BITS!)
-        for (int i = 0; i < source.size(); i++) {
-            dataOutputStream.writeUTF(source.get(i)); // adiciona cada elemento do array
+        // ArrayList<String> source;
+        dataOutputStream.writeInt(source.size());
+        for (String sourceString : source) {
+            dataOutputStream.writeUTF(sourceString);
         }
+        // int rank;
         dataOutputStream.writeInt(rank);
-        dataOutputStream.writeDouble(age);
+        // int age;
+        dataOutputStream.writeInt(age);
+        // String residence;
         dataOutputStream.writeUTF(residence);
+        // String citizenship;
         dataOutputStream.writeUTF(citizenship);
+        // String status;
         dataOutputStream.writeUTF(status);
-        dataOutputStream.writeDouble(children);
-        dataOutputStream.writeUTF(education);
+        // int children;
+        dataOutputStream.writeInt(children);
+        // ArrayList<String> education;
+        dataOutputStream.writeInt(education.size());
+        for (String educationString : education) {
+            dataOutputStream.writeUTF(educationString);
+        }
+        // Boolean selfMade;
         dataOutputStream.writeBoolean(selfMade);
+        // LocalDate birthdate;
         dataOutputStream.writeLong(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
 
-        // LocalDate timestampToLocalDate =
-        // Instant.ofEpochSecond(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()).atZone(ZoneId.systemDefault()).toLocalDate();
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    // Necessário para armazenar o tamanho do objeto antigo e não afetar na leitura
+    public byte[] toByteArrayUpdate(Billionaire billionaire, String file) throws IOException {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+
+        // Lapide
+        dataOutputStream.writeChar(' ');
+        // Print Size Object
+        dataOutputStream.writeInt(BillionaireService.getBillionaireSize(billionaire.getId(), file)); // Armazena o
+                                                                                                     // tamanho do
+                                                                                                     // objeto antigo
+        // int id;
+        dataOutputStream.writeInt(id);
+        // String name;
+        dataOutputStream.writeUTF(name);
+        // float netWorth;
+        dataOutputStream.writeFloat(netWorth);
+        // String country;
+        dataOutputStream.writeUTF(country);
+        // ArrayList<String> source;
+        dataOutputStream.writeInt(source.size());
+        for (String sourceString : source) {
+            dataOutputStream.writeUTF(sourceString);
+        }
+        // int rank;
+        dataOutputStream.writeInt(rank);
+        // int age;
+        dataOutputStream.writeInt(age);
+        // String residence;
+        dataOutputStream.writeUTF(residence);
+        // String citizenship;
+        dataOutputStream.writeUTF(citizenship);
+        // String status;
+        dataOutputStream.writeUTF(status);
+        // int children;
+        dataOutputStream.writeInt(children);
+        // ArrayList<String> education;
+        dataOutputStream.writeInt(education.size());
+        for (String educationString : education) {
+            dataOutputStream.writeUTF(educationString);
+        }
+        // Boolean selfMade;
+        dataOutputStream.writeBoolean(selfMade);
+        // LocalDate birthdate;
+        dataOutputStream.writeLong(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
 
         return byteArrayOutputStream.toByteArray();
+    }
+
+    public int getByteSize() {
+
+        int size = 0;
+
+        // int id;
+        size += Integer.BYTES;
+        // String name;
+        size += getUTFSize(name);
+        // float netWorth;
+        size += Float.BYTES;
+        // String country;
+        size += getUTFSize(country);
+        // ArrayList<String> source;
+        size += getUTFArraySize(source);
+        // int rank;
+        size += Integer.BYTES;
+        // int age;
+        size += Integer.BYTES;
+        // String residence;
+        size += getUTFSize(residence);
+        // String citizenship;
+        size += getUTFSize(citizenship);
+        // String status;
+        size += getUTFSize(status);
+        // int children;
+        size += Integer.BYTES;
+        // ArrayList<String> education;
+        size += getUTFArraySize(education);
+        // Boolean selfMade;
+        size += 1; // Boolean = 1 BYTE
+        // LocalDate birthdate;
+        size += Long.BYTES;
+
+        return size;
+    }
+
+    public int getUTFArraySize(ArrayList<String> array) {
+
+        int utfArraySize = Integer.BYTES;
+
+        for (String i : array) {
+            utfArraySize += getUTFSize(i);
+        }
+
+        return utfArraySize;
+    }
+
+    public int getUTFSize(String text) {
+
+        int textSize = text.length();
+
+        int utfSize = 0;
+
+        // Le Caracter por caracter para ler latin char e/ou caracteres diferentes
+        for (int i = 0; i < textSize; i++) {
+            // Latin
+            if (text.charAt(i) >= 123 && text.charAt(i) <= 255) {
+
+                utfSize = utfSize + 2;
+
+                // Outros
+            } else if (text.charAt(i) >= 255) {
+
+                utfSize = utfSize + 3;
+
+                // Char normal
+            } else {
+
+                utfSize++;
+
+            }
+        }
+
+        return utfSize + 2;
     }
 
     public void fromByteArray(byte[] bt) throws IOException {
@@ -123,27 +272,93 @@ public class Billionaire {
 
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
-        dataInputStream.readInt(); // Lapide
-
+        // Lapide - Char
+        // Tamanho Objeto - Int
+        // Id - Int
         id = dataInputStream.readInt();
+        // Name - 2 Bytes Size + String
         name = dataInputStream.readUTF();
-
-        netWorth = dataInputStream.readDouble();
+        // NetWorth - Float (43 31 00 00 = 177)
+        netWorth = dataInputStream.readFloat();
+        // Country - 2 Bytes Size + String
         country = dataInputStream.readUTF();
-        int arraySize = dataInputStream.readInt();
+        // Tamanho Source - Int
+        int tamanhoSource = dataInputStream.readInt();
+        // Source Element - 2 Bytes Size + String !!!
         source.clear();
-        for (int i = 0; i < arraySize; i++) {
+        for (int i = 0; i < tamanhoSource; i++) {
             source.add(dataInputStream.readUTF());
         }
+        // Rank - Int
         rank = dataInputStream.readInt();
-        age = dataInputStream.readDouble();
+        // Age - Int
+        age = dataInputStream.readInt();
+        // Residence - 2 Bytes Size + String
         residence = dataInputStream.readUTF();
+        // Citizenship - 2 Bytes Size + String
         citizenship = dataInputStream.readUTF();
+        // Status - 2 Bytes Size + String
         status = dataInputStream.readUTF();
-        children = dataInputStream.readDouble();
-        education = dataInputStream.readUTF();
+        // Children - Int
+        children = dataInputStream.readInt();
+        // Tamanho Education - Int
+        int tamanhoEducation = dataInputStream.readInt();
+        // Education - 2 Bytes Size + String !!!
+        education.clear();
+        for (int i = 0; i < tamanhoEducation; i++) {
+            education.add(dataInputStream.readUTF());
+        }
+        // Self Made - Boolean (1 Byte)
         selfMade = dataInputStream.readBoolean();
+        // Birthdate - Long (8 Bytes)
         birthdate = Instant.ofEpochSecond(dataInputStream.readLong()).atZone(ZoneId.systemDefault()).toLocalDate();
+
+    }
+
+    public void jumpElement(byte[] bt) throws IOException {
+
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bt);
+
+        DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
+
+        // Lapide - Char
+        // Tamanho Objeto - Int
+        // Id - Int
+        dataInputStream.readInt();
+        // Name - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // NetWorth - Float (43 31 00 00 = 177)
+        dataInputStream.readFloat();
+        // Country - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // Tamanho Source - Int
+        int tamanhoSource = dataInputStream.readInt();
+        // Source Element - 2 Bytes Size + String !!!
+        for (int i = 0; i < tamanhoSource; i++) {
+            dataInputStream.readUTF();
+        }
+        // Rank - Int
+        dataInputStream.readInt();
+        // Age - Int
+        dataInputStream.readInt();
+        // Residence - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // Citizenship - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // Status - 2 Bytes Size + String
+        dataInputStream.readUTF();
+        // Children - Int
+        dataInputStream.readInt();
+        // Tamanho Education - Int
+        int tamanhoEducation = dataInputStream.readInt();
+        // Education - 2 Bytes Size + String !!!
+        for (int i = 0; i < tamanhoEducation; i++) {
+            dataInputStream.readUTF();
+        }
+        // Self Made - Boolean (1 Byte)
+        dataInputStream.readBoolean();
+        // Birthdate - Long (8 Bytes)
+        dataInputStream.readLong();
 
     }
 
