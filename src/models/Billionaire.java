@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 
+import services.BillionaireService;
+
 public class Billionaire {
     private int id;
     private String name;
@@ -27,7 +29,7 @@ public class Billionaire {
     private Boolean selfMade;
     private LocalDate birthdate;
 
-    public int getId(){
+    public int getId() {
         return id;
     }
 
@@ -95,9 +97,61 @@ public class Billionaire {
 
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
 
+        // Lapide
         dataOutputStream.writeChar(' ');
         // Print Size Object
         dataOutputStream.writeInt(getByteSize());
+        // int id;
+        dataOutputStream.writeInt(id);
+        // String name;
+        dataOutputStream.writeUTF(name);
+        // float netWorth;
+        dataOutputStream.writeFloat(netWorth);
+        // String country;
+        dataOutputStream.writeUTF(country);
+        // ArrayList<String> source;
+        dataOutputStream.writeInt(source.size());
+        for (String sourceString : source) {
+            dataOutputStream.writeUTF(sourceString);
+        }
+        // int rank;
+        dataOutputStream.writeInt(rank);
+        // int age;
+        dataOutputStream.writeInt(age);
+        // String residence;
+        dataOutputStream.writeUTF(residence);
+        // String citizenship;
+        dataOutputStream.writeUTF(citizenship);
+        // String status;
+        dataOutputStream.writeUTF(status);
+        // int children;
+        dataOutputStream.writeInt(children);
+        // ArrayList<String> education;
+        dataOutputStream.writeInt(education.size());
+        for (String educationString : education) {
+            dataOutputStream.writeUTF(educationString);
+        }
+        // Boolean selfMade;
+        dataOutputStream.writeBoolean(selfMade);
+        // LocalDate birthdate;
+        dataOutputStream.writeLong(birthdate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    // Necessário para armazenar o tamanho do objeto antigo e não afetar na leitura
+    public byte[] toByteArrayUpdate(Billionaire billionaire, String file) throws IOException {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+
+        // Lapide
+        dataOutputStream.writeChar(' ');
+        // Print Size Object
+        dataOutputStream.writeInt(BillionaireService.getBillionaireSize(billionaire.getId(), file)); // Armazena o
+                                                                                                     // tamanho do
+                                                                                                     // objeto antigo
         // int id;
         dataOutputStream.writeInt(id);
         // String name;

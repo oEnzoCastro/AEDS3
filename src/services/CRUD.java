@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
-import java.util.Scanner;
 
 import DAO.DAO;
 import models.Billionaire;
@@ -19,7 +18,8 @@ public class CRUD {
 
         String file = "src/database/billionaires.db";
         String fileCSV = "src/database/forbes_billionaires.csv";
-        // String fileCSV = "src/database/BillionairesCSV.csv"; (Database com 10.000 linhas inseridas pelo ChatGPT)
+        // String fileCSV = "src/database/BillionairesCSV.csv"; (Database com 10.000
+        // linhas inseridas pelo ChatGPT)
 
         int id = -1;
 
@@ -48,7 +48,6 @@ public class CRUD {
 
             }
 
-
             // RandomAccessFile aponta para 1° posição e escreve o último ID inserido
             randomAccessFile.seek(0);
             randomAccessFile.writeInt(id);
@@ -67,7 +66,7 @@ public class CRUD {
         return id;
     }
 
-    public static void get(int id, String file) {
+    public static Billionaire get(int id, String file) {
 
         boolean found = false;
 
@@ -86,29 +85,72 @@ public class CRUD {
 
                 billionaireTmp = DAO.read(fileInputStream, dataInputStream);
 
-                // Verifica se é o ID procurado (Só possivel conferir o ID se o Objeto estiver ativo)
+                // Verifica se é o ID procurado (Só possivel conferir o ID se o Objeto estiver
+                // ativo)
                 if (billionaireTmp != null && billionaireTmp.getId() == id) {
-                    System.out.println(billionaireTmp);
                     found = true;
+                    return billionaireTmp;
                 }
 
             }
 
             if (!found) {
                 System.out.println("Bilionário não encontrado");
+                return null;
             }
 
         } catch (Exception e) {
             System.err.println("Erro Read: " + e);
         }
-
+        return null;
     }
 
     public static void update(int id, String file) {
 
-        Scanner scan = new Scanner(System.in);
+        Billionaire billionaire = get(id, file);
 
-        scan.close();
+        if (billionaire == null) {
+            System.out.println("Bilinário Indisponível!");
+        } else {
+            Billionaire newBillionaire = BillionaireService.updateBillionaire(billionaire);
+
+            try {
+
+                RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+                byte[] bt;
+
+                if (newBillionaire.getByteSize() > billionaire.getByteSize()) {
+
+                    DAO.delete(id, file); // Insere Lapide no billionaire
+
+                    randomAccessFile.seek(randomAccessFile.length()); // Move ponteiro para fim do arquivo
+
+                    // Inserir newBillionaire
+
+                    bt = newBillionaire.toByteArray();
+                    randomAccessFile.write(bt);
+
+                } else {
+
+                    long filePointer = BillionaireService.findBillionaireByte(id, file);
+
+                    randomAccessFile.seek(filePointer);
+
+                    System.out.println(randomAccessFile.getFilePointer());
+
+                    bt = newBillionaire.toByteArrayUpdate(billionaire, file);
+                    randomAccessFile.write(bt);
+
+                    // Add newBillionaire no lugar do billionaire
+                }
+
+                randomAccessFile.close();
+
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+
+        }
 
     }
 

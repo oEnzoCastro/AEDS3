@@ -41,7 +41,7 @@ public class DAO {
                 education.add(i);
             }
             Boolean self_made = Boolean.parseBoolean(row[12]); // String -> Boolean
-            LocalDate birthdate = LocalDate.parse(row[13]); // String -> LocalDate !!!
+            LocalDate birthdate = LocalDate.parse(row[13]); // String -> LocalDate
 
             // New Object
             Billionaire billionaire = new Billionaire(id, name, netWorth, country, source, rank, age, residence,
@@ -83,6 +83,16 @@ public class DAO {
         return billionaireTmp;
     }
 
+    public static void update(Billionaire newBillionaire) {
+
+        try {
+            newBillionaire.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static boolean delete(int id, String file) {
         try {
 
@@ -99,17 +109,17 @@ public class DAO {
                 if (id == randomAccessFile.readInt()) {
                     // Caso o objeto já tenha sido removido
                     if (lapide == '*') {
-                        System.err.println("Objeto já foi removido!");
+
+                    } else {
+
+                        // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
+                        randomAccessFile.seek(
+                                randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
+                        randomAccessFile.writeChar('*');
+
                         randomAccessFile.close();
-                        return false;
+                        return true;
                     }
-
-                    // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
-                    randomAccessFile.seek(randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
-                    randomAccessFile.writeChar('*');
-
-                    randomAccessFile.close();
-                    return true;
                 }
 
                 randomAccessFile.skipBytes(size - Integer.BYTES);
