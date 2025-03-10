@@ -18,7 +18,8 @@ public class CRUD {
 
         String file = "src/database/billionaires.db";
         String fileCSV = "src/database/forbes_billionaires.csv";
-        // String fileCSV = "src/database/BillionairesCSV.csv"; (Database com 10.000 linhas inseridas pelo ChatGPT)
+        // String fileCSV = "src/database/BillionairesCSV.csv"; (Database com 10.000
+        // linhas inseridas pelo ChatGPT)
 
         int id = -1;
 
@@ -46,7 +47,6 @@ public class CRUD {
                 id = Integer.parseInt(row[0]);
 
             }
-
 
             // RandomAccessFile aponta para 1° posição e escreve o último ID inserido
             randomAccessFile.seek(0);
@@ -85,7 +85,8 @@ public class CRUD {
 
                 billionaireTmp = DAO.read(fileInputStream, dataInputStream);
 
-                // Verifica se é o ID procurado (Só possivel conferir o ID se o Objeto estiver ativo)
+                // Verifica se é o ID procurado (Só possivel conferir o ID se o Objeto estiver
+                // ativo)
                 if (billionaireTmp != null && billionaireTmp.getId() == id) {
                     found = true;
                     return billionaireTmp;
@@ -97,7 +98,7 @@ public class CRUD {
                 System.out.println("Bilionário não encontrado");
                 return null;
             }
-            
+
         } catch (Exception e) {
             System.err.println("Erro Read: " + e);
         }
@@ -119,16 +120,15 @@ public class CRUD {
                 byte[] bt;
 
                 if (newBillionaire.getByteSize() > billionaire.getByteSize()) {
-                    
+
                     DAO.delete(id, file); // Insere Lapide no billionaire
 
                     randomAccessFile.seek(randomAccessFile.length()); // Move ponteiro para fim do arquivo
-                    
+
                     // Inserir newBillionaire
 
                     bt = newBillionaire.toByteArray();
                     randomAccessFile.write(bt);
-
 
                 } else {
 
@@ -138,7 +138,7 @@ public class CRUD {
 
                     System.out.println(randomAccessFile.getFilePointer());
 
-                    bt = newBillionaire.toByteArray();
+                    bt = newBillionaire.toByteArrayUpdate(billionaire);
                     randomAccessFile.write(bt);
 
                     // Add newBillionaire no lugar do billionaire
