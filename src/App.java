@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import services.CRUD;
+import services.Sorting;
 
 public class App {
 
@@ -21,7 +22,8 @@ public class App {
             System.out.println("3. Read");
             System.out.println("4. Update");
             System.out.println("5. Delete");
-            System.out.println("6. Exit");
+            System.out.println("6. Sort");
+            System.out.println("7. Exit");
             System.out.println("----------------------------------");
 
             int option = -1;
@@ -71,6 +73,12 @@ public class App {
                     break;
 
                 case 6:
+                    // Sort
+                    clearScreen(); // Clear terminal
+                    Sorting.sort(); // Sort Function
+                    break;
+
+                case 7:
                     // Exit
                     clearScreen(); // Clear terminal
                     System.out.println("Programa Encerrado!");
