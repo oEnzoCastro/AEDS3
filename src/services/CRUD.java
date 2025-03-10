@@ -6,7 +6,6 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import DAO.DAO;
@@ -117,8 +116,9 @@ public class CRUD {
             try {
 
                 RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+                byte[] bt;
 
-                if (newBillionaire.getByteSize() < billionaire.getByteSize()) {
+                if (newBillionaire.getByteSize() > billionaire.getByteSize()) {
                     
                     DAO.delete(id, file); // Insere Lapide no billionaire
 
@@ -126,11 +126,21 @@ public class CRUD {
                     
                     // Inserir newBillionaire
 
-                    byte[] bt = newBillionaire.toByteArray();
+                    bt = newBillionaire.toByteArray();
                     randomAccessFile.write(bt);
 
 
                 } else {
+
+                    long filePointer = BillionaireService.findBillionaireByte(id, file);
+
+                    randomAccessFile.seek(filePointer);
+
+                    System.out.println(randomAccessFile.getFilePointer());
+
+                    bt = newBillionaire.toByteArray();
+                    randomAccessFile.write(bt);
+
                     // Add newBillionaire no lugar do billionaire
                 }
 

@@ -1,5 +1,7 @@
 package services;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -81,4 +83,49 @@ public class BillionaireService {
 
         return billionaireTmp;
     }
+
+    public static long findBillionaireByte(int id, String file) {
+        
+        try {
+
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
+            randomAccessFile.seek(Integer.BYTES);
+
+            while (randomAccessFile.getFilePointer() < randomAccessFile.length()) {
+
+                char lapide = randomAccessFile.readChar(); // Lapide
+                int size = randomAccessFile.readInt(); // Object Size
+
+                // Id (User Input) == Id (Database)
+                if (id == randomAccessFile.readInt()) {
+                    // Caso o objeto já tenha sido removido
+                    if (lapide == '*') {
+
+                    } else {
+                        
+                        // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
+                        randomAccessFile.seek(randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
+                        
+                        long filePointer = randomAccessFile.getFilePointer();
+                        
+                        randomAccessFile.close();
+
+                        return filePointer;
+                    }
+                }
+
+                randomAccessFile.skipBytes(size - Integer.BYTES);
+
+            }
+
+            randomAccessFile.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
 }
