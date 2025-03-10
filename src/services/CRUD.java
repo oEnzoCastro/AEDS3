@@ -66,6 +66,37 @@ public class CRUD {
         return id;
     }
 
+    public static void create(String file) {
+        try {
+
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+            byte[] bt;
+
+            randomAccessFile.seek(0);
+
+            int lastId = randomAccessFile.readInt() + 1;
+
+            randomAccessFile.seek(0);
+
+            randomAccessFile.write(lastId);
+
+            Billionaire newBillionaire = BillionaireService.newBillionaire(lastId);
+
+            randomAccessFile.seek(randomAccessFile.length()); // Move ponteiro para fim do arquivo
+
+            // Inserir newBillionaire
+
+            bt = newBillionaire.toByteArray();
+            randomAccessFile.write(bt);
+
+            randomAccessFile.close();
+
+        } catch (Exception e) {
+            System.out.println("Erro CREATE: " + e);
+        }
+
+    }
+
     public static Billionaire get(int id, String file) {
 
         boolean found = false;
