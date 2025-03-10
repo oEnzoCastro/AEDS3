@@ -33,13 +33,26 @@ public class BillionaireService {
         String country = scan.nextLine();
         System.out.println();
         // Source
-        System.out.print("Source: ");
+        System.out.println("- Source -");
+        boolean addList = true;
         ArrayList<String> source = new ArrayList<String>();
-            source.add("source");
-        System.out.println();
+        while (addList == true) {
+            System.out.print("Digite o valor de Source ou 0 para continuar: ");
+
+            String sourceString = scan.nextLine();
+
+            if (sourceString.equals("0")) {
+                addList = false;
+            } else {
+                source.add(sourceString);
+            }
+
+            System.out.println();
+
+        }
         // Rank
         System.out.print("Rank: ");
-        int rank = scan.nextInt(); // Calcular a partir dos outros ranks
+        int rank = getRank(netWorth); // Calcular a partir dos outros ranks
         System.out.println();
         // Age
         System.out.print("Age: ");
@@ -64,20 +77,36 @@ public class BillionaireService {
         scan.nextLine(); // Clear Buffer
         System.out.println();
         // Education
-        System.out.print("Education: ");
+        System.out.println("- Education -");
+        addList = true;
         ArrayList<String> education = new ArrayList<String>();
-            education.add("education");
-        System.out.println();
+        while (addList == true) {
+            System.out.print("Digite o valor de Education ou 0 para continuar: ");
+
+            String educationString = scan.nextLine();
+
+            if (educationString.equals("0")) {
+                addList = false;
+            } else {
+                education.add(educationString);
+            }
+
+            System.out.println();
+
+        }
         // SelfMade
         System.out.print("Selfmade (True/False): ");
         Boolean selfMade = scan.nextBoolean();
         System.out.println();
         // Birthdate (YYYY-MM-DD)
         System.out.print("Birthdate (YYYY-MM-DD): ");
-        LocalDate birthdate = LocalDate.now();
+        scan.nextLine();
+        String dateString = scan.nextLine();
+        LocalDate birthdate = LocalDate.parse(dateString);
         System.out.println();
 
-        Billionaire billionaireTmp = new Billionaire(billionaire.getId(), name, netWorth, country, source, rank, age, residence, citizenship, status, children, education, selfMade, birthdate);
+        Billionaire billionaireTmp = new Billionaire(billionaire.getId(), name, netWorth, country, source, rank, age,
+                residence, citizenship, status, children, education, selfMade, birthdate);
 
         System.out.println(billionaireTmp);
 
@@ -85,7 +114,7 @@ public class BillionaireService {
     }
 
     public static long findBillionaireByte(int id, String file) {
-        
+
         try {
 
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
@@ -103,12 +132,13 @@ public class BillionaireService {
                     if (lapide == '*') {
 
                     } else {
-                        
+
                         // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
-                        randomAccessFile.seek(randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
-                        
+                        randomAccessFile.seek(
+                                randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
+
                         long filePointer = randomAccessFile.getFilePointer();
-                        
+
                         randomAccessFile.close();
 
                         return filePointer;
@@ -128,4 +158,46 @@ public class BillionaireService {
         return 0;
     }
 
+    public static int getBillionaireSize(int id, String file) {
+        try {
+
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
+            randomAccessFile.seek(Integer.BYTES);
+
+            while (randomAccessFile.getFilePointer() < randomAccessFile.length()) {
+
+                char lapide = randomAccessFile.readChar(); // Lapide
+                int size = randomAccessFile.readInt(); // Object Size
+
+                // Id (User Input) == Id (Database)
+                if (id == randomAccessFile.readInt()) {
+                    // Caso o objeto já tenha sido removido
+                    if (lapide == '*') {
+
+                    } else {
+
+                        randomAccessFile.close();
+
+                        return size;
+                    }
+                }
+
+                randomAccessFile.skipBytes(size - Integer.BYTES);
+
+            }
+
+            randomAccessFile.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+
+    }
+
+    public static int getRank(float NetWorth) {
+        return 0;
+    }
 }

@@ -138,7 +138,7 @@ public class CRUD {
 
                     System.out.println(randomAccessFile.getFilePointer());
 
-                    bt = newBillionaire.toByteArrayUpdate(billionaire);
+                    bt = newBillionaire.toByteArrayUpdate(billionaire, file);
                     randomAccessFile.write(bt);
 
                     // Add newBillionaire no lugar do billionaire

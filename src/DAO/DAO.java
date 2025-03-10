@@ -41,7 +41,7 @@ public class DAO {
                 education.add(i);
             }
             Boolean self_made = Boolean.parseBoolean(row[12]); // String -> Boolean
-            LocalDate birthdate = LocalDate.parse(row[13]); // String -> LocalDate !!!
+            LocalDate birthdate = LocalDate.parse(row[13]); // String -> LocalDate
 
             // New Object
             Billionaire billionaire = new Billionaire(id, name, netWorth, country, source, rank, age, residence,
@@ -58,7 +58,8 @@ public class DAO {
 
     }
 
-    public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream) throws IOException {
+    public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream)
+            throws IOException {
 
         Billionaire billionaireTmp = new Billionaire();
 
@@ -89,7 +90,7 @@ public class DAO {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
     }
 
     public static boolean delete(int id, String file) {
@@ -110,11 +111,12 @@ public class DAO {
                     if (lapide == '*') {
 
                     } else {
-                        
+
                         // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
-                        randomAccessFile.seek(randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
+                        randomAccessFile.seek(
+                                randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
                         randomAccessFile.writeChar('*');
-                        
+
                         randomAccessFile.close();
                         return true;
                     }

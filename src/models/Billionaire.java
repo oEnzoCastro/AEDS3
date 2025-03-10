@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 
+import services.BillionaireService;
+
 public class Billionaire {
     private int id;
     private String name;
@@ -137,7 +139,8 @@ public class Billionaire {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public byte[] toByteArrayUpdate(Billionaire billionaire) throws IOException {
+    // Necessário para armazenar o tamanho do objeto antigo e não afetar na leitura
+    public byte[] toByteArrayUpdate(Billionaire billionaire, String file) throws IOException {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -146,7 +149,9 @@ public class Billionaire {
         // Lapide
         dataOutputStream.writeChar(' ');
         // Print Size Object
-        dataOutputStream.writeInt(billionaire.getByteSize());
+        dataOutputStream.writeInt(BillionaireService.getBillionaireSize(billionaire.getId(), file)); // Armazena o
+                                                                                                     // tamanho do
+                                                                                                     // objeto antigo
         // int id;
         dataOutputStream.writeInt(id);
         // String name;
