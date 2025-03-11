@@ -66,7 +66,38 @@ public class CRUD {
         return id;
     }
 
-    public static Billionaire get(int id, String file) {
+    public static void create(String file) {
+        try {
+
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+            byte[] bt;
+
+            randomAccessFile.seek(0);
+
+            int lastId = randomAccessFile.readInt() + 1;
+
+            randomAccessFile.seek(0);
+
+            randomAccessFile.write(lastId);
+
+            Billionaire newBillionaire = BillionaireService.newBillionaire(lastId);
+
+            randomAccessFile.seek(randomAccessFile.length()); // Move ponteiro para fim do arquivo
+
+            // Inserir newBillionaire
+
+            bt = newBillionaire.toByteArray();
+            randomAccessFile.write(bt);
+
+            randomAccessFile.close();
+
+        } catch (Exception e) {
+            System.out.println("Erro CREATE: " + e);
+        }
+
+    }
+
+    public static Billionaire get(String key, String file) {
 
         boolean found = false;
 
@@ -87,9 +118,22 @@ public class CRUD {
 
                 // Verifica se é o ID procurado (Só possivel conferir o ID se o Objeto estiver
                 // ativo)
-                if (billionaireTmp != null && billionaireTmp.getId() == id) {
-                    found = true;
-                    return billionaireTmp;
+
+                if (key.charAt(0) >= '0' && key.charAt(0) <= '9') {
+
+                    if ((billionaireTmp != null && billionaireTmp.getId() == Integer.parseInt(key))) {
+                        found = true;
+                        System.out.println(billionaireTmp);
+                        return billionaireTmp;
+                    }
+
+                } else {
+
+                    if ((billionaireTmp != null && billionaireTmp.getName().equals(key))) {
+                        found = true;
+                        System.out.println(billionaireTmp);
+                        // Podem Haver Billionários com o mesmo nome
+                    }
                 }
 
             }
@@ -105,9 +149,17 @@ public class CRUD {
         return null;
     }
 
-    public static void update(int id, String file) {
+    public static void update(String key, String file) {
 
-        Billionaire billionaire = get(id, file);
+        Billionaire billionaire;
+        if (key.charAt(0) >= '0' && key.charAt(0) <= '9') {
+            billionaire = get(key, file);
+        } else {
+            System.out.println("Só é aceito update inserindo a chave 'ID'!");
+            return;
+        }
+
+        int id = Integer.parseInt(key);
 
         if (billionaire == null) {
             System.out.println("Bilinário Indisponível!");

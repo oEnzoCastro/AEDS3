@@ -33,6 +33,10 @@ public class Billionaire {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String toString() {
         DecimalFormat df = new DecimalFormat("#,##0.00");
         return "\nId:" + id +
@@ -360,6 +364,10 @@ public class Billionaire {
         // Birthdate - Long (8 Bytes)
         dataInputStream.readLong();
 
+    }
+
+    public int compareTo(Billionaire other) {
+        return Integer.compare(this.id, other.id); // Ordem crescente por ID
     }
 
 }

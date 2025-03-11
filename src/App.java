@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import services.CRUD;
+import services.Sorting;
 
 public class App {
 
@@ -21,7 +22,8 @@ public class App {
             System.out.println("3. Read");
             System.out.println("4. Update");
             System.out.println("5. Delete");
-            System.out.println("6. Exit");
+            System.out.println("6. Sort");
+            System.out.println("7. Exit");
             System.out.println("----------------------------------");
 
             int option = -1;
@@ -29,6 +31,7 @@ public class App {
             option = scan.nextInt();
 
             int id = -1;
+            String key = "";
             switch (option) {
                 case 1:
                     // Create from CSV
@@ -38,26 +41,29 @@ public class App {
 
                 case 2:
                     // Create
+                    CRUD.create(file);
                     break;
 
                 case 3:
                     // Read
                     System.out.print("ID: ");
-                    id = scan.nextInt();
+                    scan.nextLine(); // Clear Buffer
+                    key = scan.nextLine();
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    System.out.println(CRUD.get(id, file));
+                    CRUD.get(key, file);
                     break;
 
                 case 4:
                     // Update
                     System.out.print("ID: ");
-                    id = scan.nextInt();
+                    scan.nextLine(); // Clear Buffer
+                    key = scan.nextLine();
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    CRUD.update(id, file);
+                    CRUD.update(key, file);
                     break;
 
                 case 5:
@@ -71,6 +77,12 @@ public class App {
                     break;
 
                 case 6:
+                    // Sort
+                    clearScreen(); // Clear terminal
+                    Sorting.sort(); // Sort Function
+                    break;
+
+                case 7:
                     // Exit
                     clearScreen(); // Clear terminal
                     System.out.println("Programa Encerrado!");
@@ -91,8 +103,8 @@ public class App {
     }
 
     public static void clearScreen() {
-        System.out.print("\033[H\033[2J");  
-        System.out.flush(); 
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
 }
