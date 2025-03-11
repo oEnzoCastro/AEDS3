@@ -26,8 +26,8 @@ public class Sorting {
             randomAccessFile.close();
 
             new File(file).delete(); // Apaga o arquivo original desordenado
-
-            String finalFile = lastwrite == 1 ? temp1 : temp3; // Encontra o arquivo com os dados ordenados
+            
+            String finalFile = lastwrite == 1 ? temp1 : temp3; // Encontra o arquivo com os dados ordenados (ulitmo arquivo escrito)
 
             FileInputStream finalInputStream = new FileInputStream(finalFile);
             DataInputStream finalDataInputStream = new DataInputStream(finalInputStream);
@@ -162,19 +162,21 @@ public class Sorting {
     
                 while (dataInputStream1.available() > 0 || dataInputStream2.available() > 0) { // Enquanto ainda existir dados em um dos arquivos de input
                     DataOutputStream outputStream = writeToFirst ? dataOutputStream1 : dataOutputStream2;
-                    int countB1 = 0, countB2 = 0; // Count do segmento do primeiro arquivo e do segundo arquivo
-                    while ((countB1 < segmento || countB2 < segmento) && (dataInputStream1.available() > 0 || dataInputStream2.available() > 0)) { // Ainda existem numeros ordenados do arquivo 1 ou do 2 e tem dados disponiveis no arquivo 1 ou 2
+                    int count = 0;
+                    int countB1 = 0, countB2 = 0;
+                    
+                    while (count < segmento * 2) { // Ainda existem números no segmento de um dos arquivos
                         if (!hasB1 && countB1 < segmento && dataInputStream1.available() > 0) { // Se não tem um registro do arquivo 1 salvo e ainda tem registros no segmento ordenado do arquivo 1 e ele não acabou
-                             // Ler e salvar registro do arquivo 1
+                            // Ler e salvar registro do arquivo 1
                             char lapide = dataInputStream1.readChar();
                             int len = dataInputStream1.readInt();
                             byte[] bt = new byte[len];
-                            dataInputStream1.readFully(bt);
+                            dataInputStream1.read(bt);
                             if (lapide != '*') {
                                 b1 = new Billionaire();
                                 b1.fromByteArray(bt);
                                 hasB1 = true;
-                                countB1++; 
+                                countB1++;
                             }
                         }
     
@@ -183,7 +185,7 @@ public class Sorting {
                             char lapide = dataInputStream2.readChar();
                             int len = dataInputStream2.readInt();
                             byte[] bt = new byte[len];
-                            dataInputStream2.readFully(bt);
+                            dataInputStream2.read(bt);
                             if (lapide != '*') {
                                 b2 = new Billionaire();
                                 b2.fromByteArray(bt);
@@ -193,38 +195,46 @@ public class Sorting {
                         }
     
                         if (hasB1 && (!hasB2 || b1.getId() < b2.getId())) { // Se existe o registro do arquivo 1 e ou não existe do arquivo 2 ou o id de 1 é menor que o de 2
-                            // Escreve no outro arquivo o registro do arquivo 1
+                            // Escreve no próximo arquivo o registro do arquivo 1
                             byte[] tmp = b1.toByteArray();
                             outputStream.write(tmp);
                             hasB1 = false; // Avisa que b1 foi usado
-                            wroteData = true;
+                            wroteData = true; // Avisa que algum dado foi escrito
                             lastwrite = inicialRead ? 3 : 1; // Diz qual o ultimo arquivo que foi escrito
                         } else if (hasB2) {
-                            // Escreve no outro arquivo o registro do arquivo 2
                             byte[] tmp = b2.toByteArray();
                             outputStream.write(tmp);
-                            hasB2 = false;  // Avisa que b2 foi usado
-                            wroteData = true;
+                            hasB2 = false; // Avisa que b2 foi usado
+                            wroteData = true; // Avisa que algum dado foi escrito
                             lastwrite = inicialRead ? 3 : 1; // Diz qual o ultimo arquivo que foi escrito
-                        }
-                        writeToFirst = !writeToFirst;
-                    } 
-    
+                        } else { // Se b1 e b2 não existem
+                            break;
+                        } 
+
+                    }
+
+                    if(dataInputStream1.available() == 0 && dataInputStream2.available() == 0){ // Se os arquivos não tem mais dados disponiveis
+                        break;
+                    }
+
+                    hasData = hasData || wroteData; // Se ainda há dados ou se dados foram escritos nessa iteração
+                    
+                    writeToFirst = !writeToFirst; // Inverte o próximo arquivo a ser escrito
                 }
-    
+
                 dataInputStream1.close();
                 dataInputStream2.close();
                 dataOutputStream1.close();
                 dataOutputStream2.close();
     
-                inicialRead = !inicialRead;
+                inicialRead = !inicialRead; // Inverte o conjunto de arquivos a serem lidos e escritos
                 segmento *= 2; // Dobra o tamanho do segmento em cada iteração
                 
-                if(!wroteData){
-                    break;
-                }
             } catch (Exception e) {
                 System.err.println("Erro em Sorting.intercalacao: " + e);
+                break;
+            }
+            if(!wroteData){
                 break;
             }
         } while (hasData); // Enquanto ainda existe dados
@@ -252,4 +262,5 @@ public class Sorting {
         Collections.swap(list, i + 1, high);
         return i + 1;
     }
+
 }
