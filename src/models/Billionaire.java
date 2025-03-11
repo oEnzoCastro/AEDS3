@@ -112,7 +112,14 @@ public class Billionaire {
         // float netWorth;
         dataOutputStream.writeFloat(netWorth);
         // String country;
-        dataOutputStream.writeUTF(country);
+
+        String coutryFixedSize = this.country;
+
+        while (coutryFixedSize.length() < 20) {
+            coutryFixedSize += " ";
+        }
+
+        dataOutputStream.writeUTF(coutryFixedSize.substring(0, 20));
         // ArrayList<String> source;
         dataOutputStream.writeInt(source.size());
         for (String sourceString : source) {
@@ -163,7 +170,14 @@ public class Billionaire {
         // float netWorth;
         dataOutputStream.writeFloat(netWorth);
         // String country;
-        dataOutputStream.writeUTF(country);
+
+        String coutryFixedSize = this.country;
+
+        while (coutryFixedSize.length() < 20) {
+            coutryFixedSize += " ";
+        }
+
+        dataOutputStream.writeUTF(coutryFixedSize.substring(0, 20));
         // ArrayList<String> source;
         dataOutputStream.writeInt(source.size());
         for (String sourceString : source) {
@@ -205,7 +219,7 @@ public class Billionaire {
         // float netWorth;
         size += Float.BYTES;
         // String country;
-        size += getUTFSize(country);
+        size += 22; // 2 Bytes (Object Size) + 20 Bytes
         // ArrayList<String> source;
         size += getUTFArraySize(source);
         // int rank;
