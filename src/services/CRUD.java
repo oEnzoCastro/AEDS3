@@ -119,7 +119,7 @@ public class CRUD {
                 // Verifica se é o ID procurado (Só possivel conferir o ID se o Objeto estiver
                 // ativo)
 
-                if (key.length() == 1) {
+                if (key.charAt(0) >= '0' && key.charAt(0) <= '9') {
 
                     if ((billionaireTmp != null && billionaireTmp.getId() == Integer.parseInt(key))) {
                         found = true;
@@ -152,7 +152,7 @@ public class CRUD {
     public static void update(String key, String file) {
 
         Billionaire billionaire;
-        if (key.length() == 1) {
+        if (key.charAt(0) >= '0' && key.charAt(0) <= '9') {
             billionaire = get(key, file);
         } else {
             System.out.println("Só é aceito update inserindo a chave 'ID'!");
