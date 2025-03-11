@@ -31,6 +31,7 @@ public class App {
             option = scan.nextInt();
 
             int id = -1;
+            String key = "";
             switch (option) {
                 case 1:
                     // Create from CSV
@@ -46,21 +47,23 @@ public class App {
                 case 3:
                     // Read
                     System.out.print("ID: ");
-                    id = scan.nextInt();
+                    scan.nextLine(); // Clear Buffer
+                    key = scan.nextLine();
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    System.out.println(CRUD.get(id, file));
+                    CRUD.get(key, file);
                     break;
 
                 case 4:
                     // Update
                     System.out.print("ID: ");
-                    id = scan.nextInt();
+                    scan.nextLine(); // Clear Buffer
+                    key = scan.nextLine();
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    CRUD.update(id, file);
+                    CRUD.update(key, file);
                     break;
 
                 case 5:
