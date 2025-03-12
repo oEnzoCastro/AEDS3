@@ -79,7 +79,7 @@ public class App {
                 case 6:
                     // Sort
                     clearScreen(); // Clear terminal
-                    Sorting.sort(); // Sort Function
+                    Sorting.sort(file); // Sort Function
                     break;
 
                 case 7:

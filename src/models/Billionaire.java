@@ -277,7 +277,9 @@ public class Billionaire {
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
         // Lapide - Char
+        //
         // Tamanho Objeto - Int
+        //
         // Id - Int
         id = dataInputStream.readInt();
         // Name - 2 Bytes Size + String
@@ -326,7 +328,9 @@ public class Billionaire {
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
         // Lapide - Char
+        //
         // Tamanho Objeto - Int
+        //
         // Id - Int
         dataInputStream.readInt();
         // Name - 2 Bytes Size + String
