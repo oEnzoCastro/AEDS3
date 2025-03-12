@@ -1,5 +1,5 @@
 ID,Name,NetWorth,Country,Source,Rank,Age,Residence,Citizenship,Status,Children,Education,Self_made,Birthdate
-1,Jeff Bezos,177.0,United States,Amazon,1,57,"Seattle, Washington",United States,In Relationship,4,"Bachelor of Arts/Science, Princeton University",True,1968-01-01
+2756,Jeff Bezos,177.0,United States,Amazon,1,57,"Seattle, Washington",United States,In Relationship,4,"Bachelor of Arts/Science, Princeton University",True,1968-01-01
 2,Elon Musk,151.0,United States,"Tesla, SpaceX",2,49,"Austin, Texas",United States,In Relationship,7,"Bachelor of Arts/Science, University of Pennsylvania",True,1976-01-01
 3,Bernard Arnault & family,150.0,France,LVMH,3,72,"Paris, France",France,Married,5,"Bachelor of Arts/Science, Ecole Polytechnique de Paris",False,1953-01-01
 4,Bill Gates,124.0,United States,Microsoft,4,65,"Medina, Washington",United States,Divorced,3,"Drop Out, Harvard University",True,1960-01-01
