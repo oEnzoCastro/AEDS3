@@ -20,7 +20,7 @@ public class Sorting {
         }
 
         distribuicao(file, tmpFiles, registros);
-        intercalacao(tmpFiles, registros);
+        // intercalacao(tmpFiles, registros); TODO
 
     }
 
@@ -44,8 +44,8 @@ public class Sorting {
             int objectDistribute = 0;
             int fileDistribute = 0;
 
+            
             Billionaire[] billionaires = new Billionaire[registros];
-
             while (dataInputStream.available() > 0) {
 
                 char lapide = dataInputStream.readChar();
@@ -57,14 +57,15 @@ public class Sorting {
                     billionaire.fromByteArray(bt);
 
                     billionaires[objectDistribute] = billionaire;
-
+                    
                     // Conta o registro para distribuir do tamanho que foi pedido
                     objectDistribute++;
-                    if (objectDistribute >= registros) {
 
-                        billionaires = insertionSort(billionaires);
+                    if (objectDistribute >= registros || dataInputStream.available() <= 0) {
 
-                        for (int i = 0; i < billionaires.length; i++) {
+                        // billionaires = insertionSort(billionaires);
+
+                        for (int i = 0; i < objectDistribute; i++) {
                             dataOutputStreams[fileDistribute].write(billionaires[i].toByteArray()); // Insere objeto
                         }
 
@@ -85,14 +86,11 @@ public class Sorting {
                     billionaire.jumpElement(bt);
                 }
 
-                // System.out.println("Object: " + objectDistribute);
-                // System.out.println("File: " + fileDistribute);
-
             }
 
             dataInputStream.close();
         } catch (Exception e) {
-
+            System.out.println("ERRO: " + e);
         }
     }
 
