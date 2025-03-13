@@ -109,8 +109,9 @@ public class Sorting {
         boolean switchFiles = false;
 
         int contador = 0;
-        int switchInt = 2;
         while (isSorted == false) {
+
+            System.out.println("Registros: " + registros);
 
             try {
 
@@ -136,7 +137,39 @@ public class Sorting {
                     for (int i = inputSize; i < outputSize; i++) {
                         fileOutputStreams[i] = new FileOutputStream(tmpFiles[i]);
                         dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
-                        // Write
+                    }
+
+                    boolean isFinished = false;
+
+                    ArrayList<ArrayList<Billionaire>> billionairesPerFile = new ArrayList<ArrayList<Billionaire>>();
+                    
+                    while (isFinished == false) {
+
+                        int[] lowerPointer = new int[dataInputStreams.length];
+                        for (int i = 0; i < dataInputStreams.length; i++) {
+
+                            ArrayList<Billionaire> billionaires = new ArrayList<Billionaire>();
+
+                            lowerPointer[i] = i;
+                            for (int j = 0; j < registros; j++) {
+
+                                if (dataInputStreams[i].available() > 0) {
+
+                                    Billionaire billionaire = new Billionaire();
+
+                                    dataInputStreams[i].readChar();
+                                    int objectSize = dataInputStreams[i].readInt();
+                                    byte[] bt = new byte[objectSize];
+                                    dataInputStreams[i].read(bt);
+                                    billionaire.fromByteArray(bt);
+                                    billionaires.add(billionaire);
+
+                                }
+
+                            }
+                            billionairesPerFile.add(billionaires);
+                        }
+
                     }
 
                 } else {
@@ -168,8 +201,9 @@ public class Sorting {
                     switchFiles = true;
                 }
 
+                registros = registros * (tmpFiles.length / 2);
+
                 contador++;
-                switchInt++;
                 if (contador == 4) {
                     isSorted = true;
                 }
