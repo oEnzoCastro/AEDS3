@@ -22,7 +22,7 @@ public class Sorting {
         }
 
         distribuicao(file, tmpFiles, registros);
-        intercalacao(tmpFiles, registros);
+        intercalacao(tmpFiles, registros, caminhos);
 
     }
 
@@ -101,7 +101,7 @@ public class Sorting {
         }
     }
 
-    private static void intercalacao(String[] tmpFiles, int firstRegistros) {
+    private static void intercalacao(String[] tmpFiles, int firstRegistros, int caminhos) {
 
         int registros = firstRegistros;
 
@@ -115,97 +115,36 @@ public class Sorting {
 
             try {
 
-                int inputSize;
-                int outputSize; // Lembrar que ele não começa em 0, ele começa do tamanho do inputSize
+                int inputStart = 0;
+                int outputStart = 0; // Lembrar que ele não começa em 0, ele começa do tamanho do inputStart
 
                 if (switchFiles == false) {
-                    inputSize = tmpFiles.length / 2;
-                    outputSize = tmpFiles.length;
-
-                    FileInputStream[] fileInputStreams = new FileInputStream[inputSize];
-                    DataInputStream[] dataInputStreams = new DataInputStream[inputSize];
-
-                    for (int i = 0; i < inputSize; i++) {
-                        // System.out.println(i);
-                        fileInputStreams[i] = new FileInputStream(tmpFiles[i]);
-                        dataInputStreams[i] = new DataInputStream(fileInputStreams[i]);
-                    }
-
-                    FileOutputStream[] fileOutputStreams = new FileOutputStream[outputSize];
-                    DataOutputStream[] dataOutputStreams = new DataOutputStream[outputSize];
-
-                    for (int i = inputSize; i < outputSize; i++) {
-                        fileOutputStreams[i] = new FileOutputStream(tmpFiles[i]);
-                        dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
-                    }
-
-                    boolean isFinished = false;
-
-                    ArrayList<ArrayList<Billionaire>> billionairesPerFile = new ArrayList<ArrayList<Billionaire>>();
-                    
-                    while (isFinished == false) {
-
-                        int[] lowerPointer = new int[dataInputStreams.length];
-                        for (int i = 0; i < dataInputStreams.length; i++) {
-
-                            ArrayList<Billionaire> billionaires = new ArrayList<Billionaire>();
-
-                            lowerPointer[i] = i;
-                            for (int j = 0; j < registros; j++) {
-
-                                if (dataInputStreams[i].available() > 0) {
-
-                                    Billionaire billionaire = new Billionaire();
-
-                                    dataInputStreams[i].readChar();
-                                    int objectSize = dataInputStreams[i].readInt();
-                                    byte[] bt = new byte[objectSize];
-                                    dataInputStreams[i].read(bt);
-                                    billionaire.fromByteArray(bt);
-                                    billionaires.add(billionaire);
-
-                                }
-
-                            }
-
-                            billionairesPerFile.add(billionaires);
-
-                            if (billionaires.size() == 0) {
-                                i = dataInputStreams.length;
-                                isFinished = true;
-                            }
-                            
-                        }
-
-                        for (int i = 0; i < billionairesPerFile.size(); i++) {
-                            
-                        }
-
-                    }
+                    inputStart = 0;
+                    outputStart = caminhos;
 
                 } else {
-                    inputSize = tmpFiles.length / 2;
-                    outputSize = tmpFiles.length;
-                    FileInputStream[] fileInputStreams = new FileInputStream[outputSize];
-                    DataInputStream[] dataInputStreams = new DataInputStream[outputSize];
-
-                    for (int i = inputSize; i < outputSize; i++) {
-                        System.out.println(i);
-                        fileInputStreams[i] = new FileInputStream(tmpFiles[i]);
-                        dataInputStreams[i] = new DataInputStream(fileInputStreams[i]);
-                    }
-
-                    FileOutputStream[] fileOutputStreams = new FileOutputStream[inputSize];
-                    DataOutputStream[] dataOutputStreams = new DataOutputStream[inputSize];
-
-                    for (int i = 0; i < inputSize; i++) {
-                        fileOutputStreams[i] = new FileOutputStream(tmpFiles[i]);
-                        dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
-                        // Write
-                    }
-
-                    
+                    inputStart = caminhos;
+                    outputStart = 0;
                 }
+
+                FileInputStream[] fileInputStreams = new FileInputStream[caminhos];
+                DataInputStream[] dataInputStreams = new DataInputStream[caminhos];
+
+                for (int i = 0; i < caminhos; i++) {
+                    // System.out.println(i);
+                    fileInputStreams[i] = new FileInputStream(tmpFiles[i + inputStart]);
+                    dataInputStreams[i] = new DataInputStream(fileInputStreams[i]);
+                }
+
+                FileOutputStream[] fileOutputStreams = new FileOutputStream[caminhos];
+                DataOutputStream[] dataOutputStreams = new DataOutputStream[caminhos];
+
+                for (int i = 0; i < caminhos; i++) {
+                    fileOutputStreams[i] = new FileOutputStream(tmpFiles[i + outputStart]);
+                    dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
+                }
+
+                // 
 
                 if (switchFiles == true) {
                     switchFiles = false;
