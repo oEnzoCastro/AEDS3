@@ -126,7 +126,7 @@ public class Sorting {
                     DataInputStream[] dataInputStreams = new DataInputStream[inputSize];
 
                     for (int i = 0; i < inputSize; i++) {
-                        System.out.println(i);
+                        // System.out.println(i);
                         fileInputStreams[i] = new FileInputStream(tmpFiles[i]);
                         dataInputStreams[i] = new DataInputStream(fileInputStreams[i]);
                     }
@@ -167,7 +167,18 @@ public class Sorting {
                                 }
 
                             }
+
                             billionairesPerFile.add(billionaires);
+
+                            if (billionaires.size() == 0) {
+                                i = dataInputStreams.length;
+                                isFinished = true;
+                            }
+                            
+                        }
+
+                        for (int i = 0; i < billionairesPerFile.size(); i++) {
+                            
                         }
 
                     }
@@ -192,6 +203,8 @@ public class Sorting {
                         dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
                         // Write
                     }
+
+                    
                 }
 
                 if (switchFiles == true) {
