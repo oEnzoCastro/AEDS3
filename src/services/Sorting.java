@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import models.Billionaire;
 
@@ -11,7 +13,7 @@ public class Sorting {
 
     public static void sort(String file) {
         int registros = 4;
-        int caminhos = 2;
+        int caminhos = 10;
 
         String[] tmpFiles = new String[caminhos * 2];
 
@@ -20,7 +22,7 @@ public class Sorting {
         }
 
         distribuicao(file, tmpFiles, registros);
-        // intercalacao(tmpFiles, registros); TODO
+        intercalacao(tmpFiles, registros);
 
     }
 
@@ -44,8 +46,7 @@ public class Sorting {
             int objectDistribute = 0;
             int fileDistribute = 0;
 
-            
-            Billionaire[] billionaires = new Billionaire[registros];
+            ArrayList<Billionaire> billionaires = new ArrayList<>();   
             while (dataInputStream.available() > 0) {
 
                 char lapide = dataInputStream.readChar();
@@ -56,24 +57,32 @@ public class Sorting {
                     dataInputStream.read(bt);
                     billionaire.fromByteArray(bt);
 
-                    billionaires[objectDistribute] = billionaire;
+                    // billionaires.add(fileDistribute, billionaire);
+                    billionaires.add(billionaire);
                     
                     // Conta o registro para distribuir do tamanho que foi pedido
                     objectDistribute++;
 
                     if (objectDistribute >= registros || dataInputStream.available() <= 0) {
 
-                        // billionaires = insertionSort(billionaires);
+                        Collections.sort(billionaires, (b1, b2) -> {
+                            return b1.getId() - b2.getId();
+                        });
+
+                        System.out.println(objectDistribute);
 
                         for (int i = 0; i < objectDistribute; i++) {
-                            dataOutputStreams[fileDistribute].write(billionaires[i].toByteArray()); // Insere objeto
+                            dataOutputStreams[fileDistribute].write(billionaires.get(i).toByteArray()); // Insere objeto
                         }
 
                         fileDistribute++;
                         // Alterna em qual arquivo será armazenado
                         if (fileDistribute >= tmpFiles.length / 2) {
+                            billionaires.clear();
                             fileDistribute = 0;
+                            
                         }
+                        billionaires.clear();
 
                         objectDistribute = 0;
                     }
@@ -131,8 +140,6 @@ public class Sorting {
 
                 }
 
-                System.out.println("A");
-
                 isSorted = true;
 
             } catch (Exception e) {
@@ -141,16 +148,14 @@ public class Sorting {
         }
     }
 
-    private static Billionaire[] insertionSort(Billionaire[] billionaires) {
-        for (int i = 1; i < billionaires.length; i++) {
+    private static ArrayList<Billionaire> insertionSort(ArrayList<Billionaire> billionaires) {
+        for (int i = 1; i < billionaires.size(); i++) {
 
-            for (int j = i; j < billionaires.length; j++) {
+            for (int j = i; j < billionaires.size(); j++) {
 
-                if (billionaires[j].getId() < billionaires[j - 1].getId()) {
+                if (billionaires.get(j).getId() < billionaires.get(j - 1).getId()) {
 
-                    Billionaire billionaireTmp = billionaires[j];
-                    billionaires[j] = billionaires[j - 1];
-                    billionaires[j - 1] = billionaireTmp;
+                    //
 
                     j--;
 
