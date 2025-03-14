@@ -109,60 +109,107 @@ public class Sorting {
         boolean switchFiles = false;
 
         int contador = 0;
-        while (isSorted == false) {
 
-            System.out.println("Registros: " + registros);
+        System.out.println("Registros: " + registros);
 
-            try {
+        try {
 
-                int inputStart = 0;
-                int outputStart = 0; // Lembrar que ele não começa em 0, ele começa do tamanho do inputStart
+            int inputStart = 0;
+            int outputStart = 0; // Lembrar que ele não começa em 0, ele começa do tamanho do inputStart
 
-                if (switchFiles == false) {
-                    inputStart = 0;
-                    outputStart = caminhos;
+            if (switchFiles == false) {
+                inputStart = 0;
+                outputStart = caminhos;
 
-                } else {
-                    inputStart = caminhos;
-                    outputStart = 0;
-                }
+            } else {
+                inputStart = caminhos;
+                outputStart = 0;
+            }
 
-                FileInputStream[] fileInputStreams = new FileInputStream[caminhos];
-                DataInputStream[] dataInputStreams = new DataInputStream[caminhos];
+            // O QUE FAZER: MUDAR O OUTPUT / SALVAR A CADA ITERAÇÃO EM CADA ARQUIVO OUTPUT / COLOCAR LIMITE NO FOR PARA EVITAR EOF
 
-                for (int i = 0; i < caminhos; i++) {
-                    // System.out.println(i);
-                    fileInputStreams[i] = new FileInputStream(tmpFiles[i + inputStart]);
-                    dataInputStreams[i] = new DataInputStream(fileInputStreams[i]);
-                }
+            FileOutputStream[] fileOutputStreams = new FileOutputStream[caminhos];
+            DataOutputStream[] dataOutputStreams = new DataOutputStream[caminhos];
 
-                FileOutputStream[] fileOutputStreams = new FileOutputStream[caminhos];
-                DataOutputStream[] dataOutputStreams = new DataOutputStream[caminhos];
+            for (int i = 0; i < caminhos; i++) {
+                fileOutputStreams[i] = new FileOutputStream(tmpFiles[i + outputStart]);
+                dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
+            }
 
-                for (int i = 0; i < caminhos; i++) {
-                    fileOutputStreams[i] = new FileOutputStream(tmpFiles[i + outputStart]);
-                    dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
+            int[] readPointer = new int[caminhos];
+            Billionaire[] billionaires = new Billionaire[caminhos];
+
+            for (int i = 0; i < billionaires.length; i++) {
+                billionaires[i] = new Billionaire();
+            }
+
+            int outputPointer = 0;
+
+            while (isSorted == false) {
+                for (int i = 0; i < registros * caminhos; i++) {
+
+                    FileInputStream[] fileInputStreams = new FileInputStream[caminhos];
+                    DataInputStream[] dataInputStreams = new DataInputStream[caminhos];
+
+                    for (int j = 0; j < caminhos; j++) {
+                        // System.out.println(i);
+                        fileInputStreams[j] = new FileInputStream(tmpFiles[j + inputStart]);
+                        dataInputStreams[j] = new DataInputStream(fileInputStreams[j]);
+                    }
+
+                    for (int j = 0; j < caminhos; j++) {
+                        for (int k = 0; k < readPointer[j]; k++) {
+                            if (readPointer[j] < registros) {
+
+                                dataInputStreams[j].readChar();
+                                int objectSize = dataInputStreams[j].readInt();
+                                byte[] bt = new byte[objectSize];
+                                dataInputStreams[j].read(bt);
+                                billionaires[j].jumpElement(bt);
+
+                            }
+                        }
+                    }
+
+                    for (int j = 0; j < caminhos; j++) {
+                        dataInputStreams[j].readChar();
+                        int objectSize = dataInputStreams[j].readInt();
+                        byte[] bt = new byte[objectSize];
+                        dataInputStreams[j].read(bt);
+                        billionaires[j].fromByteArray(bt);
+                    }
+
+                    int menor = 0;
+                    for (int j = 1; j < caminhos; j++) {
+                        if (billionaires[j].getId() < billionaires[j - 1].getId()) {
+                            menor = j;
+                        }
+                    }
+
+                    dataOutputStreams[outputPointer].write(billionaires[menor].toByteArray()); // Insere objeto
+
+                    readPointer[menor]++;
+
                 }
 
                 // 
 
-                if (switchFiles == true) {
-                    switchFiles = false;
+                // if (switchFiles == true) {
+                //     switchFiles = false;
 
-                } else {
-                    switchFiles = true;
-                }
+                // } else {
+                //     switchFiles = true;
+                // }
 
-                registros = registros * (tmpFiles.length / 2);
+                // registros = registros * (tmpFiles.length / 2);
 
-                contador++;
-                if (contador == 4) {
-                    isSorted = true;
-                }
-
-            } catch (Exception e) {
-                System.out.println("ERRO: " + e);
+                // contador++;
+                // if (contador == 4) {
+                //     isSorted = true;
+                // }
             }
+        } catch (Exception e) {
+            System.out.println("ERRO: " + e);
         }
     }
 

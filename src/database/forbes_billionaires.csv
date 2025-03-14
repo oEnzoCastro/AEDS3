@@ -9,13 +9,3 @@ ID,Name,NetWorth,Country,Source,Rank,Age,Residence,Citizenship,Status,Children,E
 8,Larry Page,91.5,United States,Google,8,48,"Palo Alto, California",United States,Married,1,"Master of Science, Stanford University; Bachelor of Arts/Science, University of Michigan",True,1977-01-01
 9,Sergey Brin,89.0,United States,Google,9,47,"Los Altos, California",United States,Married,3,"Master of Science, Stanford University; Bachelor of Arts/Science, University of Maryland, College Park",True,1978-01-01
 10,Mukesh Ambani,84.5,India,diversified,10,64,"Mumbai, India",India,Married,3,"Drop Out, Stanford University; Bachelor of Science in Engineering, University of Mumbai",False,1961-01-01
-11,Amancio Ortega,77.0,Spain,Zara,11,85,"La Coruna, Spain",Spain,Married,3,,True,1940-01-01
-12,Francoise Bettencourt Meyers & family,73.6,France,L'Oréal,12,67,"Paris, France",France,Married,2,,False,1958-01-01
-13,Zhong Shanshan,68.9,China,"beverages, pharmaceuticals",13,66,"Hangzhou, China",China,,0,,True,1959-01-01
-14,Steve Ballmer,68.7,United States,Microsoft,14,65,"Hunts Point, Washington",United States,Married,3,"Bachelor of Arts/Science, Harvard University; Drop Out, Stanford University",True,1960-01-01
-15,Ma Huateng,65.8,China,internet media,15,49,"Shenzhen, China",China,Married,0,"Bachelor of Arts/Science, Shenzhen University",True,1976-01-01
-16,Carlos Slim Helu & family,62.8,Mexico,telecom,16,81,"Mexico City, Mexico",Mexico,Widowed,6,"Bachelor of Arts/Science, Universidad Nacional Autonoma de Mexico",True,1944-01-01
-17,Alice Walton,61.8,United States,Walmart,17,71,"Fort Worth, Texas",United States,Divorced,0,"Bachelor of Arts/Science, Trinity University",False,1954-01-01
-18,Jim Walton,60.2,United States,Walmart,18,72,"Bentonville, Arkansas",United States,Married,4,"Bachelor of Arts/Science, University of Arkansas",False,1953-01-01
-19,Rob Walton,59.5,United States,Walmart,19,76,"Bentonville, Arkansas",United States,Married,3,"Doctor of Jurisprudence, Columbia University; Bachelor of Arts/Science, University of Arkansas",False,1949-01-01
-20,Michael Bloomberg,59.0,United States,Bloomberg LP,20,79,"New York, New York",United States,In Relationship,2,"Master of Business Administration, Harvard Business School; Bachelor of Arts/Science, Johns Hopkins University",True,1946-01-01
