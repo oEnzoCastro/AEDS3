@@ -13,8 +13,8 @@ import models.Billionaire;
 public class Sorting {
 
     public static void sort(String file) {
-        int registros = 6;
-        int caminhos = 3;
+        int registros = 3;
+        int caminhos = 6;
 
         String[] tmpFiles = new String[caminhos * 2];
 
@@ -23,7 +23,11 @@ public class Sorting {
         }
 
         distribuicao(file, tmpFiles, registros);
-        intercalacao(tmpFiles, registros, caminhos);
+        String resultFile = intercalacao(tmpFiles, registros, caminhos);
+
+        System.out.println(resultFile);
+
+        
 
     }
 
@@ -102,19 +106,16 @@ public class Sorting {
         }
     }
 
-    private static void intercalacao(String[] tmpFiles, int firstRegistros, int caminhos) {
+    private static String intercalacao(String[] tmpFiles, int firstRegistros, int caminhos) {
 
         int registros = firstRegistros;
 
         boolean switchFiles = false;
-        
-        int contador = 0;
-        
-        System.out.println("Registros: " + registros);
+        boolean endLoop = false;
         
         try {
             
-            while (contador < 2) {
+            while (endLoop == false) {
 
                 boolean isSorted = false;
 
@@ -156,6 +157,15 @@ public class Sorting {
 
                 }
 
+                // Encerrar loop (Fim da intercalação)
+                if (randomAccessFiles[1].length() == 0) {
+                 
+                    System.out.println("Intercalação feita!");
+                    endLoop = true;
+                    return tmpFiles[0 + inputStart]; // Retorna em qual arquivo está a ordenação final
+                    
+                }
+
                 boolean[] isEOF = new boolean[caminhos];
 
                 for (int j = 0; j < caminhos; j++) {
@@ -195,7 +205,6 @@ public class Sorting {
                         }
 
                         if (isFinished == true) {
-                            System.out.println("FIM");
                             isSorted = true;
                             break;
                         } else {
@@ -242,12 +251,13 @@ public class Sorting {
                     switchFiles = true;
                 }
 
-                contador++;
-
             }
         } catch (Exception e) {
             System.out.println("ERRO: " + e);
         }
+
+        return "";
+
     }
 
     private static ArrayList<Billionaire> insertionSort(ArrayList<Billionaire> billionaires) {
