@@ -92,7 +92,7 @@ public class Billionaire {
         this.children = 0;
         this.education = new ArrayList<String>();
         this.selfMade = false;
-        this.birthdate = null;
+        this.birthdate = LocalDate.of(0001, 01, 01);
     }
 
     public byte[] toByteArray() throws IOException {

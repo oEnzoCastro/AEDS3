@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -12,8 +13,8 @@ import models.Billionaire;
 public class Sorting {
 
     public static void sort(String file) {
-        int registros = 4;
-        int caminhos = 2;
+        int registros = 6;
+        int caminhos = 3;
 
         String[] tmpFiles = new String[caminhos * 2];
 
@@ -105,114 +106,144 @@ public class Sorting {
 
         int registros = firstRegistros;
 
-        boolean isSorted = false;
         boolean switchFiles = false;
-
+        
         int contador = 0;
-
+        
         System.out.println("Registros: " + registros);
-
+        
         try {
+            
+            while (contador < 2) {
 
-            int inputStart = 0;
-            int outputStart = 0; // Lembrar que ele não começa em 0, ele começa do tamanho do inputStart
+                boolean isSorted = false;
 
-            if (switchFiles == false) {
-                inputStart = 0;
-                outputStart = caminhos;
+                int inputStart = 0;
+                int outputStart = 0; // Lembrar que ele não começa em 0, ele começa do tamanho do inputStart
 
-            } else {
-                inputStart = caminhos;
-                outputStart = 0;
-            }
+                if (switchFiles == false) {
+                    inputStart = 0;
+                    outputStart = caminhos;
 
-            // O QUE FAZER: MUDAR O OUTPUT / SALVAR A CADA ITERAÇÃO EM CADA ARQUIVO OUTPUT / COLOCAR LIMITE NO FOR PARA EVITAR EOF
+                } else {
+                    inputStart = caminhos;
+                    outputStart = 0;
+                }
 
-            FileOutputStream[] fileOutputStreams = new FileOutputStream[caminhos];
-            DataOutputStream[] dataOutputStreams = new DataOutputStream[caminhos];
+                // O QUE FAZER: MUDAR O OUTPUT / SALVAR A CADA ITERAÇÃO EM CADA ARQUIVO OUTPUT / COLOCAR LIMITE NO FOR PARA EVITAR EOF
 
-            for (int i = 0; i < caminhos; i++) {
-                fileOutputStreams[i] = new FileOutputStream(tmpFiles[i + outputStart]);
-                dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
-            }
+                FileOutputStream[] fileOutputStreams = new FileOutputStream[caminhos];
+                DataOutputStream[] dataOutputStreams = new DataOutputStream[caminhos];
 
-            int[] readPointer = new int[caminhos];
-            Billionaire[] billionaires = new Billionaire[caminhos];
+                for (int i = 0; i < caminhos; i++) {
+                    fileOutputStreams[i] = new FileOutputStream(tmpFiles[i + outputStart]);
+                    dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
+                }
+                RandomAccessFile[] randomAccessFiles = new RandomAccessFile[caminhos];
 
-            for (int i = 0; i < billionaires.length; i++) {
-                billionaires[i] = new Billionaire();
-            }
+                int[] readPointer = new int[caminhos];
+                Billionaire[] billionaires = new Billionaire[caminhos];
 
-            int outputPointer = 0;
+                for (int i = 0; i < caminhos; i++) {
+                    billionaires[i] = new Billionaire();
+                }
 
-            while (isSorted == false) {
-                for (int i = 0; i < registros * caminhos; i++) {
+                int outputPointer = 0;
 
-                    FileInputStream[] fileInputStreams = new FileInputStream[caminhos];
-                    DataInputStream[] dataInputStreams = new DataInputStream[caminhos];
-
-                    for (int j = 0; j < caminhos; j++) {
-                        // System.out.println(i);
-                        fileInputStreams[j] = new FileInputStream(tmpFiles[j + inputStart]);
-                        dataInputStreams[j] = new DataInputStream(fileInputStreams[j]);
-                    }
-
-                    for (int j = 0; j < caminhos; j++) {
-                        for (int k = 0; k < readPointer[j]; k++) {
-                            if (readPointer[j] < registros) {
-
-                                Billionaire billionaireTmp = new Billionaire();
-
-                                dataInputStreams[j].readChar();
-                                int objectSize = dataInputStreams[j].readInt();
-                                byte[] bt = new byte[objectSize];
-                                dataInputStreams[j].read(bt);
-                                // billionaires[j].jumpElement(bt);
-                                billionaireTmp.fromByteArray(bt);
-
-                                System.out.println(billionaireTmp.getName());
-                                
-                            }
-                        }
-                    }
-                    System.out.println("-");
-
-                    for (int j = 0; j < caminhos; j++) {
-                        dataInputStreams[j].readChar();
-                        int objectSize = dataInputStreams[j].readInt();
-                        byte[] bt = new byte[objectSize];
-                        dataInputStreams[j].read(bt);
-                        billionaires[j].fromByteArray(bt);
-                    }
-
-                    int menor = 0;
-                    for (int j = 1; j < caminhos; j++) {
-                        if (billionaires[j].getId() < billionaires[j - 1].getId()) {
-                            menor = j;
-                        }
-                    }
-
-                    dataOutputStreams[outputPointer].write(billionaires[menor].toByteArray()); // Insere objeto
-
-                    readPointer[menor]++;
+                for (int j = 0; j < caminhos; j++) {
+                    // System.out.println(i);
+                    randomAccessFiles[j] = new RandomAccessFile(tmpFiles[j + inputStart], "rw");
 
                 }
 
-                // 
+                boolean[] isEOF = new boolean[caminhos];
 
-                // if (switchFiles == true) {
-                //     switchFiles = false;
+                for (int j = 0; j < caminhos; j++) {
 
-                // } else {
-                //     switchFiles = true;
-                // }
+                    if (randomAccessFiles[j].getFilePointer() < randomAccessFiles[j].length()) {
 
-                // registros = registros * (tmpFiles.length / 2);
+                        randomAccessFiles[j].readChar();
+                        int objectSize = randomAccessFiles[j].readInt();
+                        byte[] bt = new byte[objectSize];
+                        randomAccessFiles[j].read(bt);
+                        billionaires[j].fromByteArray(bt);
 
-                // contador++;
-                // if (contador == 4) {
-                //     isSorted = true;
-                // }
+                    } else {
+                        isEOF[j] = true;
+                    }
+                }
+
+                while (isSorted == false) {
+                    for (int i = 0; i < registros * caminhos; i++) {
+
+                        int menor = 0;
+                        // boolean isFinished = true;
+                        for (int j = 1; j < caminhos; j++) {
+                            if (isEOF[j] == false) {
+                                if (billionaires[j].getId() < billionaires[menor].getId()) {
+                                    menor = j;
+                                    // isFinished = false;
+                                }
+                            }
+                        }
+
+                        boolean isFinished = true;
+                        for (int j = 0; j < caminhos; j++) {
+                            if (isEOF[j] == false) {
+                                isFinished = false;
+                            }
+                        }
+
+                        if (isFinished == true) {
+                            System.out.println("FIM");
+                            isSorted = true;
+                            break;
+                        } else {
+                            dataOutputStreams[outputPointer].write(billionaires[menor].toByteArray()); // Insere objeto
+                        }
+
+                        readPointer[menor]++;
+
+                        // Anda ponteiro
+                        for (int j = 0; j < caminhos; j++) {
+
+                            if (j == menor) {
+
+                                if (randomAccessFiles[j].getFilePointer() < randomAccessFiles[j].length()) {
+
+                                    randomAccessFiles[j].readChar();
+                                    int objectSize = randomAccessFiles[j].readInt();
+                                    byte[] bt = new byte[objectSize];
+                                    randomAccessFiles[j].read(bt);
+                                    billionaires[j].fromByteArray(bt);
+
+                                } else {
+                                    // dataOutputStreams[outputPointer].write(billionaires[menor].toByteArray()); // Insere objeto
+                                    isEOF[j] = true;
+                                }
+                            }
+                        }
+
+                    }
+
+                    outputPointer++;
+
+                    registros = registros * caminhos;
+
+                    if (outputPointer >= caminhos) {
+                        outputPointer = 0;
+                    }
+                }
+
+                if (switchFiles == true) {
+                    switchFiles = false;
+
+                } else {
+                    switchFiles = true;
+                }
+
+                contador++;
+
             }
         } catch (Exception e) {
             System.out.println("ERRO: " + e);
