@@ -161,15 +161,21 @@ public class Sorting {
                         for (int k = 0; k < readPointer[j]; k++) {
                             if (readPointer[j] < registros) {
 
+                                Billionaire billionaireTmp = new Billionaire();
+
                                 dataInputStreams[j].readChar();
                                 int objectSize = dataInputStreams[j].readInt();
                                 byte[] bt = new byte[objectSize];
                                 dataInputStreams[j].read(bt);
-                                billionaires[j].jumpElement(bt);
+                                // billionaires[j].jumpElement(bt);
+                                billionaireTmp.fromByteArray(bt);
 
+                                System.out.println(billionaireTmp.getName());
+                                
                             }
                         }
                     }
+                    System.out.println("-");
 
                     for (int j = 0; j < caminhos; j++) {
                         dataInputStreams[j].readChar();
