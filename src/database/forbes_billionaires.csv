@@ -49,4 +49,3 @@ ID,Name,NetWorth,Country,Source,Rank,Age,Residence,Citizenship,Status,Children,E
 15,Ma Huateng,65.8,China,internet media,15,49,"Shenzhen, China",China,Married,0,"Bachelor of Arts/Science, Shenzhen University",True,1976-01-01
 29,Masayoshi Son,45.4,Japan,"internet, telecom",29,63,"Tokyo, Japan",Japan,Married,2,"Bachelor of Arts/Science, University of California, Berkeley",True,1962-01-01
 39,Zhang Yiming,35.6,China,TikTok,39,37,"Beijing, China",China,,0,"Bachelor of Engineering, Nankai University",True,1988-01-01
-
