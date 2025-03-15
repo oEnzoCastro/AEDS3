@@ -13,9 +13,7 @@ import models.Billionaire;
 
 public class Sorting {
 
-    public static void sort(String file) {
-        int registros = 4;
-        int caminhos = 2;
+    public static void sort(String file, int registros, int caminhos) {
 
         String[] tmpFiles = new String[caminhos * 2];
 
@@ -28,45 +26,44 @@ public class Sorting {
 
         // Deleta arquivos temporarios e manda dados ordenados para arquivo principal
 
-        System.out.println(resultFile);
-
         try {
-
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
-
             randomAccessFile.seek(0);
+            int ultimoId = randomAccessFile.readInt();
+            randomAccessFile.close();
 
-            FileInputStream fileInputStream = new FileInputStream(resultFile);
-            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+            new File(file).delete();
 
-            randomAccessFile.readInt();
-            while (dataInputStream.available() > 0) {
-                dataInputStream.readChar();
-                int len = dataInputStream.readInt();
+            FileInputStream finalInputStream = new FileInputStream(resultFile);
+            DataInputStream finalDataInputStream = new DataInputStream(finalInputStream);
+
+            FileOutputStream finalOutputStream = new FileOutputStream(file);
+            DataOutputStream finalDataOutputStream = new DataOutputStream(finalOutputStream);
+
+            finalDataOutputStream.writeInt(ultimoId);
+
+            while (finalDataInputStream.available() > 0) {
+                char lapide = finalDataInputStream.readChar();
+                int len = finalDataInputStream.readInt();
                 byte[] bt = new byte[len];
-                dataInputStream.read(bt);
-                randomAccessFile.write(bt);
+                finalDataInputStream.read(bt);
+                finalDataOutputStream.writeChar(lapide);
+                finalDataOutputStream.writeInt(len);
+                finalDataOutputStream.write(bt);
             }
 
+            finalDataInputStream.close();
+            finalDataOutputStream.close();
 
+            // Deletar tmpFiles
+            for (String tempFile : tmpFiles) {
+                 new File(tempFile).delete();
+            }
 
-            randomAccessFile.close();
-            dataInputStream.close();
+            System.out.println("Ordenação concluída! Arquivo salvo em: " + file);
 
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
-        }
-
-        for (String tmpFile : tmpFiles) {
-                
-            File deleteFile = new File(tmpFile);
-
-            if (deleteFile.delete()) {
-                System.out.println("Deleted");
-            } else {
-                System.out.println("Not Deleted");
-            }
-
         }
 
     }
@@ -141,6 +138,10 @@ public class Sorting {
             }
 
             dataInputStream.close();
+            for (int i = 0; i < tmpFiles.length; i++) {
+                fileOutputStreams[i].close();
+                dataOutputStreams[i].close();
+            }
         } catch (Exception e) {
             System.out.println("ERRO: " + e);
         }
@@ -351,9 +352,16 @@ public class Sorting {
 
                 }
 
+                for (int i = 0; i < caminhos; i++) {
+                    randomAccessFile[i].close();
+                    fileOutputStream[i].close();
+                    dataOutputStream[i].close();
+                }
+
             } catch (Exception e) {
                 System.out.println("ERROR: " + e);
             }
+
         }
         // Return que estiver fora do Try/Catch
         return "";
