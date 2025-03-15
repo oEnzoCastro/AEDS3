@@ -1,6 +1,14 @@
 ## Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+Criação da base de dados, Manipulação de Arquivo Sequencial e Ordenação Externa: Implementação + Vídeo
+
+## The Team:
+`Enzo Castro Figueredo`
+`Rafael Iannini`
+
+## Program Running
+
+![AEDS3](https://github.com/user-attachments/assets/2b83ab34-f12c-49c1-adfc-65c9194dd97f)
 
 ## Folder Structure
 
@@ -8,10 +16,14 @@ The workspace contains two folders by default, where:
 
 - `src`: the folder to maintain sources
 - `lib`: the folder to maintain dependencies
+- `database`: the folder to maintain databases
+- `DAO`: the folder to access the database
+- `models`: the folder to maintain objects
+- `services`: the folder to maintain program functions
+  
+- `App.java`: the Main file
 
 Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
 
 ## Dependency Management
 
