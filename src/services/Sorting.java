@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import models.Billionaire;
 
@@ -107,9 +108,7 @@ public class Sorting {
 
                     if (objectDistribute >= registros || dataInputStream.available() <= 0) {
 
-                        Collections.sort(billionaires, (b1, b2) -> {
-                            return b1.getId() - b2.getId();
-                        });
+                        quickSort(billionaires, 0, billionaires.size() - 1);
 
                         for (int i = 0; i < objectDistribute; i++) {
                             dataOutputStreams[fileDistribute].write(billionaires.get(i).toByteArray()); // Insere objeto
@@ -365,6 +364,27 @@ public class Sorting {
         }
         // Return que estiver fora do Try/Catch
         return "";
+    }
+
+        private static void quickSort(List<Billionaire> list, int low, int high) {
+        if (low < high) {
+            int pi = partition(list, low, high);
+            quickSort(list, low, pi - 1);
+            quickSort(list, pi + 1, high);
+        }
+    }
+
+    private static int partition(List<Billionaire> list, int low, int high) {
+        Billionaire pivot = list.get(high);
+        int i = (low - 1);
+        for (int j = low; j < high; j++) {
+            if (list.get(j).getId() < pivot.getId()) { // Ordem crescente por ID
+                i++;
+                Collections.swap(list, i, j);
+            }
+        }
+        Collections.swap(list, i + 1, high);
+        return i + 1;
     }
 
 }
