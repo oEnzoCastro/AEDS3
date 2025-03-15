@@ -46,7 +46,7 @@ public class App {
 
                 case 3:
                     // Read
-                    System.out.print("ID: ");
+                    System.out.print("Chave: ");
                     scan.nextLine(); // Clear Buffer
                     key = scan.nextLine();
                     System.out.println();

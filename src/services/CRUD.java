@@ -78,7 +78,7 @@ public class CRUD {
 
             randomAccessFile.seek(0);
 
-            randomAccessFile.write(lastId);
+            randomAccessFile.writeInt(lastId);
 
             Billionaire newBillionaire = BillionaireService.newBillionaire(lastId);
 
