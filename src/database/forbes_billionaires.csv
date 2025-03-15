@@ -1,11 +1,52 @@
 ID,Name,NetWorth,Country,Source,Rank,Age,Residence,Citizenship,Status,Children,Education,Self_made,Birthdate
-21,Jeff Bezos,177.0,United States,Amazon,1,57,"Seattle, Washington",United States,In Relationship,4,"Bachelor of Arts/Science, Princeton University",True,1968-01-01
-2,Elon Musk,151.0,United States,"Tesla, SpaceX",2,49,"Austin, Texas",United States,In Relationship,7,"Bachelor of Arts/Science, University of Pennsylvania",True,1976-01-01
-3,Bernard Arnault & family,150.0,France,LVMH,3,72,"Paris, France",France,Married,5,"Bachelor of Arts/Science, Ecole Polytechnique de Paris",False,1953-01-01
-4,Bill Gates,124.0,United States,Microsoft,4,65,"Medina, Washington",United States,Divorced,3,"Drop Out, Harvard University",True,1960-01-01
+14,Steve Ballmer,68.7,United States,Microsoft,14,65,"Hunts Point, Washington",United States,Married,3,"Bachelor of Arts/Science, Harvard University; Drop Out, Stanford University",True,1960-01-01
+40,Giovanni Ferrero,35.1,Italy,"Nutella, chocolates",40,56,"Brussels, Belgium",Italy,Married,2,,False,1969-01-01
+31,Tadashi Yanai & family,44.1,Japan,fashion retail,31,72,"Tokyo, Japan",Japan,Married,2,"Bachelor of Arts/Science, Waseda University",True,1953-01-01
+46,Len Blavatnik,32.0,United States,"music, chemicals",46,63,"London, United Kingdom",United States,Married,0,"Master of Science, Columbia University; Master of Business Administration, Harvard Business School; Bachelor of Arts/Science, Moscow State University",True,1962-01-01
+18,Jim Walton,60.2,United States,Walmart,18,72,"Bentonville, Arkansas",United States,Married,4,"Bachelor of Arts/Science, University of Arkansas",False,1953-01-01
+49,John Mars,31.3,United States,"candy, pet food",48,85,"Jackson, Wyoming",United States,Married,3,"Diploma, The Hotchkiss School; Bachelor of Arts/Science, Yale University",False,1940-01-01
+27,Charles Koch,46.4,United States,Koch Industries,27,85,"Wichita, Kansas",United States,Married,2,"Bachelor of Arts/Science, Massachusetts Institute of Technology; Master of Science, Massachusetts Institute of Technology",False,1940-01-01
+26,Jack Ma,48.4,China,e-commerce,26,56,"Hangzhou, China",China,Married,0,"Bachelor of Arts/Science, Hangzhou Teacher's Institute",True,1969-01-01
+33,David Thomson & family,41.8,Canada,media,33,63,"Toronto, Canada",Canada,Divorced,4,"Master of Arts, University of Cambridge",False,1962-01-01
+20,Michael Bloomberg,59.0,United States,Bloomberg LP,20,79,"New York, New York",United States,In Relationship,2,"Master of Business Administration, Harvard Business School; Bachelor of Arts/Science, Johns Hopkins University",True,1946-01-01
+13,Zhong Shanshan,68.9,China,"beverages, pharmaceuticals",13,66,"Hangzhou, China",China,,0,,True,1959-01-01
 5,Mark Zuckerberg,97.0,United States,Facebook,5,36,"Palo Alto, California",United States,Married,2,"Drop Out, Harvard University",True,1989-01-01
-6,Warren Buffett,96.0,United States,Berkshire Hathaway,6,90,"Omaha, Nebraska",United States,"Widowed, Remarried",3,"Master of Science, Columbia University; Bachelor of Arts/Science, University of Nebraska Lincoln",True,1935-01-01
-7,Larry Ellison,93.0,United States,software,7,76,"Lanai, Hawaii",United States,In Relationship,4,"Drop Out, University of Chicago; Drop Out, University of Illinois, Urbana-Champaign",True,1949-01-01
-8,Larry Page,91.5,United States,Google,8,48,"Palo Alto, California",United States,Married,1,"Master of Science, Stanford University; Bachelor of Arts/Science, University of Michigan",True,1977-01-01
+38,Dieter Schwarz,36.9,Germany,retail,38,81,"Neckarsulm, Germany",Germany,Married,2,,False,1944-01-01
 9,Sergey Brin,89.0,United States,Google,9,47,"Los Altos, California",United States,Married,3,"Master of Science, Stanford University; Bachelor of Arts/Science, University of Maryland, College Park",True,1978-01-01
+4,Bill Gates,124.0,United States,Microsoft,4,65,"Medina, Washington",United States,Divorced,3,"Drop Out, Harvard University",True,1960-01-01
+7,Larry Ellison,93.0,United States,software,7,76,"Lanai, Hawaii",United States,In Relationship,4,"Drop Out, University of Chicago; Drop Out, University of Illinois, Urbana-Champaign",True,1949-01-01
+42,Gerard Wertheimer,34.5,France,Chanel,41,70,"New York, New York",France,Married,2,,False,1955-01-01
+47,Lee Shau Kee,31.7,Hong Kong,real estate,47,93,"Hong Kong, Hong Kong",Hong Kong,Divorced,5,,True,1932-01-01
+48,Jacqueline Mars,31.3,United States,"candy, pet food",48,81,"The Plains, Virginia",United States,Divorced,3,"Bachelor of Arts/Science, Bryn Mawr College",False,1944-01-01
+16,Carlos Slim Helu & family,62.8,Mexico,telecom,16,81,"Mexico City, Mexico",Mexico,Widowed,6,"Bachelor of Arts/Science, Universidad Nacional Autonoma de Mexico",True,1944-01-01
 10,Mukesh Ambani,84.5,India,diversified,10,64,"Mumbai, India",India,Married,3,"Drop Out, Stanford University; Bachelor of Science in Engineering, University of Mumbai",False,1961-01-01
+17,Alice Walton,61.8,United States,Walmart,17,71,"Fort Worth, Texas",United States,Divorced,0,"Bachelor of Arts/Science, Trinity University",False,1954-01-01
+25,Phil Knight & family,49.9,United States,Nike,25,83,"Hillsboro, Oregon",United States,Married,3,"Master of Business Administration, Stanford Graduate School of Business; Bachelor of Arts/Science, University of Oregon",True,1942-01-01
+35,Wang Wei,39.0,China,package delivery,35,50,"Shenzhen, China",China,,0,,True,1975-01-01
+32,François Pinault & family,42.3,France,luxury goods,32,84,"Paris, France",France,Married,3,"Drop Out, High School",True,1941-01-01
+1,Jeff Bezos,177.0,United States,Amazon,1,57,"Seattle, Washington",United States,In Relationship,4,"Bachelor of Arts/Science, Princeton University",True,1968-01-01
+45,William Lei Ding,33.0,China,online games,45,49,"Hangzhou, China",China,,0,"Bachelor of Arts/Science, University of Electronic Science and Technology of China",True,1976-01-01
+28,Julia Koch & family,46.4,United States,Koch Industries,27,59,"New York, New York",United States,Widowed,3,,False,1966-01-01
+34,Beate Heister & Karl Albrecht Jr.,39.2,Germany,supermarkets,34,0,Germany,Germany,,0,,False,0000-01-01
+6,Warren Buffett,96.0,United States,Berkshire Hathaway,6,90,"Omaha, Nebraska",United States,"Widowed, Remarried",3,"Master of Science, Columbia University; Bachelor of Arts/Science, University of Nebraska Lincoln",True,1935-01-01
+30,Michael Dell,45.1,United States,Dell computers,30,56,"Austin, Texas",United States,Married,4,"Drop Out, The University of Texas at Austin",True,1969-01-01
+12,Francoise Bettencourt Meyers & family,73.6,France,L'Oréal,12,67,"Paris, France",France,Married,2,,False,1958-01-01
+37,He Xiangjian,37.7,China,home appliances,37,78,"Foshan, China",China,Married,3,,True,1947-01-01
+2,Elon Musk,151.0,United States,"Tesla, SpaceX",2,49,"Austin, Texas",United States,In Relationship,7,"Bachelor of Arts/Science, University of Pennsylvania",True,1976-01-01
+22,MacKenzie Scott,53.0,United States,Amazon,22,51,"Seattle, Washington",United States,Married,4,"Bachelor of Arts/Science, Princeton University",False,1974-01-01
+3,Bernard Arnault & family,150.0,France,LVMH,3,72,"Paris, France",France,Married,5,"Bachelor of Arts/Science, Ecole Polytechnique de Paris",False,1953-01-01
+44,Qin Yinglin & family,33.5,China,pig breeding,44,56,"Nanyang, China",China,Married,0,,True,1969-01-01
+36,Miriam Adelson,38.2,United States,casinos,36,75,"Las Vegas, Nevada",United States,Widowed,5,"Bachelor of Science, Hebrew University Jerusalem",False,1950-01-01
+24,Gautam Adani & family,50.5,India,"infrastructure, commodities",24,58,"Ahmedabad, India",India,Married,2,,True,1967-01-01
+41,Alain Wertheimer,34.5,France,Chanel,41,72,"New York, New York",France,Married,3,,False,1953-01-01
+11,Amancio Ortega,77.0,Spain,Zara,11,85,"La Coruna, Spain",Spain,Married,3,,True,1940-01-01
+23,Daniel Gilbert,51.9,United States,Quicken Loans,23,59,"Franklin, Michigan",United States,Married,5,"Bachelor of Arts/Science, Michigan State University; LLB, Wayne State University",True,1966-01-01
+19,Rob Walton,59.5,United States,Walmart,19,76,"Bentonville, Arkansas",United States,Married,3,"Doctor of Jurisprudence, Columbia University; Bachelor of Arts/Science, University of Arkansas",False,1949-01-01
+50,Yang Huiyan & family,29.6,China,real estate,50,39,"Foshan, China",China,Married,0,"Bachelor of Arts/Science, Ohio State University",False,1986-01-01
+21,Colin Zheng Huang,55.3,China,e-commerce,21,41,"Shanghai, China",China,,0,"Master, University of Wisconsin Madison; Bachelor of Arts/Science, Zhejiang University",True,1984-01-01
+8,Larry Page,91.5,United States,Google,8,48,"Palo Alto, California",United States,Married,1,"Master of Science, Stanford University; Bachelor of Arts/Science, University of Michigan",True,1977-01-01
+43,Li Ka-shing,33.7,Hong Kong,diversified,43,92,Hong Kong,Hong Kong,Widowed,2,"Drop Out, High School",True,1933-01-01
+15,Ma Huateng,65.8,China,internet media,15,49,"Shenzhen, China",China,Married,0,"Bachelor of Arts/Science, Shenzhen University",True,1976-01-01
+29,Masayoshi Son,45.4,Japan,"internet, telecom",29,63,"Tokyo, Japan",Japan,Married,2,"Bachelor of Arts/Science, University of California, Berkeley",True,1962-01-01
+39,Zhang Yiming,35.6,China,TikTok,39,37,"Beijing, China",China,,0,"Bachelor of Engineering, Nankai University",True,1988-01-01
+
