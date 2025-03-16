@@ -154,7 +154,9 @@ public class BillionaireService {
         }
         // Rank
         System.out.print("Rank: ");
-        int rank = getRank(netWorth); // Calcular a partir dos outros ranks
+        // int rank = getRank(netWorth); // Calcular a partir dos outros ranks
+        int rank = scan.nextInt(); // Calcular a partir dos outros ranks
+        scan.nextLine(); // Clear Buffer
         System.out.println();
         // Age
         System.out.print("Age: ");

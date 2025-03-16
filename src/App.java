@@ -79,7 +79,13 @@ public class App {
                 case 6:
                     // Sort
                     clearScreen(); // Clear terminal
-                    Sorting.sort(); // Sort Function
+                    System.out.print("Registros: ");
+                    int registros = scan.nextInt();
+                    System.out.println();
+                    System.out.print("Caminhos: ");
+                    int caminhos = scan.nextInt();
+                    System.out.println();
+                    Sorting.sort(file, registros, caminhos); // Sort Function
                     break;
 
                 case 7:

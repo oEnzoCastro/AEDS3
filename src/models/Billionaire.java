@@ -92,7 +92,7 @@ public class Billionaire {
         this.children = 0;
         this.education = new ArrayList<String>();
         this.selfMade = false;
-        this.birthdate = null;
+        this.birthdate = LocalDate.of(0001, 01, 01);
     }
 
     public byte[] toByteArray() throws IOException {
@@ -277,7 +277,9 @@ public class Billionaire {
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
         // Lapide - Char
+        //
         // Tamanho Objeto - Int
+        //
         // Id - Int
         id = dataInputStream.readInt();
         // Name - 2 Bytes Size + String
@@ -326,7 +328,9 @@ public class Billionaire {
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
 
         // Lapide - Char
+        //
         // Tamanho Objeto - Int
+        //
         // Id - Int
         dataInputStream.readInt();
         // Name - 2 Bytes Size + String
