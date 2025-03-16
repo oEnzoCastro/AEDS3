@@ -78,7 +78,7 @@ public class CRUD {
 
             randomAccessFile.seek(0);
 
-            randomAccessFile.write(lastId);
+            randomAccessFile.writeInt(lastId);
 
             Billionaire newBillionaire = BillionaireService.newBillionaire(lastId);
 
@@ -187,8 +187,6 @@ public class CRUD {
                     long filePointer = BillionaireService.findBillionaireByte(id, file);
 
                     randomAccessFile.seek(filePointer);
-
-                    System.out.println(randomAccessFile.getFilePointer());
 
                     bt = newBillionaire.toByteArrayUpdate(billionaire, file);
                     randomAccessFile.write(bt);
