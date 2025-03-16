@@ -1,248 +1,372 @@
 package services;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import models.Billionaire;
 
 public class Sorting {
 
-    private static int max_Memory = 50;
+    public static void sort(String file, int registros, int caminhos) {
 
-    public static void sort(){
-        String file = "src/database/billionaires.db";
-        String temp1 = "src/database/temp1.db";
-        String temp2 = "src/database/temp2.db";
-        String temp3 = "src/database/temp3.db";
-        String temp4 = "src/database/temp4.db";
-        
-        distribuicao();
-        int lastwrite = intercalacao();
+        String[] tmpFiles = new String[caminhos * 2];
+
+        for (int i = 0; i < caminhos * 2; i++) {
+            tmpFiles[i] = "src/database/tmp" + i + ".db";
+        }
+
+        distribuicao(file, tmpFiles, registros);
+        String resultFile = intercalacao(tmpFiles, registros, caminhos);
+
+        // Deleta arquivos temporarios e manda dados ordenados para arquivo principal
+
         try {
-            // Lê o ultimo id inserido no arquivo original e salva
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
             randomAccessFile.seek(0);
             int ultimoId = randomAccessFile.readInt();
             randomAccessFile.close();
 
-            new File(file).delete(); // Apaga o arquivo original desordenado
-            
-            String finalFile = lastwrite == 1 ? temp1 : temp3; // Encontra o arquivo com os dados ordenados (ulitmo arquivo escrito)
+            new File(file).delete();
 
-            FileInputStream finalInputStream = new FileInputStream(finalFile);
+            FileInputStream finalInputStream = new FileInputStream(resultFile);
             DataInputStream finalDataInputStream = new DataInputStream(finalInputStream);
 
             FileOutputStream finalOutputStream = new FileOutputStream(file);
             DataOutputStream finalDataOutputStream = new DataOutputStream(finalOutputStream);
 
-            finalDataOutputStream.writeInt(ultimoId); // Escreve o cabeçalho
+            finalDataOutputStream.writeInt(ultimoId);
 
-            // Transfere os dados do arquivo temporario para o final
             while (finalDataInputStream.available() > 0) {
                 char lapide = finalDataInputStream.readChar();
                 int len = finalDataInputStream.readInt();
                 byte[] bt = new byte[len];
                 finalDataInputStream.read(bt);
-                Billionaire b = new Billionaire();
-                b.fromByteArray(bt);
-                byte[] tmp = b.toByteArray();
-                if (lapide != '*') {
-                    finalDataOutputStream.write(tmp);
-                }
+                finalDataOutputStream.writeChar(lapide);
+                finalDataOutputStream.writeInt(len);
+                finalDataOutputStream.write(bt);
             }
-    
+
             finalDataInputStream.close();
             finalDataOutputStream.close();
-    
-            // Deletando arquivos temporários
-            new File(temp1).delete();
-            new File(temp2).delete();
-            new File(temp3).delete();
-            new File(temp4).delete();
-    
+
+            // Deletar tmpFiles
+            for (String tempFile : tmpFiles) {
+                 new File(tempFile).delete();
+            }
+
             System.out.println("Ordenação concluída! Arquivo salvo em: " + file);
+
         } catch (Exception e) {
-            System.err.println("Erro ao salvar arquivo final: " + e);
+            System.out.println("ERROR: " + e);
         }
+
     }
 
-    private static void distribuicao() {
-        String file = "src/database/billionaires.db";
-        String temp1 = "src/database/temp1.db";
-        String temp2 = "src/database/temp2.db";
-
+    private static void distribuicao(String file, String[] tmpFiles, int registros) {
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 
-            FileOutputStream fileOutputStream1 = new FileOutputStream(temp1);
-            DataOutputStream dataOutputStream1 = new DataOutputStream(fileOutputStream1);
+            dataInputStream.readInt(); // Pula Cabeçalho
 
-            FileOutputStream fileOutputStream2 = new FileOutputStream(temp2);
-            DataOutputStream dataOutputStream2 = new DataOutputStream(fileOutputStream2);
+            FileOutputStream[] fileOutputStreams = new FileOutputStream[tmpFiles.length];
+            DataOutputStream[] dataOutputStreams = new DataOutputStream[tmpFiles.length];
 
-            dataInputStream.readInt(); // Ignorar o primeiro int
+            // Cria Arquivos tmp de acordo com o tamanho dos caminhos
+            for (int i = 0; i < fileOutputStreams.length; i++) {
+                fileOutputStreams[i] = new FileOutputStream(tmpFiles[i]);
+                dataOutputStreams[i] = new DataOutputStream(fileOutputStreams[i]);
 
-            List<Billionaire> billionaires = new ArrayList<>();
-            boolean writeTemp1 = true;
+            }
 
+            int objectDistribute = 0;
+            int fileDistribute = 0;
+
+            ArrayList<Billionaire> billionaires = new ArrayList<>();
             while (dataInputStream.available() > 0) {
-                billionaires.clear();
 
-                for (int i = 0; i < max_Memory; i++) { // Lê até 50 registros
-                    if (dataInputStream.available() <= 0) break; // Evita ler além do arquivo se ele tiver acabado
-
-                    char lapide = dataInputStream.readChar(); // Ler Lapide
-                    int len = dataInputStream.readInt(); // Ler Tamanho do Obj
-
-                    byte[] bt = new byte[len];
+                char lapide = dataInputStream.readChar();
+                if (lapide != '*') {
+                    Billionaire billionaire = new Billionaire();
+                    int objectSize = dataInputStream.readInt();
+                    byte[] bt = new byte[objectSize];
                     dataInputStream.read(bt);
+                    billionaire.fromByteArray(bt);
 
-                    if (lapide != '*') { // Ignora registros com lapide 
-                        Billionaire b = new Billionaire();
-                        b.fromByteArray(bt);
-                        billionaires.add(b);
+                    // billionaires.add(fileDistribute, billionaire);
+                    billionaires.add(billionaire);
+
+                    // Conta o registro para distribuir do tamanho que foi pedido
+                    objectDistribute++;
+
+                    if (objectDistribute >= registros || dataInputStream.available() <= 0) {
+
+                        quickSort(billionaires, 0, billionaires.size() - 1);
+
+                        for (int i = 0; i < objectDistribute; i++) {
+                            dataOutputStreams[fileDistribute].write(billionaires.get(i).toByteArray()); // Insere objeto
+                        }
+
+                        fileDistribute++;
+                        // Alterna em qual arquivo será armazenado
+                        if (fileDistribute >= tmpFiles.length / 2) {
+                            billionaires.clear();
+                            fileDistribute = 0;
+
+                        }
+                        billionaires.clear();
+
+                        objectDistribute = 0;
                     }
+
+                } else {
+                    Billionaire billionaire = new Billionaire();
+                    int objectSize = dataInputStream.readInt();
+                    byte[] bt = new byte[objectSize];
+                    dataInputStream.read(bt);
+                    billionaire.jumpElement(bt);
                 }
 
-                quickSort(billionaires, 0, billionaires.size() - 1); // Ordenação crescente por ID
-
-                DataOutputStream outputStream = writeTemp1 ? dataOutputStream1 : dataOutputStream2; // Testa em qual arquivo vai inserir
-
-                for (Billionaire b : billionaires) {
-                    byte[] tmp = b.toByteArray();
-                    outputStream.write(tmp);
-                }
-
-                writeTemp1 = !writeTemp1; // Alterna os arquivos de saída
             }
 
             dataInputStream.close();
-            dataOutputStream1.close();
-            dataOutputStream2.close();
+            for (int i = 0; i < tmpFiles.length; i++) {
+                fileOutputStreams[i].close();
+                dataOutputStreams[i].close();
+            }
         } catch (Exception e) {
-            System.err.println("Erro Sorting.distribuicao: " + e);
+            System.out.println("ERRO: " + e);
         }
     }
 
-    private static int intercalacao() {
-        String temp1 = "src/database/temp1.db";
-        String temp2 = "src/database/temp2.db";
-        String temp3 = "src/database/temp3.db";
-        String temp4 = "src/database/temp4.db";
-    
-        boolean inicialRead = true; // Para saber em quais arquivos ler e em quais escrever
-        int segmento = max_Memory; // Tamanho inicial do segmento ordenado
-        boolean hasData;
-        int lastwrite = -1; // Para saber qual o ulitmo arquivo escrito para saber onde está o arquivo ordenado final
+    private static String intercalacao(String[] tmpFiles, int firstRegistros, int caminhos) {
 
-        do {
-            hasData = false; // Controle se ainda existe dados nos arquivos
-            boolean wroteData = false; // Controle se algum dado foi escrito
-    
+        boolean switchFiles = false;
+
+        boolean endSorting = false;
+
+        int registros = firstRegistros;
+
+        while (endSorting == false) {
+
+            // Inicio Declaração de I/O
+
+            int inputStart;
+            int outputStart;
+
+            if (switchFiles == false) {
+                inputStart = 0;
+                outputStart = caminhos;
+            } else {
+                inputStart = caminhos;
+                outputStart = 0;
+            }
+
+            // In
+            RandomAccessFile[] randomAccessFile = new RandomAccessFile[caminhos];
+            // Out
+            FileOutputStream[] fileOutputStream = new FileOutputStream[caminhos];
+            DataOutputStream[] dataOutputStream = new DataOutputStream[caminhos];
+
+            // Setar endereço dos arquivos
             try {
-                // Seleção dos arquivos
-                FileInputStream fileInputStream1 = new FileInputStream(inicialRead ? temp1 : temp3);
-                DataInputStream dataInputStream1 = new DataInputStream(fileInputStream1);
-    
-                FileInputStream fileInputStream2 = new FileInputStream(inicialRead ? temp2 : temp4);
-                DataInputStream dataInputStream2 = new DataInputStream(fileInputStream2);
-    
-                FileOutputStream fileOutputStream1 = new FileOutputStream(inicialRead ? temp3 : temp1);
-                DataOutputStream dataOutputStream1 = new DataOutputStream(fileOutputStream1);
-    
-                FileOutputStream fileOutputStream2 = new FileOutputStream(inicialRead ? temp4 : temp2);
-                DataOutputStream dataOutputStream2 = new DataOutputStream(fileOutputStream2);
-                
-                // Em qual arquivo começar escrevendo
-                boolean writeToFirst = true;
-    
-                Billionaire b1 = null, b2 = null;
-                boolean hasB1 = false, hasB2 = false;
-    
-                while (dataInputStream1.available() > 0 || dataInputStream2.available() > 0) { // Enquanto ainda existir dados em um dos arquivos de input
-                    DataOutputStream outputStream = writeToFirst ? dataOutputStream1 : dataOutputStream2;
-                    int count = 0;
-                    int countB1 = 0, countB2 = 0;
-                    
-                    while (count < segmento * 2) { // Ainda existem números no segmento de um dos arquivos
-                        if (!hasB1 && countB1 < segmento && dataInputStream1.available() > 0) { // Se não tem um registro do arquivo 1 salvo e ainda tem registros no segmento ordenado do arquivo 1 e ele não acabou
-                            // Ler e salvar registro do arquivo 1
-                            char lapide = dataInputStream1.readChar();
-                            int len = dataInputStream1.readInt();
-                            byte[] bt = new byte[len];
-                            dataInputStream1.read(bt);
-                            if (lapide != '*') {
-                                b1 = new Billionaire();
-                                b1.fromByteArray(bt);
-                                hasB1 = true;
-                                countB1++;
-                            }
-                        }
-    
-                        if (!hasB2 && countB2 < segmento && dataInputStream2.available() > 0) { // Se não tem um registro do arquivo 2 salvo e ainda tem registros no segmento ordenado do arquivo2 e ele não acabou
-                            // Ler e salvar registro do arquivo 2
-                            char lapide = dataInputStream2.readChar();
-                            int len = dataInputStream2.readInt();
-                            byte[] bt = new byte[len];
-                            dataInputStream2.read(bt);
-                            if (lapide != '*') {
-                                b2 = new Billionaire();
-                                b2.fromByteArray(bt);
-                                hasB2 = true;
-                                countB2++;
-                            }
-                        }
-    
-                        if (hasB1 && (!hasB2 || b1.getId() < b2.getId())) { // Se existe o registro do arquivo 1 e ou não existe do arquivo 2 ou o id de 1 é menor que o de 2
-                            // Escreve no próximo arquivo o registro do arquivo 1
-                            byte[] tmp = b1.toByteArray();
-                            outputStream.write(tmp);
-                            hasB1 = false; // Avisa que b1 foi usado
-                            wroteData = true; // Avisa que algum dado foi escrito
-                            lastwrite = inicialRead ? 3 : 1; // Diz qual o ultimo arquivo que foi escrito
-                        } else if (hasB2) {
-                            byte[] tmp = b2.toByteArray();
-                            outputStream.write(tmp);
-                            hasB2 = false; // Avisa que b2 foi usado
-                            wroteData = true; // Avisa que algum dado foi escrito
-                            lastwrite = inicialRead ? 3 : 1; // Diz qual o ultimo arquivo que foi escrito
-                        } else { // Se b1 e b2 não existem
-                            break;
-                        } 
-
-                    }
-
-                    if(dataInputStream1.available() == 0 && dataInputStream2.available() == 0){ // Se os arquivos não tem mais dados disponiveis
-                        break;
-                    }
-
-                    hasData = hasData || wroteData; // Se ainda há dados ou se dados foram escritos nessa iteração
-                    
-                    writeToFirst = !writeToFirst; // Inverte o próximo arquivo a ser escrito
+                for (int i = 0; i < caminhos; i++) {
+                    randomAccessFile[i] = new RandomAccessFile(tmpFiles[i + inputStart], "rw");
                 }
 
-                dataInputStream1.close();
-                dataInputStream2.close();
-                dataOutputStream1.close();
-                dataOutputStream2.close();
-    
-                inicialRead = !inicialRead; // Inverte o conjunto de arquivos a serem lidos e escritos
-                segmento *= 2; // Dobra o tamanho do segmento em cada iteração
-                
-            } catch (Exception e) {
-                System.err.println("Erro em Sorting.intercalacao: " + e);
-                break;
-            }
-            if(!wroteData){
-                break;
-            }
-        } while (hasData); // Enquanto ainda existe dados
+                for (int i = 0; i < caminhos; i++) {
+                    fileOutputStream[i] = new FileOutputStream(tmpFiles[i + outputStart]);
+                    dataOutputStream[i] = new DataOutputStream(fileOutputStream[i]);
+                }
 
-        return lastwrite; // Retorna o ultimo arquivo escrito (que sera o ordenado)
+                if (randomAccessFile[1].length() <= 0) {
+                    // Retorna o arquivo que está ordenado
+                    for (int i = 0; i < caminhos; i++) {
+                        randomAccessFile[i].close();
+                        fileOutputStream[i].close();
+                        dataOutputStream[i].close();
+                    }
+                    return tmpFiles[0 + inputStart];
+                }
+
+            } catch (Exception e) {
+                System.out.println("ERROR: " + e);
+            }
+
+            // Fim Declaração de I/O
+            // Inicio Intercalação
+
+            Billionaire[] billionaires = new Billionaire[caminhos];
+            try {
+
+                // Bool para conferir se os registros totais já foram lidos
+                boolean[] isOff = new boolean[caminhos];
+
+                // Pega o input de cada caminho e inicializa os Bilionários
+                for (int i = 0; i < caminhos; i++) {
+
+                    billionaires[i] = new Billionaire();
+
+                    // Ler se houver Bilionário, se não, Billionario = NULL
+                    if (randomAccessFile[i].getFilePointer() < randomAccessFile[i].length()) {
+
+                        randomAccessFile[i].readChar();
+                        int objectSize = randomAccessFile[i].readInt();
+                        byte[] bt = new byte[objectSize];
+                        randomAccessFile[i].read(bt);
+                        billionaires[i].fromByteArray(bt);
+
+                    } else {
+                        isOff[i] = true;
+                    }
+                }
+
+                int[] billionairePointer = new int[caminhos];
+                int outputPointer = 0;
+
+                Boolean isEOF = false;
+
+                while (isEOF == false) { // Loop Infinito de Teste
+
+                    int menor = 0;
+
+                    if (isOff[0] == true) {
+                        for (int i = 0; i < caminhos; i++) {
+                            if (isOff[i] == false) {
+                                menor = i;
+                                i = caminhos; // Break    
+                            }
+                        }
+                    }
+
+                    // Comparar ID de cada caminho
+                    for (int i = 0; i < caminhos; i++) {
+                        if (isOff[i] == false) {
+                            if (billionaires[i].getId() < billionaires[menor].getId()) {
+                                menor = i;
+                            }
+                        }
+                    }
+
+                    // System.out.println(outputPointer + " - " + billionaires[menor].getId());
+
+                    if (randomAccessFile[menor].getFilePointer() < randomAccessFile[menor].length()) {
+                        // Insere o Bilionário no arquivo correspondente ao Output
+                        fileOutputStream[outputPointer].write(billionaires[menor].toByteArray());
+                        // Lê o proximo Bilionário
+                        randomAccessFile[menor].readChar();
+                        int objectSize = randomAccessFile[menor].readInt();
+                        byte[] bt = new byte[objectSize];
+                        randomAccessFile[menor].read(bt);
+                        billionaires[menor].fromByteArray(bt);
+                        // Adiciona no contador que o menor bilionário foi movimentado
+                        billionairePointer[menor]++;
+                        if (billionairePointer[menor] >= registros) {
+                            isOff[menor] = true;
+                        }
+                    } else {
+                        isOff[menor] = true;
+                    }
+
+                    boolean isAllOff = true;
+                    isEOF = true;
+
+                    for (int i = 0; i < caminhos; i++) {
+                        if (isOff[i] == false) {
+                            isAllOff = false;
+                        }
+                        if (randomAccessFile[i].getFilePointer() < randomAccessFile[i].length()) {
+                            isEOF = false;
+                        }
+                    }
+
+                    // Se todos tiverem acabado o registro, ir para o proximo arquivo
+                    if (isAllOff == true) {
+                        for (int i = 0; i < isOff.length; i++) {
+                            if (randomAccessFile[i].getFilePointer() < randomAccessFile[i].length()) {
+                                isOff[i] = false;
+                            }
+
+                            billionairePointer[i] = 0;
+                        }
+                        outputPointer++;
+                        if (outputPointer >= caminhos) {
+                            outputPointer = 0;
+                        }
+                    }
+
+                    // Insere os Bilionários que faltaram e muda o arquivo de output e input
+                    if (isEOF == true) {
+
+                        // Insere o Bilionário no arquivo correspondente ao Output
+                        for (int i = 0; i < caminhos; i++) {
+
+                            menor = 0;
+
+                            if (isOff[0] == true) {
+                                for (int j = 0; j < caminhos; j++) {
+                                    if (isOff[j] == false) {
+                                        menor = j;
+                                        j = caminhos; // Break    
+                                    }
+                                }
+                            }
+
+                            // Comparar ID de cada caminho
+                            for (int j = 0; j < caminhos; j++) {
+                                if (isOff[j] == false) {
+                                    if (billionaires[j].getId() < billionaires[menor].getId()) {
+                                        menor = j;
+                                    }
+                                }
+                            }
+
+                            if (isOff[menor] == false) {
+                                // System.out.println(outputPointer + " - " + billionaires[menor].getId());
+
+                                fileOutputStream[outputPointer].write(billionaires[menor].toByteArray());
+                            }
+
+                            isOff[menor] = true;
+
+                        }
+
+                        // Altera o tamanho dos registros de acordo com a Ordenação Externa
+                        registros = registros * caminhos;
+
+                        if (switchFiles == false) {
+                            switchFiles = true;
+                        } else {
+                            switchFiles = false;
+                        }
+
+                    }
+
+                }
+
+                for (int i = 0; i < caminhos; i++) {
+                    randomAccessFile[i].close();
+                    fileOutputStream[i].close();
+                    dataOutputStream[i].close();
+                }
+
+            } catch (Exception e) {
+                System.out.println("ERROR: " + e);
+            }
+
+        }
+        // Return que estiver fora do Try/Catch
+        return "";
     }
-    
-    private static void quickSort(List<Billionaire> list, int low, int high) {
+
+        private static void quickSort(List<Billionaire> list, int low, int high) {
         if (low < high) {
             int pi = partition(list, low, high);
             quickSort(list, low, pi - 1);
