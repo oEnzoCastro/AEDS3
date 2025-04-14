@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.util.Scanner;
-
 import services.CRUD;
 import services.Sorting;
 
@@ -48,11 +47,11 @@ public class App {
                     // Read
                     System.out.print("Chave: ");
                     scan.nextLine(); // Clear Buffer
-                    key = scan.nextLine();
+                    id = scan.nextInt();
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    CRUD.get(key, file);
+                    CRUD.getIndex(id);
                     break;
 
                 case 4:

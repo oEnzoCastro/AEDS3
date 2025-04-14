@@ -1,5 +1,5 @@
 ID,Name,NetWorth,Country,Source,Rank,Age,Residence,Citizenship,Status,Children,Education,Self_made,Birthdate
-2756,Jeff Bezos,177.0,United States,Amazon,1,57,"Seattle, Washington",United States,In Relationship,4,"Bachelor of Arts/Science, Princeton University",True,1968-01-01
+1,Jeff Bezos,177.0,United States,Amazon,1,57,"Seattle, Washington",United States,In Relationship,4,"Bachelor of Arts/Science, Princeton University",True,1968-01-01
 2,Elon Musk,151.0,United States,"Tesla, SpaceX",2,49,"Austin, Texas",United States,In Relationship,7,"Bachelor of Arts/Science, University of Pennsylvania",True,1976-01-01
 3,Bernard Arnault & family,150.0,France,LVMH,3,72,"Paris, France",France,Married,5,"Bachelor of Arts/Science, Ecole Polytechnique de Paris",False,1953-01-01
 4,Bill Gates,124.0,United States,Microsoft,4,65,"Medina, Washington",United States,Divorced,3,"Drop Out, Harvard University",True,1960-01-01
@@ -2753,4 +2753,3 @@ ID,Name,NetWorth,Country,Source,Rank,Age,Residence,Citizenship,Status,Children,E
 2752,Zhang Yuqiang,1.0,China,Fiberglass,2674,65,"Tongxiang, China",China,,0,,True,1960-01-01
 2753,Zhao Meiguang,1.0,China,gold mining,2674,58,"Jilin, China",China,,0,,True,1967-01-01
 2754,Zhong Naixiong,1.0,China,conglomerate,2674,58,"Foshan, China",China,,0,,True,1967-01-01
-2755,Zhou Wei family,1.0,China,Software,2674,54,"Shanghai, China",China,Married,0,,True,1971-01-01

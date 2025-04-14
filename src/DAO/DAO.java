@@ -1,62 +1,59 @@
 package DAO;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import models.Billionaire;
 
 public class DAO {
-    public static void create(String[] row, FileOutputStream fileOutputStream) {
+    public static void create(String[] row, RandomAccessFile raf) {
 
         try {
-
-            // Format
+            // Parsing dos dados
             int id = Integer.parseInt(row[0]);
             String name = row[1];
-            float netWorth = Float.parseFloat(row[2]); // String -> Double
+            float netWorth = Float.parseFloat(row[2]);
             String country = row[3];
-            row[4] = row[4].replace("\"", ""); // Remove "" do array
-            String[] sourceArray = row[4].split(","); // Splita o Array
-            ArrayList<String> source = new ArrayList<String>();
+    
+            row[4] = row[4].replace("\"", "");
+            String[] sourceArray = row[4].split(",");
+            ArrayList<String> source = new ArrayList<>();
             for (String i : sourceArray) {
-                source.add(i);
+                source.add(i.trim());
             }
-            int rank = Integer.parseInt(row[5]); // String -> Int
-            int age = Integer.parseInt(row[6]); // String(Float) -> Double !!!
+    
+            int rank = Integer.parseInt(row[5]);
+            int age = Integer.parseInt(row[6]);
             String residence = row[7];
             String citizenship = row[8];
             String status = row[9];
-            int children = Integer.parseInt(row[10]); // String(Float) -> Double !!!
-
-            row[11] = row[11].replace("\"", ""); // Remove "" do array
-            String[] educationArray = row[11].split(","); // Splita o Array
-            ArrayList<String> education = new ArrayList<String>();
+            int children = Integer.parseInt(row[10]);
+    
+            row[11] = row[11].replace("\"", "");
+            String[] educationArray = row[11].split(",");
+            ArrayList<String> education = new ArrayList<>();
             for (String i : educationArray) {
-                education.add(i);
+                education.add(i.trim());
             }
-            Boolean self_made = Boolean.parseBoolean(row[12]); // String -> Boolean
-            LocalDate birthdate = LocalDate.parse(row[13]); // String -> LocalDate
-
-            // New Object
+    
+            Boolean self_made = Boolean.parseBoolean(row[12]);
+            LocalDate birthdate = LocalDate.parse(row[13]);
+    
+            // Criação do objeto
             Billionaire billionaire = new Billionaire(id, name, netWorth, country, source, rank, age, residence,
                     citizenship, status, children, education, self_made, birthdate);
-
-            // Write
-
-            DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
-            dataOutputStream.write(billionaire.toByteArray()); // Insere objeto
-
+    
+            // Escrita binária direta com RandomAccessFile
+            raf.write(billionaire.toByteArray());
+    
         } catch (Exception e) {
             System.err.println("Error -> DAO.create: " + e);
         }
-
-    }
+    }    
 
     public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream)
             throws IOException {
@@ -93,45 +90,79 @@ public class DAO {
 
     }
 
-    public static boolean delete(int id, String file) {
-        try {
+    // Novo delete com arquivo index
+    public static boolean deleteIndex(int key) {
+        String file = "src/database/billionaires.db";
+        String indexFile ="src/database/index.db";
+        try{
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
 
-            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+            while (rafIndex.getFilePointer() < rafIndex.length()) {
+                int id = rafIndex.readInt();       // lê o id
+                long posicao = rafIndex.readLong(); // lê a posição`
+                if (id == key) { // encontrou o id procurado
+                    raf.seek(posicao); // vai até a posição no arquivo original
+                    char lapide;
+                    lapide = raf.readChar(); // Ler Lapide
 
-            randomAccessFile.seek(Integer.BYTES);
-
-            while (randomAccessFile.getFilePointer() < randomAccessFile.length()) {
-
-                char lapide = randomAccessFile.readChar(); // Lapide
-                int size = randomAccessFile.readInt(); // Object Size
-
-                // Id (User Input) == Id (Database)
-                if (id == randomAccessFile.readInt()) {
-                    // Caso o objeto já tenha sido removido
+                    // Confere se o objeto já está inativo
                     if (lapide == '*') {
 
-                    } else {
-
-                        // Pega posição atual e volta os Bytes que foram lidos para alterar a lapide
-                        randomAccessFile.seek(
-                                randomAccessFile.getFilePointer() - Integer.BYTES - Integer.BYTES - Character.BYTES);
-                        randomAccessFile.writeChar('*');
-
-                        randomAccessFile.close();
-                        return true;
                     }
+                    else {
+                        raf.seek(posicao); //volta para o inicio do billionario a ser deletado
+                        raf.writeChar('*');
+                    }
+                    
+                    //Deletar do arquivo index
+                    
+                    File tempFile = new File("src/database/temp_index.db");
+                    RandomAccessFile tempIndex = new RandomAccessFile(tempFile, "rw");
+
+                    rafIndex.seek(0);
+                    
+                    //Reescreve no arquivo tmp sem o id deletado
+                    while (rafIndex.getFilePointer() < rafIndex.length()) {
+                        int currentId = rafIndex.readInt();
+                        long currentPos = rafIndex.readLong();
+
+                        if (currentId != id) {
+                            tempIndex.writeInt(currentId);
+                            tempIndex.writeLong(currentPos);
+                        }
+                    }
+
+                    rafIndex.close();
+                    raf.close();
+                    tempIndex.close();
+
+                    File original = new File(indexFile);
+                    if (original.delete()) {
+                        tempFile.renameTo(original);
+                    }
+                
+                    return true;
                 }
-
-                randomAccessFile.skipBytes(size - Integer.BYTES);
-
             }
+            raf.close();
+            rafIndex.close();
 
-            randomAccessFile.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        }catch(Exception e){
+            System.err.println("Erro na leitura: " + e);
         }
-        return false; // Algum erro aconteceu
+        System.out.println("Bilionário não encontrado");
+        return false;
+    }
+    
+    // Escreve no arquivo index
+    public static void createIndex (int id, long posicao, RandomAccessFile raf) {
+        try{
+            raf.writeInt(id);
+            raf.writeLong(posicao);
+        } catch (Exception e){
+            System.err.println("Erro ao inserir no arquivo index: " + e);
+        }
     }
 
 }
