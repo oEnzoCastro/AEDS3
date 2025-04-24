@@ -15,6 +15,7 @@ public class CRUD {
         String file = "src/database/billionaires.db";
         String fileCSV = "src/database/forbes_billionaires.csv";
         String indexFile ="src/database/index.db";
+        String bucketFile = "src/database/bucketFile.db";
 
         int id = -1;
     
@@ -23,6 +24,7 @@ public class CRUD {
         // Deleta os arquivos antigos
         new File(file).delete();
         new File(indexFile).delete();
+        new File(bucketFile).delete();
 
         // Cria os arquivos novos
         try {
@@ -32,7 +34,6 @@ public class CRUD {
     
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             
-            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
 
             // Reserva espaço para o último ID
             raf.writeInt(0);
@@ -49,7 +50,7 @@ public class CRUD {
     
                 id = Integer.parseInt(row[0]);
                 
-                DAO.createIndex(id, posicao, rafIndex);
+                DAO.createIndex(id, posicao, indexFile, bucketFile);
             }
     
             // Volta ao início e grava o último ID inserido
@@ -58,7 +59,6 @@ public class CRUD {
     
             raf.close();
             reader.close();
-            rafIndex.close();
             System.out.println("CSV convertido para Database!");
     
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class CRUD {
 
             long posicao = randomAccessFile.getFilePointer();
             rafIndex.seek(rafIndex.length()); // Move para o fim do arquivo index
-            DAO.createIndex(lastId, posicao, rafIndex); // Insere no arquivo index
+            // DAO.createIndex(lastId, posicao, rafIndex); // Insere no arquivo index TODO
 
             // Inserir newBillionaire no arquivo original
 
