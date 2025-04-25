@@ -1,21 +1,22 @@
 package services;
 
 import DAO.DAO;
+import DAO.DAO_BTree;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
 import models.Billionaire;
 
-public class CRUD {
+public class CRUD_BTree {
     public static int createAll() {
 
         String line;
     
         String file = "src/database/billionaires.db";
         String fileCSV = "src/database/forbes_billionaires.csv";
-        String indexFile ="src/database/index.db";
-        String bucketFile = "src/database/bucketFile.db";
+        String indexFile ="src/database/indexTree.db";
 
         int id = -1;
     
@@ -24,7 +25,6 @@ public class CRUD {
         // Deleta os arquivos antigos
         new File(file).delete();
         new File(indexFile).delete();
-        new File(bucketFile).delete();
 
         // Cria os arquivos novos
         try {
@@ -33,7 +33,6 @@ public class CRUD {
             reader.readLine(); // pula o cabeçalho
     
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
-            
 
             // Reserva espaço para o último ID
             raf.writeInt(0);
@@ -50,7 +49,7 @@ public class CRUD {
     
                 id = Integer.parseInt(row[0]);
                 
-                DAO.createIndex(id, posicao, indexFile, bucketFile);
+                DAO_BTree.createIndex(id, posicao, indexFile); // Adiciona Elemento no arquivo de indice
             }
     
             // Volta ao início e grava o último ID inserido
@@ -91,7 +90,7 @@ public class CRUD {
 
             long posicao = randomAccessFile.getFilePointer();
             rafIndex.seek(rafIndex.length()); // Move para o fim do arquivo index
-            DAO.createIndex(lastId, posicao, indexFile, bucketFile); 
+            DAO_BTree.createIndex(lastId, posicao, indexFile); 
 
             // Inserir newBillionaire no arquivo original
 
@@ -144,7 +143,7 @@ public class CRUD {
 
                 if (key == id) {
 
-                    Billionaire billionaire = DAO.read(file, posicao);
+                    Billionaire billionaire = DAO_BTree.read(file, posicao);
 
                     System.out.println(billionaire);
 
@@ -381,7 +380,7 @@ public class CRUD {
 
     public static void delete(int id, String file) {
 
-        boolean isDeleted = DAO.deleteIndex(id);
+        boolean isDeleted = DAO_BTree.deleteIndex(id);
 
         if (isDeleted == true) {
             System.out.println("Bilionário Deletado!");

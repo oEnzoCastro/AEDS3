@@ -1,13 +1,11 @@
 package DAO;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import models.Billionaire;
+import services.CRUD;
 
 public class DAO {
     public static void create(String[] row, RandomAccessFile raf) {
@@ -55,20 +53,23 @@ public class DAO {
         }
     }
 
-    public static Billionaire read(FileInputStream fileInputStream, DataInputStream dataInputStream)
-            throws IOException {
+    public static Billionaire read(String file, long posicao) throws IOException {
 
         Billionaire billionaireTmp = new Billionaire();
+
+        RandomAccessFile raf = new RandomAccessFile(file, "rw");
+
+        raf.seek(posicao);
 
         byte[] bt;
         int len;
         char lapide;
 
-        lapide = dataInputStream.readChar(); // Ler Lapide
-        len = dataInputStream.readInt(); // Ler Tamanho Obj
+        lapide = raf.readChar(); // Ler Lapide
+        len = raf.readInt(); // Ler Tamanho Obj
 
         bt = new byte[len];
-        dataInputStream.read(bt);
+        raf.read(bt);
 
         billionaireTmp.fromByteArray(bt);
 
@@ -94,56 +95,70 @@ public class DAO {
     public static boolean deleteIndex(int key) {
         String file = "src/database/billionaires.db";
         String indexFile = "src/database/index.db";
+        String bucketFile = "src/database/bucketFile.db";
         try {
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
+            RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
+            
+            long billionairePosition = CRUD.getBillionairePosition(key);
 
-            while (rafIndex.getFilePointer() < rafIndex.length()) {
-                int id = rafIndex.readInt(); // lê o id
-                long posicao = rafIndex.readLong(); // lê a posição`
-                if (id == key) { // encontrou o id procurado
-                    raf.seek(posicao); // vai até a posição no arquivo original
-                    char lapide;
-                    lapide = raf.readChar(); // Ler Lapide
+            raf.seek(billionairePosition);
 
-                    // Confere se o objeto já está inativo
-                    if (lapide == '*') {
+            raf.writeChar('*');
+
+            long enderecoBucket = CRUD.getBucketPosition(key);
+
+            rafBucket.seek(enderecoBucket);
+
+            int tamanhoBucket = rafBucket.readInt();
+            tamanhoBucket = tamanhoBucket - 1;
+
+            rafBucket.seek(enderecoBucket);
+
+            rafBucket.writeInt(tamanhoBucket);
+            
+            for (int i = 0; i < tamanhoBucket; i++) {
+
+                int id = rafBucket.readInt();
+                long posicao = rafBucket.readLong();
+                System.out.println();
+
+                if (key == id) {
+
+                    rafBucket.seek(rafBucket.getFilePointer() - 12); // Voltar para posição do bucket
+
+                    rafBucket.writeInt(0);
+                    rafBucket.writeLong(0);
+
+                    if (i + 1 >= tamanhoBucket) {
 
                     } else {
-                        raf.seek(posicao); //volta para o inicio do billionario a ser deletado
-                        raf.writeChar('*');
-                    }
 
-                    //Deletar do arquivo index
+                        while (i < tamanhoBucket) {
 
-                    File tempFile = new File("src/database/temp_index.db");
-                    RandomAccessFile tempIndex = new RandomAccessFile(tempFile, "rw");
+                            int updateId = rafBucket.readInt();
+                            long updatePosicao = rafBucket.readLong();
 
-                    rafIndex.seek(0);
+                            rafBucket.seek(rafBucket.getFilePointer() - 24);
 
-                    //Reescreve no arquivo tmp sem o id deletado
-                    while (rafIndex.getFilePointer() < rafIndex.length()) {
-                        int currentId = rafIndex.readInt();
-                        long currentPos = rafIndex.readLong();
+                            rafBucket.writeInt(updateId);
+                            rafBucket.writeLong(updatePosicao);
+                            rafBucket.writeInt(0);
+                            rafBucket.writeLong(0);
 
-                        if (currentId != id) {
-                            tempIndex.writeInt(currentId);
-                            tempIndex.writeLong(currentPos);
+                            i++;
+
+                            System.out.println();
+
                         }
                     }
 
-                    rafIndex.close();
-                    raf.close();
-                    tempIndex.close();
-
-                    File original = new File(indexFile);
-                    if (original.delete()) {
-                        tempFile.renameTo(original);
-                    }
-
-                    return true;
                 }
+
             }
+
+
             raf.close();
             rafIndex.close();
 
@@ -250,7 +265,7 @@ public class DAO {
             hash = ((id % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
 
             rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
-            
+
             pL = rafIndex.readInt(); // pL = Profundidade Local
 
             posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
@@ -276,8 +291,6 @@ public class DAO {
 
             rafIndex.close();
             rafBucket.close();
-            
-            System.out.println();
 
         } catch (Exception e) {
             System.err.println("Erro ao inserir no arquivo index: " + e);
@@ -320,7 +333,7 @@ public class DAO {
 
                 rafIndex.seek(hash);
 
-                int pL = rafIndex.readInt(); // pL = Profundidade Local
+                rafIndex.readInt(); // pL = Profundidade Local
 
                 posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
@@ -342,9 +355,6 @@ public class DAO {
                 rafBucket.writeLong(elementosPosicao[i]);
 
             }
-
-            System.out.println();
-
 
         } catch (Exception e) {
             System.err.println("Erro ao rebalancear Bucket: " + e);

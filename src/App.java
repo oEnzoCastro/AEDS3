@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.util.Scanner;
 import services.CRUD;
+import services.CRUD_BTree;
 import services.Sorting;
 
 public class App {
@@ -35,12 +36,12 @@ public class App {
                 case 1:
                     // Create from CSV
                     clearScreen(); // Clear terminal
-                    CRUD.createAll();
+                    CRUD_BTree.createAll();
                     break;
 
                 case 2:
                     // Create
-                    CRUD.create(file);
+                    CRUD_BTree.create(file);
                     break;
 
                 case 3:
@@ -51,7 +52,7 @@ public class App {
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    CRUD.getIndex(id);
+                    CRUD_BTree.getIndex(id);
                     break;
 
                 case 4:
@@ -62,7 +63,7 @@ public class App {
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    CRUD.update(key, file);
+                    CRUD_BTree.update(key, file);
                     break;
 
                 case 5:
@@ -72,7 +73,7 @@ public class App {
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    CRUD.delete(id, file);
+                    CRUD_BTree.delete(id, file);
                     break;
 
                 case 6:
