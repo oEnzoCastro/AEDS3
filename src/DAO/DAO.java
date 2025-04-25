@@ -172,6 +172,7 @@ public class DAO {
                 for (int i = 0; i < 2; i++) {
 
                     // Inserir no indexFile
+                    rafIndex.writeInt(2); // Primeira posição do fileBucket
                     rafIndex.writeLong(i); // Primeira posição do fileBucket
 
                     // Inserir no bucketFile
@@ -191,9 +192,10 @@ public class DAO {
             rafIndex.seek(0); // Index Posição 0
 
             int pG = rafIndex.readInt(); // pG = Profundidade Global
-            int hash = ((id % pG) * 8) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
+            int hash = ((id % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
 
             rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
+            int pL = rafIndex.readInt(); // pL = Profundidade Local
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
@@ -201,28 +203,41 @@ public class DAO {
             rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
 
             int numBucket = rafBucket.readInt(); // Lê quantos valores estão armazenados no Bucket
-            if (numBucket == tamanhoBucket - 1) { // Se o Bucket estourar
 
-                rafIndex.seek(rafIndex.length());
+            // Se o Bucket estourar
+            if (numBucket == tamanhoBucket - 1) {
 
-                for (int i = pG; i < pG * 2; i++) {
+                rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
 
-                    rafIndex.writeLong(i);
+                pL = pL * 2;
 
-                    rafBucket.seek(rafBucket.length());
+                rafIndex.writeInt(pL);
 
-                    rafBucket.writeInt(0); // Tamanho dos Buckets novos
+                if (pL > pG) {
 
-                    for (int j = 0; j < tamanhoBucket; j++) {
-                        rafBucket.writeInt(0); // Id
-                        rafBucket.writeLong(0); // Pos
+                    rafIndex.seek(rafIndex.length());
+
+                    for (int i = pG; i < pG * 2; i++) {
+
+                        rafIndex.writeInt(pG * 2);
+                        rafIndex.writeLong(i);
+
+                        rafBucket.seek(rafBucket.length());
+
+                        rafBucket.writeInt(0); // Tamanho dos Buckets novos
+
+                        for (int j = 0; j < tamanhoBucket; j++) {
+                            rafBucket.writeInt(0); // Id
+                            rafBucket.writeLong(0); // Pos
+                        }
+
                     }
+
+                    pG = pG * 2;
 
                 }
 
-                pG = pG * 2;
-
-                hash = ((id % pG) * 8) + 4;
+                hash = ((id % pG) * 12) + 4;
 
                 rafIndex.seek(0);
                 rafIndex.writeInt(pG);
@@ -231,6 +246,20 @@ public class DAO {
                 rebalancearBucket(rafIndex, rafBucket, pG, posicaoBucket, tamanhoBucket, bitsBucket);
 
             }
+
+            hash = ((id % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
+
+            rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
+            
+            pL = rafIndex.readInt(); // pL = Profundidade Local
+
+            posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
+
+            posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
+
+            rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
+
+            numBucket = rafBucket.readInt(); // Lê quantos valores estão armazenados no Bucket
 
             long ponteiroBucket = (posicaoBucket + (numBucket * 12) + 4);
             rafBucket.seek(posicaoBucket);
@@ -242,13 +271,13 @@ public class DAO {
             rafBucket.writeInt(id);
             rafBucket.writeLong(posicao);
 
-            System.out.println();
-
             // rafIndex.writeInt(id);
             // rafIndex.writeLong(posicao);
 
             rafIndex.close();
             rafBucket.close();
+            
+            System.out.println();
 
         } catch (Exception e) {
             System.err.println("Erro ao inserir no arquivo index: " + e);
@@ -259,8 +288,63 @@ public class DAO {
             long posicaoBucket, int tamanhoBucket, int bitsBucket) {
 
         try {
-            
-            
+
+            int[] elementos = new int[tamanhoBucket - 1];
+            long[] elementosPosicao = new long[tamanhoBucket - 1];
+
+            rafBucket.seek(posicaoBucket);
+
+            rafBucket.readInt();
+
+            for (int i = 0; i < tamanhoBucket - 1; i++) {
+
+                elementos[i] = rafBucket.readInt();
+                elementosPosicao[i] = rafBucket.readLong();
+
+            }
+
+            rafBucket.seek(posicaoBucket);
+
+            rafBucket.writeInt(0);
+
+            for (int i = 0; i < tamanhoBucket - 1; i++) {
+
+                rafBucket.writeInt(0);
+                rafBucket.writeLong(0);
+
+            }
+
+            for (int i = 0; i < tamanhoBucket - 1; i++) {
+
+                int hash = ((elementos[i] % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
+
+                rafIndex.seek(hash);
+
+                int pL = rafIndex.readInt(); // pL = Profundidade Local
+
+                posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
+
+                posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
+
+                rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
+
+                int numBucket = rafBucket.readInt(); // Lê quantos valores estão armazenados no Bucket
+
+                long ponteiroBucket = (posicaoBucket + (numBucket * 12) + 4);
+
+                rafBucket.seek(posicaoBucket);
+
+                rafBucket.writeInt(numBucket + 1);
+
+                rafBucket.seek(ponteiroBucket);
+                // Escrever elemento
+                rafBucket.writeInt(elementos[i]);
+                rafBucket.writeLong(elementosPosicao[i]);
+
+            }
+
+            System.out.println();
+
 
         } catch (Exception e) {
             System.err.println("Erro ao rebalancear Bucket: " + e);

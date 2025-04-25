@@ -71,6 +71,7 @@ public class CRUD {
     public static void create(String file) {
         try {
             String indexFile ="src/database/index.db";
+            String bucketFile = "src/database/bucketFile.db";
 
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
@@ -90,7 +91,7 @@ public class CRUD {
 
             long posicao = randomAccessFile.getFilePointer();
             rafIndex.seek(rafIndex.length()); // Move para o fim do arquivo index
-            // DAO.createIndex(lastId, posicao, rafIndex); // Insere no arquivo index TODO
+            DAO.createIndex(lastId, posicao, indexFile, bucketFile); 
 
             // Inserir newBillionaire no arquivo original
 
