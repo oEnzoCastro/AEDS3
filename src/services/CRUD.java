@@ -11,14 +11,14 @@ public class CRUD {
     public static int createAll() {
 
         String line;
-    
+
         String file = "src/database/billionaires.db";
         String fileCSV = "src/database/forbes_billionaires.csv";
-        String indexFile ="src/database/index.db";
+        String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 
         int id = -1;
-    
+
         BufferedReader reader;
 
         // Deleta os arquivos antigos
@@ -28,49 +28,49 @@ public class CRUD {
 
         // Cria os arquivos novos
         try {
-    
+
             reader = new BufferedReader(new FileReader(fileCSV));
             reader.readLine(); // pula o cabeçalho
-    
+
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
-            
 
             // Reserva espaço para o último ID
             raf.writeInt(0);
-    
+
             long posicao;
-    
+
+            System.out.println("Criando Database... Aguarde");
             while ((line = reader.readLine()) != null) {
-    
+
                 String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-    
+
                 posicao = raf.getFilePointer(); // posição antes da escrita
-    
+
                 DAO.create(row, raf);
-    
+
                 id = Integer.parseInt(row[0]);
-                
+
                 DAO.createIndex(id, posicao, indexFile, bucketFile);
             }
-    
+
             // Volta ao início e grava o último ID inserido
             raf.seek(0);
             raf.writeInt(id);
-    
+
             raf.close();
             reader.close();
             System.out.println("CSV convertido para Database!");
-    
+
         } catch (Exception e) {
             System.err.println("Erro ReadCSV.createAll: " + e);
         }
-    
+
         return id;
-    }    
+    }
 
     public static void create(String file) {
         try {
-            String indexFile ="src/database/index.db";
+            String indexFile = "src/database/index.db";
             String bucketFile = "src/database/bucketFile.db";
 
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
@@ -91,7 +91,7 @@ public class CRUD {
 
             long posicao = randomAccessFile.getFilePointer();
             rafIndex.seek(rafIndex.length()); // Move para o fim do arquivo index
-            DAO.createIndex(lastId, posicao, indexFile, bucketFile); 
+            DAO.createIndex(lastId, posicao, indexFile, bucketFile);
 
             // Inserir newBillionaire no arquivo original
 
@@ -107,14 +107,13 @@ public class CRUD {
 
     }
 
-    public static Billionaire getIndex(int key){
+    public static Billionaire getIndex(int key) {
 
         String file = "src/database/billionaires.db";
-        String indexFile ="src/database/index.db";
+        String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 
-        try{
-
+        try {
 
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
             RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
@@ -129,7 +128,7 @@ public class CRUD {
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             int bitsBucket = (4 * 12) + 4;
-            
+
             posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
 
             rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
@@ -137,7 +136,7 @@ public class CRUD {
             int numBucket = rafBucket.readInt();
 
             for (int i = 0; i < numBucket; i++) {
-                
+
                 int id = rafBucket.readInt();
                 long posicao = rafBucket.readLong();
                 System.out.println();
@@ -156,20 +155,20 @@ public class CRUD {
 
             rafIndex.close();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
         }
         System.out.println("Bilionário não encontrado");
         return null;
     }
 
-    public static long getBucketPosition(int key){
+    public static long getBucketPosition(int key) {
 
         String file = "src/database/billionaires.db";
-        String indexFile ="src/database/index.db";
+        String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 
-        try{
+        try {
 
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
             RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
@@ -184,28 +183,27 @@ public class CRUD {
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             int bitsBucket = (4 * 12) + 4;
-            
+
             posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
 
             rafIndex.close();
-            
+
             return posicaoBucket;
 
-        }catch(Exception e){
+        } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
         }
         System.out.println("Bilionário não encontrado");
         return -1;
     }
 
-    public static long getBucketElementPosition(int key){
+    public static long getBucketElementPosition(int key) {
 
         String file = "src/database/billionaires.db";
-        String indexFile ="src/database/index.db";
+        String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 
-        try{
-
+        try {
 
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
             RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
@@ -220,7 +218,7 @@ public class CRUD {
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             int bitsBucket = (4 * 12) + 4;
-            
+
             posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
 
             rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
@@ -228,7 +226,7 @@ public class CRUD {
             int numBucket = rafBucket.readInt();
 
             for (int i = 0; i < numBucket; i++) {
-                
+
                 int id = rafBucket.readInt();
                 long posicao = rafBucket.readLong();
                 System.out.println();
@@ -245,21 +243,20 @@ public class CRUD {
 
             rafIndex.close();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
         }
         System.out.println("Bilionário não encontrado");
         return -1;
     }
 
-    public static long getBillionairePosition(int key){
+    public static long getBillionairePosition(int key) {
 
         String file = "src/database/billionaires.db";
-        String indexFile ="src/database/index.db";
+        String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 
-        try{
-
+        try {
 
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
             RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
@@ -274,7 +271,7 @@ public class CRUD {
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             int bitsBucket = (4 * 12) + 4;
-            
+
             posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
 
             rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
@@ -282,7 +279,7 @@ public class CRUD {
             int numBucket = rafBucket.readInt();
 
             for (int i = 0; i < numBucket; i++) {
-                
+
                 int id = rafBucket.readInt();
                 long posicao = rafBucket.readLong();
                 System.out.println();
@@ -297,7 +294,7 @@ public class CRUD {
 
             rafIndex.close();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
         }
         System.out.println("Bilionário não encontrado");
@@ -321,7 +318,7 @@ public class CRUD {
             Billionaire newBillionaire = BillionaireService.updateBillionaire(billionaire);
 
             try {
-                String indexFile ="src/database/index.db";
+                String indexFile = "src/database/index.db";
                 String bucketFile = "src/database/bucketFile.db";
 
                 RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
@@ -334,7 +331,7 @@ public class CRUD {
 
                     long posicaoBilionario = getBillionairePosition(id);
 
-                    randomAccessFile.seek(posicaoBilionario); 
+                    randomAccessFile.seek(posicaoBilionario);
 
                     randomAccessFile.writeChar('*'); // Adiciona Lapide
 
@@ -345,7 +342,6 @@ public class CRUD {
                     rafBucket.seek(posicaoBucket);
 
                     rafBucket.writeLong(randomAccessFile.getFilePointer());
-                    
 
                     // Inserir newBillionaire
 

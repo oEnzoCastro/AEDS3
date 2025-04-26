@@ -203,8 +203,6 @@ public class CRUD_BTree {
 
                     if (tamanhoRaiz >= maxPagina) {
 
-
-
                     } else {
                         tamanhoRaiz = tamanhoRaiz + 1;
 
@@ -283,6 +281,8 @@ public class CRUD_BTree {
 
     }
 
+    // Funções da Arvore
+
     public static long createPagina(String indexFile, long pagina, int maxPagina) {
 
         try {
@@ -309,15 +309,19 @@ public class CRUD_BTree {
         return -1;
     }
 
-    //
+    // --
 
     public static void create(String file) {
+
+        String indexFile = "src/database/indexTree.db";
+
         try {
-            String indexFile = "src/database/index.db";
-            String bucketFile = "src/database/bucketFile.db";
 
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
+
+            long raiz = rafIndex.readLong();
+
             byte[] bt;
 
             randomAccessFile.seek(0);
@@ -333,8 +337,7 @@ public class CRUD_BTree {
             randomAccessFile.seek(randomAccessFile.length()); // Move ponteiro para fim do arquivo
 
             long posicao = randomAccessFile.getFilePointer();
-            rafIndex.seek(rafIndex.length()); // Move para o fim do arquivo index
-            DAO_BTree.createIndex(lastId, posicao, indexFile);
+            insertTree(lastId, posicao, indexFile, 5, raiz, raiz); // Adiciona Elemento no arquivo de indice
 
             // Inserir newBillionaire no arquivo original
 
@@ -353,50 +356,26 @@ public class CRUD_BTree {
     public static Billionaire getIndex(int key) {
 
         String file = "src/database/billionaires.db";
-        String indexFile = "src/database/index.db";
-        String bucketFile = "src/database/bucketFile.db";
+        String indexFile = "src/database/indexTree.db";
 
         try {
 
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
-            RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
+            RandomAccessFile rafBilionario = new RandomAccessFile(file, "rw");
 
-            int pG = rafIndex.readInt();
+            rafIndex.seek(0);
+            long raiz = rafIndex.readLong();
 
-            int hash = ((key % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
+            long indexBilionario = pesquisarArvore(key, indexFile, raiz);
 
-            rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
 
-            int pL = rafIndex.readInt(); // pL = Profundidade Local
-            long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
+            Billionaire billionaire = DAO.read(file, indexBilionario);
 
-            int bitsBucket = (4 * 12) + 4;
-
-            posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
-
-            rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
-
-            int numBucket = rafBucket.readInt();
-
-            for (int i = 0; i < numBucket; i++) {
-
-                int id = rafBucket.readInt();
-                long posicao = rafBucket.readLong();
-                System.out.println();
-
-                if (key == id) {
-
-                    Billionaire billionaire = DAO_BTree.read(file, posicao);
-
-                    System.out.println(billionaire);
-
-                    return billionaire;
-
-                }
-
-            }
+            System.out.println(billionaire);
 
             rafIndex.close();
+            return billionaire;
+
 
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
@@ -405,218 +384,46 @@ public class CRUD_BTree {
         return null;
     }
 
-    public static long getBucketPosition(int key) {
-
-        String file = "src/database/billionaires.db";
-        String indexFile = "src/database/index.db";
-        String bucketFile = "src/database/bucketFile.db";
+    public static long pesquisarArvore(int key, String indexFile, long pagina) {
 
         try {
 
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
-            RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
 
-            int pG = rafIndex.readInt();
+            rafIndex.seek(pagina);
+            int tamanhoPagina = rafIndex.readInt();
 
-            int hash = ((key % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
+            for (int i = 0; i < tamanhoPagina; i++) {
 
-            rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
-
-            int pL = rafIndex.readInt(); // pL = Profundidade Local
-            long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
-
-            int bitsBucket = (4 * 12) + 4;
-
-            posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
-
-            rafIndex.close();
-
-            return posicaoBucket;
-
-        } catch (Exception e) {
-            System.err.println("Erro na leitura: " + e);
-        }
-        System.out.println("Bilionário não encontrado");
-        return -1;
-    }
-
-    public static long getBucketElementPosition(int key) {
-
-        String file = "src/database/billionaires.db";
-        String indexFile = "src/database/index.db";
-        String bucketFile = "src/database/bucketFile.db";
-
-        try {
-
-            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
-            RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
-
-            int pG = rafIndex.readInt();
-
-            int hash = ((key % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
-
-            rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
-
-            int pL = rafIndex.readInt(); // pL = Profundidade Local
-            long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
-
-            int bitsBucket = (4 * 12) + 4;
-
-            posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
-
-            rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
-
-            int numBucket = rafBucket.readInt();
-
-            for (int i = 0; i < numBucket; i++) {
-
-                int id = rafBucket.readInt();
-                long posicao = rafBucket.readLong();
-                System.out.println();
+                long esq = rafIndex.readLong();
+                int id = rafIndex.readInt();
+                long posicao = rafIndex.readLong();
 
                 if (key == id) {
-
-                    rafBucket.seek(rafBucket.getFilePointer() - 8); // Voltar para posição do bucket
-
-                    return rafBucket.getFilePointer();
-
+                    return posicao; // Se achar o elemento na arvore, retornar posição dele no arquivo de Bilionarios
+                } else if (key < id) {
+                    return pesquisarArvore(key, indexFile, esq);
                 }
 
             }
 
-            rafIndex.close();
+            long dir = rafIndex.readLong();
+            if (dir == -1) {
+                return -1;
+            } else {
+
+                return pesquisarArvore(key, indexFile, dir);
+
+            }
 
         } catch (Exception e) {
-            System.err.println("Erro na leitura: " + e);
+            System.err.println("Erro na pesquisa: " + e);
         }
-        System.out.println("Bilionário não encontrado");
+
         return -1;
     }
 
-    public static long getBillionairePosition(int key) {
-
-        String file = "src/database/billionaires.db";
-        String indexFile = "src/database/index.db";
-        String bucketFile = "src/database/bucketFile.db";
-
-        try {
-
-            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
-            RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
-
-            int pG = rafIndex.readInt();
-
-            int hash = ((key % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
-
-            rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
-
-            int pL = rafIndex.readInt(); // pL = Profundidade Local
-            long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
-
-            int bitsBucket = (4 * 12) + 4;
-
-            posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
-
-            rafBucket.seek(posicaoBucket); // Aponta para o Bucket a ser adicionado
-
-            int numBucket = rafBucket.readInt();
-
-            for (int i = 0; i < numBucket; i++) {
-
-                int id = rafBucket.readInt();
-                long posicao = rafBucket.readLong();
-                System.out.println();
-
-                if (key == id) {
-
-                    return posicao;
-
-                }
-
-            }
-
-            rafIndex.close();
-
-        } catch (Exception e) {
-            System.err.println("Erro na leitura: " + e);
-        }
-        System.out.println("Bilionário não encontrado");
-        return -1;
-    }
-
-    public static void update(String key, String file) {
-
-        Billionaire billionaire;
-        int id = Integer.parseInt(key);
-        if (key.charAt(0) >= '0' && key.charAt(0) <= '9') {
-            billionaire = getIndex(id);
-        } else {
-            System.out.println("Só é aceito update inserindo a chave 'ID'!");
-            return;
-        }
-
-        if (billionaire == null) {
-            System.out.println("Bilionário Indisponível!");
-        } else {
-            Billionaire newBillionaire = BillionaireService.updateBillionaire(billionaire);
-
-            try {
-                String indexFile = "src/database/index.db";
-                String bucketFile = "src/database/bucketFile.db";
-
-                RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
-                RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
-                RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
-
-                byte[] bt;
-
-                if (newBillionaire.getByteSize() > billionaire.getByteSize()) {
-
-                    long posicaoBilionario = getBillionairePosition(id);
-
-                    randomAccessFile.seek(posicaoBilionario);
-
-                    randomAccessFile.writeChar('*'); // Adiciona Lapide
-
-                    randomAccessFile.seek(randomAccessFile.length()); // Move ponteiro para fim do arquivo
-
-                    long posicaoBucket = getBucketElementPosition(id);
-
-                    rafBucket.seek(posicaoBucket);
-
-                    rafBucket.writeLong(randomAccessFile.getFilePointer());
-
-                    // Inserir newBillionaire
-
-                    bt = newBillionaire.toByteArray();
-                    randomAccessFile.write(bt);
-
-                    randomAccessFile.close();
-                    rafIndex.close();
-
-                } else {
-
-                    long filePointer = getBillionairePosition(id);
-
-                    randomAccessFile.seek(filePointer);
-
-                    bt = newBillionaire.toByteArrayUpdate(billionaire, file);
-                    randomAccessFile.write(bt);
-
-                    randomAccessFile.close();
-                    rafIndex.close();
-                    // Add newBillionaire no lugar do billionaire
-                }
-
-                randomAccessFile.close();
-                rafIndex.close();
-            } catch (Exception e) {
-                System.err.println(e);
-            }
-
-        }
-
-    }
+    //
 
     public static void delete(int id, String file) {
 

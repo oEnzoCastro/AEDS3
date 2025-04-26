@@ -31,30 +31,99 @@ public class App {
             option = scan.nextInt();
 
             int id = -1;
+            int algoritmo = -1;
+            @SuppressWarnings("unused")
             String key = "";
             switch (option) {
                 case 1:
+
+                    System.out.println("----------------------------------");
+                    System.out.println("Escolha qual algoritmo: ");
+                    System.out.println("1 -> Árvore B");
+                    System.out.println("2 -> Tabela Hash");
+                    scan.nextLine(); // Clear Buffer
+                    algoritmo = scan.nextInt();
+                    System.out.println();
+
+                    switch (algoritmo) {
+                        case 1:
+                            // CRUD Árvore B
+                            CRUD_BTree.createAll();
+                            break;
+                        case 2:
+                            // CRUD Tabela Hash
+                            CRUD.createAll();
+                            break;
+
+                        default:
+                            break;
+                    }
                     // Create from CSV
                     clearScreen(); // Clear terminal
-                    CRUD_BTree.createAll();
                     break;
 
                 case 2:
-                    // Create
-                    CRUD_BTree.create(file);
+
+                    System.out.println("----------------------------------");
+                    System.out.println("Escolha qual algoritmo: ");
+                    System.out.println("1 -> Árvore B");
+                    System.out.println("2 -> Tabela Hash");
+                    scan.nextLine(); // Clear Buffer
+                    algoritmo = scan.nextInt();
+                    System.out.println();
+
+                    switch (algoritmo) {
+                        case 1:
+                            // CRUD Árvore B
+                            CRUD_BTree.create(file);
+                            break;
+                        case 2:
+                            // CRUD Tabela Hash
+                            CRUD.create(file);
+                            break;
+
+                        default:
+                            break;
+                    }
                     break;
 
                 case 3:
-                    // Read
-                    System.out.print("Chave: ");
+
+                    System.out.println("----------------------------------");
+                    System.out.println("Escolha qual algoritmo: ");
+                    System.out.println("1 -> Árvore B");
+                    System.out.println("2 -> Tabela Hash");
                     scan.nextLine(); // Clear Buffer
-                    id = scan.nextInt();
+                    algoritmo = scan.nextInt();
                     System.out.println();
 
-                    clearScreen(); // Clear terminal
-                    CRUD_BTree.getIndex(id);
-                    break;
+                    switch (algoritmo) {
+                        case 1:
+                            // Read
+                            System.out.print("Chave: ");
+                            scan.nextLine(); // Clear Buffer
+                            id = scan.nextInt();
+                            System.out.println();
 
+                            clearScreen(); // Clear terminal
+                            CRUD_BTree.getIndex(id);
+                            break;
+                        case 2:
+                            // Read
+                            System.out.print("Chave: ");
+                            scan.nextLine(); // Clear Buffer
+                            id = scan.nextInt();
+                            System.out.println();
+
+                            clearScreen(); // Clear terminal
+                            CRUD.getIndex(id);
+                            break;
+
+                        default:
+                            break;
+                        }
+                        break;
+                        
                 case 4:
                     // Update
                     System.out.print("ID: ");
@@ -63,7 +132,6 @@ public class App {
                     System.out.println();
 
                     clearScreen(); // Clear terminal
-                    CRUD_BTree.update(key, file);
                     break;
 
                 case 5:
