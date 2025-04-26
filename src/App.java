@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.util.Scanner;
+
+import DAO.DAO_InvertedList;
 import services.CRUD;
 import services.Sorting;
 
@@ -22,7 +24,8 @@ public class App {
             System.out.println("4. Update");
             System.out.println("5. Delete");
             System.out.println("6. Sort");
-            System.out.println("7. Exit");
+            System.out.println("7. Procurar Palavra nas Listas Invertidas");
+            System.out.println("8. Exit");
             System.out.println("----------------------------------");
 
             int option = -1;
@@ -88,6 +91,18 @@ public class App {
                     break;
 
                 case 7:
+                    clearScreen();
+                    System.out.print("Palavra a ser pesquisada: ");
+                    scan.nextLine();
+                    String palavra = scan.nextLine();
+                    System.out.println("Escolha a lista a ser pesquisada:");
+                    System.out.println("1. Para coluna Source");
+                    System.out.println("2. Para coluna Country");
+                    int code = scan.nextInt();
+                    DAO_InvertedList.searchIL(palavra, code);
+                    break;
+                    
+                case 8:
                     // Exit
                     clearScreen(); // Clear terminal
                     System.out.println("Programa Encerrado!");

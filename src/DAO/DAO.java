@@ -46,7 +46,10 @@ public class DAO {
             // Criação do objeto
             Billionaire billionaire = new Billionaire(id, name, netWorth, country, source, rank, age, residence,
                     citizenship, status, children, education, self_made, birthdate);
-    
+            
+            DAO_InvertedList.addIL(billionaire, 1);
+            DAO_InvertedList.addIL(billionaire, 2);
+
             // Escrita binária direta com RandomAccessFile
             raf.write(billionaire.toByteArray());
     
@@ -94,6 +97,7 @@ public class DAO {
     public static boolean deleteIndex(int key) {
         String file = "src/database/billionaires.db";
         String indexFile ="src/database/index.db";
+        DAO_InvertedList.deleteIL(key);
         try{
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");

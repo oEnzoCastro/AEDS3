@@ -37,6 +37,14 @@ public class Billionaire {
         return name;
     }
 
+    public ArrayList<String> getSource() {
+        return source;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
     public String toString() {
         DecimalFormat df = new DecimalFormat("#,##0.00");
         return "\nId:" + id +
