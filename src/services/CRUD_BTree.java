@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
+import models.ArvoreBElemento;
 import models.Billionaire;
 
 public class CRUD_BTree {
@@ -48,17 +49,15 @@ public class CRUD_BTree {
             int maxPagina = 5; // Maximo de elementos por pagina
             long raiz = 8; // Endereço da raiz
 
-            rafIndex.writeLong(raiz); // Aponta para Raiz            
-            rafIndex.writeInt(0); // Tamanho da Raiz
+            rafIndex.writeLong(raiz); // Aponta para Raiz   
 
-            for (int i = 0; i < maxPagina; i++) {
-                rafIndex.writeLong(-1); // Ponteiro
-                rafIndex.writeInt(0); // Valor
-                rafIndex.writeLong(-1); // Endereço
-            }
-            rafIndex.writeLong(-1); // Ponteiro
+            createPagina(indexFile, raiz, maxPagina);
 
+            System.out.println("Criando Database... Aguarde");
             while ((line = reader.readLine()) != null) {
+
+                rafIndex.seek(0);
+                raiz = rafIndex.readLong();
 
                 String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
@@ -68,7 +67,7 @@ public class CRUD_BTree {
 
                 id = Integer.parseInt(row[0]);
 
-                insertTree(id, posicao, indexFile, maxPagina, raiz); // Adiciona Elemento no arquivo de indice
+                insertTree(id, posicao, indexFile, maxPagina, raiz, raiz); // Adiciona Elemento no arquivo de indice
             }
 
             // Volta ao início e grava o último ID inserido
@@ -87,7 +86,8 @@ public class CRUD_BTree {
         return id;
     }
 
-    public static void insertTree(int id, long posicao, String indexFile, int maxPagina, long pagina) {
+    public static ArvoreBElemento insertTree(int id, long posicao, String indexFile, int maxPagina, long pagina,
+            long raiz) {
 
         try {
 
@@ -97,165 +97,189 @@ public class CRUD_BTree {
 
             int tamanhoPagina = rafIndex.readInt();
 
-            if (tamanhoPagina == 0) {
-                rafIndex.readLong();
-                rafIndex.writeInt(id);
-                rafIndex.writeLong(posicao);
-
-                rafIndex.seek(pagina);
-
-                rafIndex.writeInt(tamanhoPagina + 1);
-
-                return;
-
-            }
-
+            // Quebrar
             if (tamanhoPagina >= maxPagina) {
 
                 // Ordenar
 
-                ArrayList<Integer> arrId = new ArrayList<>();
-                ArrayList<Long> arrPosicao = new ArrayList<>();
+                ArrayList<ArvoreBElemento> arrElemento = new ArrayList<>();
 
                 for (int i = 0; i < tamanhoPagina; i++) {
-                    rafIndex.readLong();
-                    arrId.add(rafIndex.readInt());
-                    arrPosicao.add(rafIndex.readLong());
+                    ArvoreBElemento arvoreBElemento = new ArvoreBElemento();
+
+                    arvoreBElemento.setEsq(rafIndex.readLong());
+                    arvoreBElemento.setId(rafIndex.readInt());
+                    arvoreBElemento.setPosicao(rafIndex.readLong());
+                    arvoreBElemento.setDir(rafIndex.readLong());
+
+                    arrElemento.add(arvoreBElemento);
+
+                    rafIndex.seek(rafIndex.getFilePointer() - 8);
                 }
 
-                for (int i = 0; i < arrId.size(); i++) {
+                for (int i = 0; i < arrElemento.size(); i++) {
 
                     int menor = i;
 
-                    for (int j = i + 1; j < arrId.size(); j++) {
+                    for (int j = i + 1; j < arrElemento.size(); j++) {
 
-                        if (arrId.get(j) < arrId.get(menor)) {
-                            menor = j;
-                        }
-
-                        if (arrId.get(j) < arrId.get(menor)) {
+                        if (arrElemento.get(j).getId() < arrElemento.get(menor).getId()) {
                             menor = j;
                         }
 
                     }
 
-                    int tmpMenorId = arrId.get(i);
-                    long tmpMenorPos = arrPosicao.get(i);
+                    ArvoreBElemento arvoreBElementoTmp = arrElemento.get(i);
 
-                    arrId.set(i, arrId.get(menor));
-                    arrPosicao.set(i, arrPosicao.get(menor));
+                    arrElemento.set(i, arrElemento.get(menor));
 
-                    arrId.set(menor, tmpMenorId);
-                    arrPosicao.set(menor, tmpMenorPos);
+                    arrElemento.set(menor, arvoreBElementoTmp);
 
                 }
 
-                System.out.println();
+                //
 
-                // Quebrar
-                if (pagina == 8) { // Se o pai for a raiz
+                rafIndex.seek(pagina);
 
-                    rafIndex.seek(pagina);
+                rafIndex.writeInt(maxPagina / 2);
+                for (int i = 0; i < maxPagina; i++) {
 
-                    rafIndex.writeInt(1);
+                    if (i <= maxPagina / 2) {
 
-                    boolean isFolha = true;
-
-                    if (rafIndex.readLong() != -1) {
-                        isFolha = false;
-                    }
-                    rafIndex.seek(rafIndex.getFilePointer() - 8);
-                    long esq = 0;
-                    if (isFolha) {
-                        esq = createPagina(indexFile, pagina + (4 + (20 * maxPagina) + 8), maxPagina);
+                        rafIndex.writeLong(arrElemento.get(i).getEsq());
+                        rafIndex.writeInt(arrElemento.get(i).getId());
+                        rafIndex.writeLong(arrElemento.get(i).getPosicao());
+                        rafIndex.writeLong(arrElemento.get(i).getDir());
+                        rafIndex.seek(rafIndex.getFilePointer() - 8);
 
                     } else {
-                        esq = pagina + (4 + (20 * maxPagina) + 8);
-                    }
-                    for (int k = 0; k < (maxPagina / 2); k++) {
-                        insertTree(arrId.get(k), arrPosicao.get(k), indexFile, maxPagina, esq);
-                    }
-                    rafIndex.writeLong(esq);
 
-                    rafIndex.writeInt(arrId.get(maxPagina / 2));
-
-                    rafIndex.writeLong(arrPosicao.get(maxPagina / 2));
-
-                    long dir = 0;
-                    if (isFolha) {
-                        dir = createPagina(indexFile, pagina + ((4 + (20 * maxPagina) + 8) * 2), maxPagina);
-
-                    } else {
-                        dir = pagina + ((4 + (20 * maxPagina) + 8) * 2);
-                    }
-                    for (int k = (maxPagina / 2) + 1; k < maxPagina; k++) {
-                        insertTree(arrId.get(k), arrPosicao.get(k), indexFile, maxPagina, dir);
-                    }
-                    rafIndex.writeLong(dir);
-
-                    for (int i = 1; i < maxPagina; i++) {
+                        rafIndex.writeLong(-1);
                         rafIndex.writeInt(0);
                         rafIndex.writeLong(-1);
                         rafIndex.writeLong(-1);
+                        rafIndex.seek(rafIndex.getFilePointer() - 8);
+
                     }
 
-                    System.out.println();
+                }
+
+                long newPagina = createPagina(indexFile, rafIndex.length(), maxPagina);
+
+                rafIndex.seek(newPagina);
+
+                rafIndex.writeInt(maxPagina / 2);
+                for (int i = (maxPagina / 2) + 1; i < maxPagina; i++) {
+
+                    rafIndex.writeLong(arrElemento.get(i).getEsq());
+                    rafIndex.writeInt(arrElemento.get(i).getId());
+                    rafIndex.writeLong(arrElemento.get(i).getPosicao());
+                    rafIndex.writeLong(arrElemento.get(i).getDir());
+                    rafIndex.seek(rafIndex.getFilePointer() - 8);
+
+                }
+
+                if (pagina == raiz) {
+
+                    long newRaiz = createPagina(indexFile, rafIndex.length(), maxPagina);
+
+                    rafIndex.seek(newRaiz);
+                    rafIndex.writeInt(1);
+                    rafIndex.writeLong(pagina);
+                    rafIndex.writeInt(arrElemento.get(maxPagina / 2).getId());
+                    rafIndex.writeLong(arrElemento.get(maxPagina / 2).getPosicao());
+                    rafIndex.writeLong(newPagina);
+
+                    rafIndex.seek(0);
+                    rafIndex.writeLong(newRaiz);
+
+                    raiz = newRaiz;
 
                 } else {
 
+                    rafIndex.seek(raiz);
+
+                    int tamanhoRaiz = rafIndex.readInt();
+
+                    if (tamanhoRaiz >= maxPagina) {
+
+
+
+                    } else {
+                        tamanhoRaiz = tamanhoRaiz + 1;
+
+                        rafIndex.seek(raiz);
+                        rafIndex.writeInt(tamanhoRaiz);
+
+                        rafIndex.seek(raiz + 4 + ((tamanhoRaiz - 1) * 20) + 8);
+
+                        rafIndex.writeInt(arrElemento.get(maxPagina / 2).getId());
+                        rafIndex.writeLong(arrElemento.get(maxPagina / 2).getPosicao());
+                        rafIndex.writeLong(newPagina);
+
+                    }
+
                 }
+
+                return insertTree(id, posicao, indexFile, maxPagina, raiz, raiz);
 
             }
 
-            rafIndex.seek(pagina + 4);
-
-            boolean isFolha = true;
+            boolean isFolha = false;
 
             for (int i = 0; i <= tamanhoPagina; i++) {
 
-                long esq = rafIndex.readLong();
-                int elemento = rafIndex.readInt();
-
-                if (esq != -1) {
-                    isFolha = false;
+                long esq = rafIndex.readLong(); // Esq
+                if (esq == -1) {
+                    isFolha = true;
                 }
+                int elemento = rafIndex.readInt(); // Elemento
+                long posicaoElemento = rafIndex.readLong(); // Posicao Elemento
 
-                if (id < elemento && isFolha == false) {
-                    insertTree(id, posicao, indexFile, maxPagina, esq);
-                    return;
-                } else if (elemento == 0 && isFolha == false) {
-                    insertTree(id, posicao, indexFile, maxPagina, esq);
-                    return;
+                if (isFolha) {
+
+                    if (elemento == 0) {
+
+                        rafIndex.seek(rafIndex.getFilePointer() - 12);
+                        rafIndex.writeInt(id);
+                        rafIndex.writeLong(posicao);
+
+                        tamanhoPagina++;
+
+                        rafIndex.seek(pagina);
+                        rafIndex.writeInt(tamanhoPagina);
+
+                        return null; // -1 = Escreveu
+
+                    }
+
+                } else {
+
+                    if (id < elemento) {
+
+                        return insertTree(id, posicao, indexFile, maxPagina, esq, raiz);
+
+                    } else if (elemento == 0) {
+
+                        return insertTree(id, posicao, indexFile, maxPagina, esq, raiz);
+                    }
+
                 }
-
-                if (elemento == 0) {
-
-                    rafIndex.seek(rafIndex.getFilePointer() - 4);
-                    rafIndex.writeInt(id);
-                    rafIndex.writeLong(posicao);
-
-                    rafIndex.seek(pagina);
-
-                    rafIndex.writeInt(tamanhoPagina + 1);
-
-                    return;
-
-                }
-
-                rafIndex.readLong(); // Ler Endereco
 
             }
 
-            long dir = rafIndex.readLong();
+            long dir = rafIndex.readLong(); // Dir
 
-            insertTree(id, posicao, indexFile, maxPagina, dir);
-            return;
+            rafIndex.close();
+            return insertTree(id, posicao, indexFile, maxPagina, dir, raiz);
 
         } catch (
 
         Exception e) {
             System.err.println("Erro ao adicionar na Arvore: " + e);
         }
+
+        return null;
 
     }
 
@@ -276,6 +300,7 @@ public class CRUD_BTree {
             }
             rafIndex.writeLong(-1); // Ponteiro
 
+            rafIndex.close();
             return pagina;
 
         } catch (Exception e) {
