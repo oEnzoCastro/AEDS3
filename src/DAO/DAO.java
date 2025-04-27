@@ -45,6 +45,10 @@ public class DAO {
             Billionaire billionaire = new Billionaire(id, name, netWorth, country, source, rank, age, residence,
                     citizenship, status, children, education, self_made, birthdate);
 
+            // Adiciona nas 2 listas invertidas         
+            DAO_InvertedList.addIL(billionaire, 1);
+            DAO_InvertedList.addIL(billionaire, 2);
+
             // Escrita binária direta com RandomAccessFile
             raf.write(billionaire.toByteArray());
 
