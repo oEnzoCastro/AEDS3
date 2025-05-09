@@ -10,6 +10,37 @@ import models.Billionaire;
 
 public class BillionaireService {
 
+    public static Billionaire read(String file, long posicao) throws IOException {
+
+        Billionaire billionaireTmp = new Billionaire();
+
+        RandomAccessFile raf = new RandomAccessFile(file, "rw");
+
+        raf.seek(posicao);
+
+        byte[] bt;
+        int len;
+        char lapide;
+
+        lapide = raf.readChar(); // Ler Lapide
+        len = raf.readInt(); // Ler Tamanho Obj
+
+        bt = new byte[len];
+        raf.read(bt);
+
+        billionaireTmp.fromByteArray(bt);
+
+        // Confere se o objeto está inativo, se sim, retornar null
+        if (lapide == '*') {
+            raf.close();
+            return null;
+        }
+
+        raf.close();
+        return billionaireTmp;
+    }
+
+
     // Retorna um objeto Billionaire a partir de input de usuário
     public static Billionaire updateBillionaire(Billionaire billionaire) {
 

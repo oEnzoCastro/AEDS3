@@ -170,7 +170,7 @@ public class CRUD_Hash {
 
                 if (key == id) {
 
-                    Billionaire billionaire = DAO_Hash.read(file, posicao);
+                    Billionaire billionaire = BillionaireService.read(file, posicao);
 
                     System.out.println(billionaire);
 

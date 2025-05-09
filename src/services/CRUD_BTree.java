@@ -397,7 +397,7 @@ public class CRUD_BTree {
 
             long indexBilionario = pesquisarArvore(key, indexFile, raiz);
 
-            Billionaire billionaire = DAO_Hash.read(file, indexBilionario);
+            Billionaire billionaire = BillionaireService.read(file, indexBilionario);
 
             System.out.println(billionaire);
 
@@ -429,8 +429,7 @@ public class CRUD_BTree {
 
                 if (key == id) {
                     rafIndex.close();
-                    return posicao; // Se achar o elemento na arvore, retornar posição dele no arquivo de
-                                    // Bilionarios
+                    return posicao; // Se achar o elemento na arvore, retornar posição dele no arquivo de Bilionarios
                 } else if (key < id) {
                     rafIndex.close();
                     return pesquisarArvore(key, indexFile, esq);
@@ -456,11 +455,66 @@ public class CRUD_BTree {
         return -1;
     }
 
+    public static long pesquisarPonteiroArvore(int key, String indexFile, long pagina) {
+
+        try {
+
+            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
+
+            rafIndex.seek(pagina);
+            int tamanhoPagina = rafIndex.readInt();
+
+            for (int i = 0; i < tamanhoPagina; i++) {
+
+                long esq = rafIndex.readLong();
+                int id = rafIndex.readInt();
+                long posicao = rafIndex.getFilePointer();
+                rafIndex.readLong();
+
+                if (key == id) {
+                    rafIndex.close();
+                    return posicao; // Se achar o elemento na arvore, retornar posição do ponteiro dele na arvore
+                } else if (key < id) {
+                    rafIndex.close();
+                    return pesquisarPonteiroArvore(key, indexFile, esq);
+                }
+
+            }
+
+            long dir = rafIndex.readLong();
+            if (dir == -1) {
+                rafIndex.close();
+                return -1;
+            } else {
+
+                rafIndex.close();
+                return pesquisarPonteiroArvore(key, indexFile, dir);
+
+            }
+
+        } catch (Exception e) {
+            System.err.println("Erro na pesquisa: " + e);
+        }
+
+        return -1;
+    }
+
     // Update
 
-    public static void update(String key, String file) {
+    public static void update(String id, String file) {
 
-        
+        int key = Integer.parseInt(id);
+
+        Billionaire billionaire = getIndex(key);
+
+        if (billionaire == null) {
+            System.out.println("Bilionário não encontrado!");
+            return;
+        }
+
+        Billionaire newBillionaire = BillionaireService.updateBillionaire(billionaire);
+
+        DAO_BTree.update(newBillionaire, billionaire, key);
 
     }
 

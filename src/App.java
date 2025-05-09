@@ -61,20 +61,25 @@ public class App {
                         CRUD_BTree.update(key, file);
                     else if (algoritmo == 2)
                         CRUD_Hash.update(key, file);
-                    clearScreen();
                     break;
 
-                case 5:
-                    System.out.print("ID: ");
-                    id = scan.nextInt();
-                    clearScreen();
+                case 5: // Delete
+                algoritmo = selectAlgorithm(scan);
+                System.out.print("ID: ");
+                clearInputBuffer(scan);
+                id = scan.nextInt();
+                clearScreen();
+                if (algoritmo == 1)
                     CRUD_BTree.delete(id, file);
+                else if (algoritmo == 2)
+                    CRUD_Hash.delete(0, file);
                     break;
 
                 case 6:
                     clearScreen();
                     System.out.print("Registros: ");
                     int registros = scan.nextInt();
+                    clearInputBuffer(scan);
                     System.out.print("Caminhos: ");
                     int caminhos = scan.nextInt();
                     Sorting.sort(file, registros, caminhos);
@@ -83,7 +88,6 @@ public class App {
                 case 7:
                     clearScreen();
                     System.out.print("Palavra a ser pesquisada: ");
-                    clearInputBuffer(scan);
                     String palavra = scan.nextLine();
                     System.out.println("Escolha a lista a ser pesquisada:");
                     System.out.println("1. Para coluna Source");
@@ -128,8 +132,18 @@ public class App {
         System.out.println("Escolha qual algoritmo: ");
         System.out.println("1 -> Árvore B");
         System.out.println("2 -> Tabela Hash");
-        clearInputBuffer(scan);
-        return scan.nextInt();
+        int choice = scan.nextInt();
+        switch (choice) {
+            case 1:
+                return choice;
+            case 2:
+                return choice;
+
+            default:
+                System.out.println("----------------------------------");
+                System.out.println("Opção Inválida!");
+                return selectAlgorithm(scan);
+        }
     }
 
     public static void clearInputBuffer(Scanner scan) {

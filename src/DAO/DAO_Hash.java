@@ -45,7 +45,7 @@ public class DAO_Hash {
             Billionaire billionaire = new Billionaire(id, name, netWorth, country, source, rank, age, residence,
                     citizenship, status, children, education, self_made, birthdate);
 
-            // Adiciona nas 2 listas invertidas         
+            // Adiciona nas 2 listas invertidas
             DAO_InvertedList.addIL(billionaire, 1);
             DAO_InvertedList.addIL(billionaire, 2);
 
@@ -55,36 +55,6 @@ public class DAO_Hash {
         } catch (Exception e) {
             System.err.println("Error -> DAO.create: " + e);
         }
-    }
-
-    public static Billionaire read(String file, long posicao) throws IOException {
-
-        Billionaire billionaireTmp = new Billionaire();
-
-        RandomAccessFile raf = new RandomAccessFile(file, "rw");
-
-        raf.seek(posicao);
-
-        byte[] bt;
-        int len;
-        char lapide;
-
-        lapide = raf.readChar(); // Ler Lapide
-        len = raf.readInt(); // Ler Tamanho Obj
-
-        bt = new byte[len];
-        raf.read(bt);
-
-        billionaireTmp.fromByteArray(bt);
-
-        // Confere se o objeto está inativo, se sim, retornar null
-        if (lapide == '*') {
-            raf.close();
-            return null;
-        }
-
-        raf.close();
-        return billionaireTmp;
     }
 
     public static void update(Billionaire newBillionaire) {
@@ -106,8 +76,15 @@ public class DAO_Hash {
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
             RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
-            
+
             long billionairePosition = CRUD_Hash.getBillionairePosition(key);
+
+            if (billionairePosition < 0) {
+                raf.close();
+                rafIndex.close();
+                rafBucket.close();
+                return false;
+            }
 
             raf.seek(billionairePosition);
 
@@ -123,7 +100,7 @@ public class DAO_Hash {
             rafBucket.seek(enderecoBucket);
 
             rafBucket.writeInt(tamanhoBucket);
-            
+
             for (int i = 0; i < tamanhoBucket; i++) {
 
                 int id = rafBucket.readInt();
@@ -162,21 +139,21 @@ public class DAO_Hash {
 
                 }
             }
-            
-            
+
             raf.close();
             rafIndex.close();
             rafBucket.close();
+            return true;
 
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
         }
-        System.out.println("Bilionário não encontrado");
-        return false;
+        return true;
     }
 
     // Escreve no arquivo index
-    public static void createIndex(int id, long posicao, String indexFile, String bucketFile, RandomAccessFile rafIndex, RandomAccessFile rafBucket) {
+    public static void createIndex(int id, long posicao, String indexFile, String bucketFile, RandomAccessFile rafIndex,
+            RandomAccessFile rafBucket) {
         try {
             // Deverá ter no maximo 138 buckets (5% de 2755)
             // Para testes vou fazer com tamanho 4
@@ -263,7 +240,8 @@ public class DAO_Hash {
                 rafIndex.seek(0);
                 rafIndex.writeInt(pG);
 
-                // Passa RAF, profundidadeGlobal, Posicao do bucket antigo e o Tamanho maximo do bucket
+                // Passa RAF, profundidadeGlobal, Posicao do bucket antigo e o Tamanho maximo do
+                // bucket
                 rebalancearBucket(rafIndex, rafBucket, pG, posicaoBucket, tamanhoBucket, bitsBucket);
 
             }
@@ -332,7 +310,8 @@ public class DAO_Hash {
 
             for (int i = 0; i < tamanhoBucket - 1; i++) {
 
-                int hash = ((elementos[i] % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular pG)
+                int hash = ((elementos[i] % pG) * 12) + 4; // Multiplicar por 8 que é o tamanho de Long (+ 4 para pular
+                                                           // pG)
 
                 rafIndex.seek(hash);
 

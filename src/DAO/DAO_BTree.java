@@ -5,6 +5,7 @@ import java.io.RandomAccessFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import models.Billionaire;
+import services.CRUD_BTree;
 
 public class DAO_BTree {
     public static void create(String[] row, RandomAccessFile raf) {
@@ -84,20 +85,99 @@ public class DAO_BTree {
         return billionaireTmp;
     }
 
-    public static void update(Billionaire newBillionaire) {
+    public static boolean update(Billionaire newBillionaire, Billionaire billionaire, int key) {
+
+        String file = "src/database/billionaires.db";
+        String indexFile = "src/database/indexTree.db";
+
+        try {
+            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
+            RandomAccessFile rafBilionario = new RandomAccessFile(file, "rw");
+
+            rafIndex.seek(0);
+            long raiz = rafIndex.readLong();
+
+            long pointer = CRUD_BTree.pesquisarArvore(key, indexFile, raiz);
+
+            rafBilionario.seek(pointer);
+            if (rafBilionario.readChar() == '*') {
+                rafIndex.close();
+                rafBilionario.close();
+                System.out.println("Bilionário não encontrado!");
+                return false;
+            }
+
+            if (newBillionaire.getByteSize() <= billionaire.getByteSize()) {
+                
+                rafBilionario.seek(pointer);
+    
+                rafBilionario.write(newBillionaire.toByteArray());
+            
+            } else {
+
+                rafBilionario.seek(pointer);
+    
+                rafBilionario.writeChar('*');
+
+                rafBilionario.seek(rafBilionario.length());
+
+                rafIndex.seek(CRUD_BTree.pesquisarPonteiroArvore(key, indexFile, raiz));
+
+                rafIndex.writeLong(rafBilionario.getFilePointer());
+
+                rafBilionario.write(newBillionaire.toByteArray());
+
+
+            }
+
+            rafIndex.close();
+            rafBilionario.close();
+
+            
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar: " + e);
+        }
+
+        return true;
 
     }
 
     // Novo delete com arquivo index
     public static boolean deleteIndex(int key) {
+
+        String file = "src/database/billionaires.db";
+        String indexFile = "src/database/indexTree.db";
         
         try {
 
+            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
+            RandomAccessFile rafBilionario = new RandomAccessFile(file, "rw");
+
+            rafIndex.seek(0);
+            long raiz = rafIndex.readLong();
+
+            long pointer = CRUD_BTree.pesquisarArvore(key, indexFile, raiz);
+
+            rafBilionario.seek(pointer);
+            if (rafBilionario.readChar() == '*') {
+                rafIndex.close();
+                rafBilionario.close();
+                System.out.println("Bilionário não encontrado!");
+                return false;
+            }
+
+            rafBilionario.seek(pointer);
+
+            rafBilionario.writeChar('*');
+            
+            System.out.println();
+
+            rafIndex.close();
+            rafBilionario.close();
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
         }
-        System.out.println("Bilionário não encontrado");
-        return false;
+        return true;
     }
 
 }
