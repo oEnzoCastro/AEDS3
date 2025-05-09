@@ -1,6 +1,6 @@
 package services;
 
-import DAO.DAO;
+import DAO.DAO_Hash;
 import DAO.DAO_BTree;
 
 import java.io.BufferedReader;
@@ -29,11 +29,17 @@ public class CRUD_BTree {
         new File(file).delete();
         new File(indexFile).delete();
 
+        BufferedReader countLines;
         // Cria os arquivos novos
         try {
+            countLines = new BufferedReader(new FileReader(fileCSV));
+            int csvLines = (int) countLines.lines().count() - 1;
+            countLines.close();
 
             reader = new BufferedReader(new FileReader(fileCSV));
             reader.readLine(); // pula o cabeçalho
+            int currentLine = 0;
+            int percent = 0;
 
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
 
@@ -49,11 +55,13 @@ public class CRUD_BTree {
             int maxPagina = 5; // Maximo de elementos por pagina
             long raiz = 8; // Endereço da raiz
 
-            rafIndex.writeLong(raiz); // Aponta para Raiz   
+            rafIndex.writeLong(raiz); // Aponta para Raiz
 
             createPagina(indexFile, raiz, maxPagina);
 
             System.out.println("Criando Database... Aguarde");
+            System.out.println("Adicionando " + csvLines + " elementos:");
+
             while ((line = reader.readLine()) != null) {
 
                 rafIndex.seek(0);
@@ -63,11 +71,25 @@ public class CRUD_BTree {
 
                 posicao = raf.getFilePointer(); // posição antes da escrita
 
-                DAO.create(row, raf);
+                DAO_Hash.create(row, raf);
 
                 id = Integer.parseInt(row[0]);
 
                 insertTree(id, posicao, indexFile, maxPagina, raiz, raiz); // Adiciona Elemento no arquivo de indice
+
+                // Loading Start
+                if (percent != Math.round((float) currentLine / csvLines * 100) || currentLine == 0) {
+                    percent = Math.round((float) currentLine / csvLines * 100);
+                    System.out.print("\r[");
+                    for (int i = 0; i < percent; i += 2)
+                        System.out.print("█");
+                    for (int i = percent; i <= 100; i += 2)
+                        System.out.print(" ");
+                    System.out.print("][ " + percent + "% ]");
+                }
+                currentLine++;
+                // Loading End
+
             }
 
             // Volta ao início e grava o último ID inserido
@@ -79,7 +101,9 @@ public class CRUD_BTree {
             reader.close();
             System.out.println("CSV convertido para Database!");
 
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             System.err.println("Erro ReadCSV.createAll: " + e);
         }
 
@@ -219,6 +243,7 @@ public class CRUD_BTree {
 
                 }
 
+                rafIndex.close();
                 return insertTree(id, posicao, indexFile, maxPagina, raiz, raiz);
 
             }
@@ -232,7 +257,7 @@ public class CRUD_BTree {
                     isFolha = true;
                 }
                 int elemento = rafIndex.readInt(); // Elemento
-                long posicaoElemento = rafIndex.readLong(); // Posicao Elemento
+                rafIndex.readLong(); // Posicao Elemento
 
                 if (isFolha) {
 
@@ -247,6 +272,7 @@ public class CRUD_BTree {
                         rafIndex.seek(pagina);
                         rafIndex.writeInt(tamanhoPagina);
 
+                        rafIndex.close();
                         return null; // -1 = Escreveu
 
                     }
@@ -255,10 +281,12 @@ public class CRUD_BTree {
 
                     if (id < elemento) {
 
+                        rafIndex.close();
                         return insertTree(id, posicao, indexFile, maxPagina, esq, raiz);
 
                     } else if (elemento == 0) {
 
+                        rafIndex.close();
                         return insertTree(id, posicao, indexFile, maxPagina, esq, raiz);
                     }
 
@@ -269,6 +297,7 @@ public class CRUD_BTree {
             long dir = rafIndex.readLong(); // Dir
 
             rafIndex.close();
+
             return insertTree(id, posicao, indexFile, maxPagina, dir, raiz);
 
         } catch (
@@ -368,14 +397,13 @@ public class CRUD_BTree {
 
             long indexBilionario = pesquisarArvore(key, indexFile, raiz);
 
-
-            Billionaire billionaire = DAO.read(file, indexBilionario);
+            Billionaire billionaire = DAO_Hash.read(file, indexBilionario);
 
             System.out.println(billionaire);
 
             rafIndex.close();
+            rafBilionario.close();
             return billionaire;
-
 
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
@@ -400,8 +428,11 @@ public class CRUD_BTree {
                 long posicao = rafIndex.readLong();
 
                 if (key == id) {
-                    return posicao; // Se achar o elemento na arvore, retornar posição dele no arquivo de Bilionarios
+                    rafIndex.close();
+                    return posicao; // Se achar o elemento na arvore, retornar posição dele no arquivo de
+                                    // Bilionarios
                 } else if (key < id) {
+                    rafIndex.close();
                     return pesquisarArvore(key, indexFile, esq);
                 }
 
@@ -409,9 +440,11 @@ public class CRUD_BTree {
 
             long dir = rafIndex.readLong();
             if (dir == -1) {
+                rafIndex.close();
                 return -1;
             } else {
 
+                rafIndex.close();
                 return pesquisarArvore(key, indexFile, dir);
 
             }
@@ -421,6 +454,14 @@ public class CRUD_BTree {
         }
 
         return -1;
+    }
+
+    // Update
+
+    public static void update(String key, String file) {
+
+        
+
     }
 
     //

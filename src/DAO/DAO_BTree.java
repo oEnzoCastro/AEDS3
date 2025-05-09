@@ -74,43 +74,30 @@ public class DAO_BTree {
 
         // Confere se o objeto está inativo, se sim, retornar null
         if (lapide == '*') {
+            raf.close();
+
             return null;
         }
+
+        raf.close();
 
         return billionaireTmp;
     }
 
     public static void update(Billionaire newBillionaire) {
 
-        
-
     }
 
     // Novo delete com arquivo index
     public static boolean deleteIndex(int key) {
-        String file = "src/database/billionaires.db";
-        String indexFile = "src/database/index.db";
-        String bucketFile = "src/database/bucketFile.db";
+        
         try {
-            
-
 
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
         }
         System.out.println("Bilionário não encontrado");
         return false;
-    }
-
-    // Escreve no arquivo index
-    public static void createIndex(int id, long posicao, String indexFile) {
-        try {
-
-
-
-        } catch (Exception e) {
-            System.err.println("Erro ao inserir no arquivo index: " + e);
-        }
     }
 
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import models.Billionaire;
-import services.CRUD;
+import services.CRUD_Hash;
 
 public class DAO_InvertedList {
     private static final String file1 = "src/database/invertedListSource.db";
@@ -161,7 +161,7 @@ public class DAO_InvertedList {
 
             for (int i = 0; i < quantidadeIds; i++) { // Pra cada ID da palavra
                 int id = raf.readInt();
-                CRUD.getIndex(id); // Procura o billionario no arquivo original
+                CRUD_Hash.getIndex(id); // Procura o billionario no arquivo original
             }
         } catch (Exception e) {
             System.err.println("Erro DAO_InvertedList.searchIL: " + e.getMessage());
@@ -186,7 +186,7 @@ public class DAO_InvertedList {
             raf.seek(0); // Começa a ler desde o início do arquivo
     
             while (raf.getFilePointer() < raf.length()) { // Enquanto não chegar no fim do arquivo
-                long inicioPalavra = raf.getFilePointer(); // Marca onde começa a palavra
+                raf.getFilePointer(); // Marca onde começa a palavra
                 String palavra = raf.readUTF(); // Lê a palavra
                 int quantidadeIds = raf.readInt(); // Lê qntd IDs
     

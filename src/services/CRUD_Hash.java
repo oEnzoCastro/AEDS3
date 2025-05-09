@@ -1,13 +1,13 @@
 package services;
 
-import DAO.DAO;
+import DAO.DAO_Hash;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
 import models.Billionaire;
 
-public class CRUD {
+public class CRUD_Hash {
     public static int createAll() {
 
         String line;
@@ -26,13 +26,24 @@ public class CRUD {
         new File(indexFile).delete();
         new File(bucketFile).delete();
 
+        BufferedReader countLines;
+
         // Cria os arquivos novos
         try {
+
+            countLines = new BufferedReader(new FileReader(fileCSV));
+            int csvLines = (int) countLines.lines().count() - 1;
+            countLines.close();
 
             reader = new BufferedReader(new FileReader(fileCSV));
             reader.readLine(); // pula o cabeçalho
 
+            int currentLine = 0;
+            int percent = 0;
+
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
+            RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
 
             // Reserva espaço para o último ID
             raf.writeInt(0);
@@ -40,17 +51,32 @@ public class CRUD {
             long posicao;
 
             System.out.println("Criando Database... Aguarde");
+            System.out.println("Adicionando " + csvLines + " elementos:");
             while ((line = reader.readLine()) != null) {
 
                 String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
                 posicao = raf.getFilePointer(); // posição antes da escrita
 
-                DAO.create(row, raf);
+                DAO_Hash.create(row, raf);
 
                 id = Integer.parseInt(row[0]);
 
-                DAO.createIndex(id, posicao, indexFile, bucketFile);
+                DAO_Hash.createIndex(id, posicao, indexFile, bucketFile, rafIndex, rafBucket);
+
+                // Loading Start
+                if (percent != Math.round((float) currentLine / csvLines * 100) || currentLine == 0) {
+                    percent = Math.round((float) currentLine / csvLines * 100);
+                    System.out.print("\r[");
+                    for (int i = 0; i < percent; i += 2)
+                        System.out.print("█");
+                    for (int i = percent; i <= 100; i += 2)
+                        System.out.print(" ");
+                    System.out.print("][ " + percent + "% ]");
+                }
+                currentLine++;
+                // Loading End
+
             }
 
             // Volta ao início e grava o último ID inserido
@@ -75,6 +101,7 @@ public class CRUD {
 
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
+            RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
             byte[] bt;
 
             randomAccessFile.seek(0);
@@ -91,7 +118,7 @@ public class CRUD {
 
             long posicao = randomAccessFile.getFilePointer();
             rafIndex.seek(rafIndex.length()); // Move para o fim do arquivo index
-            DAO.createIndex(lastId, posicao, indexFile, bucketFile);
+            DAO_Hash.createIndex(lastId, posicao, indexFile, bucketFile, rafIndex, rafBucket);
 
             // Inserir newBillionaire no arquivo original
 
@@ -124,7 +151,7 @@ public class CRUD {
 
             rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
 
-            int pL = rafIndex.readInt(); // pL = Profundidade Local
+            rafIndex.readInt(); // pL = Profundidade Local
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             int bitsBucket = (4 * 12) + 4;
@@ -143,10 +170,12 @@ public class CRUD {
 
                 if (key == id) {
 
-                    Billionaire billionaire = DAO.read(file, posicao);
+                    Billionaire billionaire = DAO_Hash.read(file, posicao);
 
                     System.out.println(billionaire);
 
+                    rafIndex.close();
+                    rafBucket.close();
                     return billionaire;
 
                 }
@@ -154,6 +183,7 @@ public class CRUD {
             }
 
             rafIndex.close();
+            rafBucket.close();
 
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
@@ -164,7 +194,6 @@ public class CRUD {
 
     public static long getBucketPosition(int key) {
 
-        String file = "src/database/billionaires.db";
         String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 
@@ -179,7 +208,7 @@ public class CRUD {
 
             rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
 
-            int pL = rafIndex.readInt(); // pL = Profundidade Local
+            rafIndex.readInt(); // pL = Profundidade Local
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             int bitsBucket = (4 * 12) + 4;
@@ -187,6 +216,7 @@ public class CRUD {
             posicaoBucket = (posicaoBucket * bitsBucket); // PosicaoBucket = Endereço do bucket
 
             rafIndex.close();
+            rafBucket.close();
 
             return posicaoBucket;
 
@@ -199,7 +229,6 @@ public class CRUD {
 
     public static long getBucketElementPosition(int key) {
 
-        String file = "src/database/billionaires.db";
         String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 
@@ -214,7 +243,7 @@ public class CRUD {
 
             rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
 
-            int pL = rafIndex.readInt(); // pL = Profundidade Local
+            rafIndex.readInt(); // pL = Profundidade Local
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             int bitsBucket = (4 * 12) + 4;
@@ -228,12 +257,15 @@ public class CRUD {
             for (int i = 0; i < numBucket; i++) {
 
                 int id = rafBucket.readInt();
-                long posicao = rafBucket.readLong();
+                rafBucket.readLong();
                 System.out.println();
 
                 if (key == id) {
 
                     rafBucket.seek(rafBucket.getFilePointer() - 8); // Voltar para posição do bucket
+
+                    rafIndex.close();
+                    rafBucket.close();
 
                     return rafBucket.getFilePointer();
 
@@ -242,6 +274,7 @@ public class CRUD {
             }
 
             rafIndex.close();
+            rafBucket.close();
 
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
@@ -252,7 +285,6 @@ public class CRUD {
 
     public static long getBillionairePosition(int key) {
 
-        String file = "src/database/billionaires.db";
         String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 
@@ -267,7 +299,7 @@ public class CRUD {
 
             rafIndex.seek(hash); // Ir para a posição no arquivo de Indice
 
-            int pL = rafIndex.readInt(); // pL = Profundidade Local
+            rafIndex.readInt(); // pL = Profundidade Local
             long posicaoBucket = rafIndex.readLong(); // PosicaoBucket = Valor da posição no Indice
 
             int bitsBucket = (4 * 12) + 4;
@@ -286,6 +318,8 @@ public class CRUD {
 
                 if (key == id) {
 
+                    rafIndex.close();
+                    rafBucket.close();
                     return posicao;
 
                 }
@@ -293,6 +327,7 @@ public class CRUD {
             }
 
             rafIndex.close();
+            rafBucket.close();
 
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
@@ -350,6 +385,7 @@ public class CRUD {
 
                     randomAccessFile.close();
                     rafIndex.close();
+                    rafBucket.close();
 
                 } else {
 
@@ -377,7 +413,7 @@ public class CRUD {
 
     public static void delete(int id, String file) {
 
-        boolean isDeleted = DAO.deleteIndex(id);
+        boolean isDeleted = DAO_Hash.deleteIndex(id);
 
         if (isDeleted == true) {
             System.out.println("Bilionário Deletado!");

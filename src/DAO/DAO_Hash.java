@@ -5,9 +5,9 @@ import java.io.RandomAccessFile;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import models.Billionaire;
-import services.CRUD;
+import services.CRUD_Hash;
 
-public class DAO {
+public class DAO_Hash {
     public static void create(String[] row, RandomAccessFile raf) {
 
         try {
@@ -79,9 +79,11 @@ public class DAO {
 
         // Confere se o objeto está inativo, se sim, retornar null
         if (lapide == '*') {
+            raf.close();
             return null;
         }
 
+        raf.close();
         return billionaireTmp;
     }
 
@@ -105,13 +107,13 @@ public class DAO {
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
             RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
             
-            long billionairePosition = CRUD.getBillionairePosition(key);
+            long billionairePosition = CRUD_Hash.getBillionairePosition(key);
 
             raf.seek(billionairePosition);
 
             raf.writeChar('*');
 
-            long enderecoBucket = CRUD.getBucketPosition(key);
+            long enderecoBucket = CRUD_Hash.getBucketPosition(key);
 
             rafBucket.seek(enderecoBucket);
 
@@ -125,7 +127,7 @@ public class DAO {
             for (int i = 0; i < tamanhoBucket; i++) {
 
                 int id = rafBucket.readInt();
-                long posicao = rafBucket.readLong();
+                rafBucket.readLong();
                 System.out.println();
 
                 if (key == id) {
@@ -159,12 +161,12 @@ public class DAO {
                     }
 
                 }
-
             }
-
-
+            
+            
             raf.close();
             rafIndex.close();
+            rafBucket.close();
 
         } catch (Exception e) {
             System.err.println("Erro na leitura: " + e);
@@ -174,15 +176,15 @@ public class DAO {
     }
 
     // Escreve no arquivo index
-    public static void createIndex(int id, long posicao, String indexFile, String bucketFile) {
+    public static void createIndex(int id, long posicao, String indexFile, String bucketFile, RandomAccessFile rafIndex, RandomAccessFile rafBucket) {
         try {
             // Deverá ter no maximo 138 buckets (5% de 2755)
             // Para testes vou fazer com tamanho 4
             int tamanhoBucket = 4;
             int bitsBucket = (4 * 12) + 4;
 
-            RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
-            RandomAccessFile rafBucket = new RandomAccessFile(bucketFile, "rw");
+            rafIndex.seek(0);
+            rafBucket.seek(0);
 
             if (rafIndex.length() == 0) { // Confere se existem indices, se não, criar formato do indice
                 rafIndex.writeInt(2); // pG (Profundidade Global) = 2
@@ -292,9 +294,6 @@ public class DAO {
 
             // rafIndex.writeInt(id);
             // rafIndex.writeLong(posicao);
-
-            rafIndex.close();
-            rafBucket.close();
 
         } catch (Exception e) {
             System.err.println("Erro ao inserir no arquivo index: " + e);
