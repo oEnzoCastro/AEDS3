@@ -52,38 +52,27 @@ public class BillionaireService {
         System.out.println("----------------------------------");
 
         // Name
-        System.out.print("Name: ");
-        String name = scan.nextLine();
+        String name = billionaire.getName();
+        System.out.print("Name: " + name);
         System.out.println();
         // NetWorth
         System.out.print("NetWorth: ");
         float netWorth = Float.parseFloat(scan.nextLine());
         System.out.println();
         // Country
-        System.out.print("Country: ");
-        String country = scan.nextLine();
-        System.out.println();
+        String country = billionaire.getCountry();
+        System.out.println("Country: " + country);
         // Source
-        System.out.println("- Source -");
-        boolean addList = true;
-        ArrayList<String> source = new ArrayList<String>();
-        while (addList == true) {
-            System.out.print("Digite o valor de Source ou 0 para continuar: ");
-
-            String sourceString = scan.nextLine();
-
-            if (sourceString.equals("0")) {
-                addList = false;
-            } else {
-                source.add(sourceString);
-            }
-
-            System.out.println();
-
+        ArrayList<String> source = billionaire.getSource();
+        System.out.print("Sources: ");
+        for (String string : source) {
+            System.out.print(string + " ");
         }
+        boolean addList;
+        System.out.println();
         // Rank
-        System.out.print("Rank: ");
         int rank = getRank(netWorth); // Calcular a partir dos outros ranks
+        System.out.print("Rank: " + rank);
         System.out.println();
         // Age
         System.out.print("Age: ");
@@ -126,14 +115,13 @@ public class BillionaireService {
 
         }
         // SelfMade
-        System.out.print("Selfmade (True/False): ");
-        Boolean selfMade = scan.nextBoolean();
+        Boolean selfMade = billionaire.getSelfMade();
+        System.out.print("Selfmade (True/False): " + selfMade);
+
         System.out.println();
         // Birthdate (YYYY-MM-DD)
         System.out.print("Birthdate (YYYY-MM-DD): ");
-        scan.nextLine();
-        String dateString = scan.nextLine();
-        LocalDate birthdate = LocalDate.parse(dateString);
+        LocalDate birthdate = billionaire.getBirthdate();
         System.out.println();
 
         Billionaire billionaireTmp = new Billionaire(billionaire.getId(), name, netWorth, country, source, rank, age,
@@ -331,6 +319,6 @@ public class BillionaireService {
     }
 
     public static int getRank(float NetWorth) {
-        return 0;
+        return 100;
     }
 }

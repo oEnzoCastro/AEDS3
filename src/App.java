@@ -1,9 +1,8 @@
+import DAO.DAO_InvertedList;
 import java.io.IOException;
 import java.util.Scanner;
-
-import DAO.DAO_InvertedList;
-import services.CRUD_Hash;
 import services.CRUD_BTree;
+import services.CRUD_Hash;
 import services.Sorting;
 
 public class App {
@@ -27,6 +26,7 @@ public class App {
                     if (algoritmo == 1)
                         CRUD_BTree.createAll();
                     else if (algoritmo == 2)
+                        DAO_InvertedList.limparLista();
                         CRUD_Hash.createAll();
                     clearScreen();
                     break;
@@ -87,6 +87,7 @@ public class App {
 
                 case 7:
                     clearScreen();
+                    scan.nextLine();
                     System.out.print("Palavra a ser pesquisada: ");
                     String palavra = scan.nextLine();
                     System.out.println("Escolha a lista a ser pesquisada:");

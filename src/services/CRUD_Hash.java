@@ -1,6 +1,7 @@
 package services;
 
 import DAO.DAO_Hash;
+import DAO.DAO_InvertedList;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -119,6 +120,10 @@ public class CRUD_Hash {
             long posicao = randomAccessFile.getFilePointer();
             rafIndex.seek(rafIndex.length()); // Move para o fim do arquivo index
             DAO_Hash.createIndex(lastId, posicao, indexFile, bucketFile, rafIndex, rafBucket);
+
+            // Inserir newBillionaires nas listas invertidas
+            DAO_InvertedList.addIL(newBillionaire, 1);
+            DAO_InvertedList.addIL(newBillionaire, 2);
 
             // Inserir newBillionaire no arquivo original
 
@@ -414,6 +419,9 @@ public class CRUD_Hash {
     public static void delete(int id, String file) {
 
         boolean isDeleted = DAO_Hash.deleteIndex(id);
+
+        //Deleta na lista invertida
+        // DAO_InvertedList.deleteIL(id);
 
         if (isDeleted == true) {
             System.out.println("Bilionário Deletado!");

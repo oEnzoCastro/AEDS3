@@ -1,16 +1,25 @@
 package DAO;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import models.Billionaire;
 import services.CRUD_Hash;
 
 public class DAO_InvertedList {
     private static final String file1 = "src/database/invertedListSource.db";
     private static final String file2 = "src/database/invertedListCountry.db";
+
+    public static void limparLista() {
+        try {
+            new FileWriter(file1, false).close(); // Sobrescreve com conteúdo vazio
+            new FileWriter(file2, false).close();
+        } catch (IOException e) {
+            System.err.println("Erro ao limpar os arquivos: " + e.getMessage());
+        }
+    }
 
     public static void addIL(Billionaire b, int code) {
         int id = b.getId();
@@ -180,50 +189,54 @@ public class DAO_InvertedList {
     
     private static void deleteFromFile(String fileName, int id) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
-        ArrayList<byte[]> entradasValidas = new ArrayList<>(); // Lista de palavras e IDs válidas
-    
+
         try {
-            raf.seek(0); // Começa a ler desde o início do arquivo
-    
-            while (raf.getFilePointer() < raf.length()) { // Enquanto não chegar no fim do arquivo
-                raf.getFilePointer(); // Marca onde começa a palavra
+            raf.seek(0);
+
+            while (raf.getFilePointer() < raf.length()) {
+                long posPalavra = raf.getFilePointer(); // Marca o início da palavra
                 String palavra = raf.readUTF(); // Lê a palavra
-                int quantidadeIds = raf.readInt(); // Lê qntd IDs
-    
+
+                long posNumIds = raf.getFilePointer(); // Marca onde começa a quantidade de IDs
+                int quantidadeIds = raf.readInt(); // Lê quantidade de IDs
+
                 ArrayList<Integer> ids = new ArrayList<>();
                 for (int i = 0; i < quantidadeIds; i++) {
-                    ids.add(raf.readInt()); // Lê cada ID e adiciona na lista
+                    ids.add(raf.readInt());
                 }
-    
+
                 if (ids.contains(id)) {
-                    ids.remove(Integer.valueOf(id)); // Remove o ID a ser deletado
-                }
-    
-                if (!ids.isEmpty()) { 
-                    // Se ainda sobraram IDs associados à palavra
-                    try (RandomAccessFile temp = new RandomAccessFile("temp.db", "rw")) {
-                        temp.seek(0);
-                        temp.writeUTF(palavra); // Escreve a palavra
-                        temp.writeInt(ids.size()); // Escreve nova quantidade de IDs
-                        for (Integer novoId : ids) {
-                            temp.writeInt(novoId); // Escreve cada ID novo
-                        }
-                        temp.seek(0);
-                        byte[] buffer = new byte[(int) temp.length()];
-                        temp.readFully(buffer); // Cria um buffer com a palavra e os ids
-                        entradasValidas.add(buffer); // Guarda para depois regravar
+                    ids.remove(Integer.valueOf(id));
+
+                    raf.seek(posPalavra); // Volta para reescrever desde a palavra
+
+                    if (ids.isEmpty()) {
+                        // Se não há mais IDs, remove completamente a entrada (sobrescrevendo com o restante do arquivo)
+                        long posDepoisEntrada = raf.getFilePointer(); // Onde terminaria a entrada
+                        byte[] restante = new byte[(int) (raf.length() - posDepoisEntrada)];
+                        raf.readFully(restante);
+
+                        raf.seek(posPalavra);
+                        raf.write(restante);
+                        raf.setLength(raf.getFilePointer());
+
+                        // Volta para o início para continuar o loop corretamente
+                        raf.seek(posPalavra);
+                    } else {
+                        // Apenas atualiza a lista de IDs
+                        rewriteList(raf, posNumIds, ids);
+                        raf.seek(posPalavra + getEntrySize(palavra, ids.size())); // Pula para próxima entrada
                     }
                 }
             }
-    
-            // Depois de varrer o arquivo
-            raf.setLength(0); // Limpa o arquivo original
-            for (byte[] entrada : entradasValidas) {
-                raf.write(entrada); // Escreve as entradas novamente
-            }
-    
         } finally {
-            raf.close(); // Fecha o arquivo
+            raf.close();
         }
-    }    
+    }
+
+    // Método auxiliar para calcular o tamanho de uma entrada no arquivo
+    private static int getEntrySize(String palavra, int numIds) {
+        int tamanhoPalavra = 2 + palavra.length() * 2; // UTF: 2 bytes para length + 2 bytes por caractere
+        return tamanhoPalavra + 4 + (4 * numIds); // + 4 bytes do int quantidade, + 4 por ID
+    }
 }
