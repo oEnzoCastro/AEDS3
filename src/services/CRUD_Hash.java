@@ -13,7 +13,7 @@ public class CRUD_Hash {
 
         String line;
 
-        String file = "src/database/billionaires.db";
+        String file = "src/database/billionairesHash.db";
         String fileCSV = "src/database/forbes_billionaires.csv";
         String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
@@ -141,7 +141,7 @@ public class CRUD_Hash {
 
     public static Billionaire getIndex(int key) {
 
-        String file = "src/database/billionaires.db";
+        String file = "src/database/billionairesHash.db";
         String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
 

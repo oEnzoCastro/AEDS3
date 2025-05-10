@@ -11,7 +11,8 @@ public class App {
 
         boolean isRunning = true;
         Scanner scan = new Scanner(System.in);
-        String file = "src/database/billionaires.db";
+        String fileTree = "src/database/billionairesTree.db";
+        String fileHash = "src/database/billionairesHash.db";
 
         while (isRunning) {
             printMenu();
@@ -21,49 +22,54 @@ public class App {
             String key;
 
             switch (option) {
-                case 1:
+                case 1: // Create All
                     algoritmo = selectAlgorithm(scan);
-                    if (algoritmo == 1)
+                    if (algoritmo == 1) {
                         CRUD_BTree.createAll();
-                    else if (algoritmo == 2)
+                    } else if (algoritmo == 2) {
                         DAO_InvertedList.limparLista();
                         CRUD_Hash.createAll();
+                    }
                     clearScreen();
                     break;
 
-                case 2:
+                case 2: // Create
                     algoritmo = selectAlgorithm(scan);
-                    if (algoritmo == 1)
-                        CRUD_BTree.create(file);
-                    else if (algoritmo == 2)
-                        CRUD_Hash.create(file);
+                    if (algoritmo == 1) {
+                        CRUD_BTree.create(fileTree);
+                    } else if (algoritmo == 2) {
+                        CRUD_Hash.create(fileHash);
+                    }
                     break;
 
-                case 3:
+                case 3: // Read
                     algoritmo = selectAlgorithm(scan);
                     System.out.print("Chave: ");
                     clearInputBuffer(scan);
                     id = scan.nextInt();
                     clearScreen();
-                    if (algoritmo == 1)
+                    if (algoritmo == 1) {
                         CRUD_BTree.getIndex(id);
-                    else if (algoritmo == 2)
+                    } else if (algoritmo == 2) {
                         CRUD_Hash.getIndex(id);
+                    }
                     break;
 
-                case 4:
+                case 4: // Update
                     algoritmo = selectAlgorithm(scan);
                     System.out.print("Chave: ");
                     clearInputBuffer(scan);
                     key = scan.nextLine();
                     clearScreen();
-                    if (algoritmo == 1)
-                        CRUD_BTree.update(key, file);
-                    else if (algoritmo == 2)
-                        CRUD_Hash.update(key, file);
+                    if (algoritmo == 1) {
+                        CRUD_BTree.update(key, fileTree);
+                    } else if (algoritmo == 2) {
+                        CRUD_Hash.update(key, fileHash);
+                    }
                     break;
 
                 case 5: // Delete
+
                 algoritmo = selectAlgorithm(scan);
                 System.out.print("ID: ");
                 clearInputBuffer(scan);
@@ -71,23 +77,27 @@ public class App {
                 clearScreen();
                 if (algoritmo == 1)
                     CRUD_BTree.delete(id, file);
-                else if (algoritmo == 2)
+                else if (algoritmo == 2) {
                     CRUD_Hash.delete(id, file);
                     DAO_InvertedList.deleteIL(id);
                     DAO_InvertedList.deleteIL(id);
+
+                    }
+
                     break;
 
-                case 6:
+                case 6: // Sort
                     clearScreen();
                     System.out.print("Registros: ");
                     int registros = scan.nextInt();
                     clearInputBuffer(scan);
                     System.out.print("Caminhos: ");
                     int caminhos = scan.nextInt();
-                    Sorting.sort(file, registros, caminhos);
+                    Sorting.sort(fileTree, registros, caminhos);
+                    Sorting.sort(fileHash, registros, caminhos);
                     break;
 
-                case 7:
+                case 7: // Lista Invertida
                     clearScreen();
                     scan.nextLine();
                     System.out.print("Palavra a ser pesquisada: ");

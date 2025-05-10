@@ -87,7 +87,7 @@ public class DAO_BTree {
 
     public static boolean update(Billionaire newBillionaire, Billionaire billionaire, int key) {
 
-        String file = "src/database/billionaires.db";
+        String file = "src/database/billionairesTree.db";
         String indexFile = "src/database/indexTree.db";
 
         try {
@@ -145,7 +145,7 @@ public class DAO_BTree {
     // Novo delete com arquivo index
     public static boolean deleteIndex(int key) {
 
-        String file = "src/database/billionaires.db";
+        String file = "src/database/billionairesTree.db";
         String indexFile = "src/database/indexTree.db";
         
         try {

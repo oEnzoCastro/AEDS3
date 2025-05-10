@@ -17,7 +17,7 @@ public class CRUD_BTree {
 
         String line;
 
-        String file = "src/database/billionaires.db";
+        String file = "src/database/billionairesTree.db";
         String fileCSV = "src/database/forbes_billionaires.csv";
         String indexFile = "src/database/indexTree.db";
 
@@ -384,7 +384,7 @@ public class CRUD_BTree {
 
     public static Billionaire getIndex(int key) {
 
-        String file = "src/database/billionaires.db";
+        String file = "src/database/billionairesTree.db";
         String indexFile = "src/database/indexTree.db";
 
         try {

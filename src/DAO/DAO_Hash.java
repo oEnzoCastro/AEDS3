@@ -69,7 +69,7 @@ public class DAO_Hash {
 
     // Novo delete com arquivo index
     public static boolean deleteIndex(int key) {
-        String file = "src/database/billionaires.db";
+        String file = "src/database/billionairesHash.db";
         String indexFile = "src/database/index.db";
         String bucketFile = "src/database/bucketFile.db";
         try {
