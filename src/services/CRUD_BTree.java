@@ -122,7 +122,15 @@ public class CRUD_BTree {
             int tamanhoPagina = rafIndex.readInt();
 
             // Quebrar
+
             if (tamanhoPagina >= maxPagina) {
+
+                /**
+                 *  Tranforma a pagina já existente no filho esquerdo, cria uma nova pagina (filho direito), e escreve 
+                 * 
+                 *  Se a pagina atual for a raiz:
+                 *  Tranforma a pagina já existente em raiz, mantêm o elemento que vai subir, rebalanceia os elementos filhos
+                 */
 
                 // Ordenar
 
@@ -204,6 +212,7 @@ public class CRUD_BTree {
                 }
 
                 if (pagina == raiz) {
+                    // Se a pagina cheia for a raiz
 
                     long newRaiz = createPagina(indexFile, rafIndex.length(), maxPagina);
 
@@ -259,18 +268,19 @@ public class CRUD_BTree {
                 int elemento = rafIndex.readInt(); // Elemento
                 rafIndex.readLong(); // Posicao Elemento
 
-                if (isFolha) {
+                if (isFolha) { // Se for Folha
 
-                    if (elemento == 0) {
+                    if (elemento == 0) { // Se o elemento da pagina for vazio = Inserir
 
                         rafIndex.seek(rafIndex.getFilePointer() - 12);
                         rafIndex.writeInt(id);
                         rafIndex.writeLong(posicao);
+                        // Insere elemento na pagina
 
                         tamanhoPagina++;
 
                         rafIndex.seek(pagina);
-                        rafIndex.writeInt(tamanhoPagina);
+                        rafIndex.writeInt(tamanhoPagina); // Adicionar no tamanho da pagina
 
                         rafIndex.close();
                         return null; // -1 = Escreveu
@@ -279,13 +289,13 @@ public class CRUD_BTree {
 
                 } else {
 
+                    // Caminhar Arvore
                     if (id < elemento) {
-
+                        // ID é menor = Filho Esquerdo
                         rafIndex.close();
                         return insertTree(id, posicao, indexFile, maxPagina, esq, raiz);
-
                     } else if (elemento == 0) {
-
+                        // ID é maior que o anterior e o atual não existe = Filho Esquerdo (Direito do ponto de vista do anterior)
                         rafIndex.close();
                         return insertTree(id, posicao, indexFile, maxPagina, esq, raiz);
                     }
@@ -298,6 +308,8 @@ public class CRUD_BTree {
 
             rafIndex.close();
 
+            // Caminhar arvore se for o ultimo elemento da pagina
+            // ID é maior = Filho Direito
             return insertTree(id, posicao, indexFile, maxPagina, dir, raiz);
 
         } catch (
@@ -349,17 +361,17 @@ public class CRUD_BTree {
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
             RandomAccessFile rafIndex = new RandomAccessFile(indexFile, "rw");
 
-            long raiz = rafIndex.readLong();
+            long raiz = rafIndex.readLong(); // Pega ponteiro da Raiz
 
             byte[] bt;
 
             randomAccessFile.seek(0);
 
-            int lastId = randomAccessFile.readInt() + 1;
+            int lastId = randomAccessFile.readInt() + 1; // Lê ultimo ID (Cabeçalho)
 
             randomAccessFile.seek(0);
 
-            randomAccessFile.writeInt(lastId);
+            randomAccessFile.writeInt(lastId); // Adiciona ID a ser adicionado
 
             Billionaire newBillionaire = BillionaireService.newBillionaire(lastId);
 
@@ -393,11 +405,11 @@ public class CRUD_BTree {
             RandomAccessFile rafBilionario = new RandomAccessFile(file, "rw");
 
             rafIndex.seek(0);
-            long raiz = rafIndex.readLong();
+            long raiz = rafIndex.readLong(); // Pega ponteiro da Raiz
 
-            long indexBilionario = pesquisarArvore(key, indexFile, raiz);
+            long indexBilionario = pesquisarArvore(key, indexFile, raiz); // Pega ponteiro do Billionario
 
-            Billionaire billionaire = BillionaireService.read(file, indexBilionario);
+            Billionaire billionaire = BillionaireService.read(file, indexBilionario); // Cria Bilionario
 
             System.out.println(billionaire);
 

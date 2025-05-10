@@ -70,18 +70,17 @@ public class App {
 
                 case 5: // Delete
 
-                algoritmo = selectAlgorithm(scan);
-                System.out.print("ID: ");
-                clearInputBuffer(scan);
-                id = scan.nextInt();
-                clearScreen();
-                if (algoritmo == 1)
-                    CRUD_BTree.delete(id, file);
-                else if (algoritmo == 2) {
-                    CRUD_Hash.delete(id, file);
-                    DAO_InvertedList.deleteIL(id);
-                    DAO_InvertedList.deleteIL(id);
-
+                    algoritmo = selectAlgorithm(scan);
+                    System.out.print("ID: ");
+                    clearInputBuffer(scan);
+                    id = scan.nextInt();
+                    clearScreen();
+                    if (algoritmo == 1)
+                        CRUD_BTree.delete(id, fileTree);
+                    else if (algoritmo == 2) {
+                        CRUD_Hash.delete(id, fileHash);
+                        DAO_InvertedList.deleteIL(id);
+                        DAO_InvertedList.deleteIL(id);
                     }
 
                     break;
