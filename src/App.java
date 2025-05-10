@@ -72,7 +72,9 @@ public class App {
                 if (algoritmo == 1)
                     CRUD_BTree.delete(id, file);
                 else if (algoritmo == 2)
-                    CRUD_Hash.delete(0, file);
+                    CRUD_Hash.delete(id, file);
+                    DAO_InvertedList.deleteIL(id);
+                    DAO_InvertedList.deleteIL(id);
                     break;
 
                 case 6:

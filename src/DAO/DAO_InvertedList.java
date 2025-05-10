@@ -1,5 +1,6 @@
 package DAO;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -183,60 +184,51 @@ public class DAO_InvertedList {
             deleteFromFile(file1, id);
             deleteFromFile(file2, id);
         } catch (Exception e) {
-            System.err.println("Erro DAO_InvertedList.deleteIL: " + e.getMessage());
+            e.printStackTrace(); // Mais informativo do que apenas e.getMessage()
         }
     }
     
     private static void deleteFromFile(String fileName, int id) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+        File originalFile = new File(fileName);
+        File tempFile = new File(fileName + ".tmp");
 
-        try {
-            raf.seek(0);
+        try (
+            // Abre os arquivos original e temporário
+            RandomAccessFile rafRead = new RandomAccessFile(originalFile, "r");
+            RandomAccessFile rafWrite = new RandomAccessFile(tempFile, "rw")
+        ) {
+            while (rafRead.getFilePointer() < rafRead.length()) {
+                // Lê a palavra e a quantidade de IDs
+                String palavra = rafRead.readUTF();
+                int quantidadeIds = rafRead.readInt();
 
-            while (raf.getFilePointer() < raf.length()) {
-                long posPalavra = raf.getFilePointer(); // Marca o início da palavra
-                String palavra = raf.readUTF(); // Lê a palavra
-
-                long posNumIds = raf.getFilePointer(); // Marca onde começa a quantidade de IDs
-                int quantidadeIds = raf.readInt(); // Lê quantidade de IDs
-
+                // Lê todos os IDs
                 ArrayList<Integer> ids = new ArrayList<>();
                 for (int i = 0; i < quantidadeIds; i++) {
-                    ids.add(raf.readInt());
+                    ids.add(rafRead.readInt());
                 }
 
-                if (ids.contains(id)) {
-                    ids.remove(Integer.valueOf(id));
+                // Remove o ID se estiver presente
+                ids.removeIf(x -> x == id);
 
-                    raf.seek(posPalavra); // Volta para reescrever desde a palavra
-
-                    if (ids.isEmpty()) {
-                        // Se não há mais IDs, remove completamente a entrada (sobrescrevendo com o restante do arquivo)
-                        long posDepoisEntrada = raf.getFilePointer(); // Onde terminaria a entrada
-                        byte[] restante = new byte[(int) (raf.length() - posDepoisEntrada)];
-                        raf.readFully(restante);
-
-                        raf.seek(posPalavra);
-                        raf.write(restante);
-                        raf.setLength(raf.getFilePointer());
-
-                        // Volta para o início para continuar o loop corretamente
-                        raf.seek(posPalavra);
-                    } else {
-                        // Apenas atualiza a lista de IDs
-                        rewriteList(raf, posNumIds, ids);
-                        raf.seek(posPalavra + getEntrySize(palavra, ids.size())); // Pula para próxima entrada
+                // Se ainda houver IDs, reescreve a entrada no arquivo temporário
+                if (!ids.isEmpty()) {
+                    rafWrite.writeUTF(palavra);
+                    rafWrite.writeInt(ids.size());
+                    for (int i : ids) {
+                        rafWrite.writeInt(i);
                     }
                 }
             }
-        } finally {
-            raf.close();
+        }
+
+        // Substitui o arquivo original pelo temporário
+        if (!originalFile.delete()) {
+            throw new IOException("Não foi possível deletar o arquivo original.");
+        }
+        if (!tempFile.renameTo(originalFile)) {
+            throw new IOException("Não foi possível renomear o arquivo temporário.");
         }
     }
 
-    // Método auxiliar para calcular o tamanho de uma entrada no arquivo
-    private static int getEntrySize(String palavra, int numIds) {
-        int tamanhoPalavra = 2 + palavra.length() * 2; // UTF: 2 bytes para length + 2 bytes por caractere
-        return tamanhoPalavra + 4 + (4 * numIds); // + 4 bytes do int quantidade, + 4 por ID
-    }
 }
