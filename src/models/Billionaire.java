@@ -37,6 +37,22 @@ public class Billionaire {
         return name;
     }
 
+    public String getCountry(){
+        return country;
+    }
+
+    public ArrayList<String> getSource(){
+        return source;
+    }
+
+    public boolean getSelfMade(){
+        return selfMade;
+    }
+
+    public LocalDate getBirthdate(){
+        return birthdate;
+    }
+    
     public String toString() {
         DecimalFormat df = new DecimalFormat("#,##0.00");
         return "\nId:" + id +
