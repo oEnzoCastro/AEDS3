@@ -1,4 +1,9 @@
+
+// Java
 import java.util.Scanner;
+
+// Services
+import services.CRUD_Hash;
 
 public class App {
 
@@ -11,9 +16,13 @@ public class App {
         switch (printMenu()) {
             case 1: // Create All
 
+                CRUD_Hash.createAll();
+
                 break;
 
             case 2: // Create One
+
+                CRUD_Hash.create();
 
                 break;
 
