@@ -22,8 +22,6 @@ public class App {
 
             case 2: // Create One
 
-                CRUD_Hash.create();
-
                 break;
 
             default:
