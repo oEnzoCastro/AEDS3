@@ -5,6 +5,9 @@ import java.util.Scanner;
 // Services
 import services.CRUD_Hash;
 
+/**
+ * 
+ */
 public class App {
 
     public static void main(String[] args) {
@@ -14,6 +17,12 @@ public class App {
         // Start
 
         switch (printMenu()) {
+            case 0: // Exit
+
+                System.out.println("Exiting the application...");
+
+                break;
+
             case 1: // Create All
 
                 CRUD_Hash.createAll();
