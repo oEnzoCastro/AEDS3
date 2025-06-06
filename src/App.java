@@ -6,6 +6,7 @@ import DAO.DAO_InvertedList;
 import services.CRUD_BTree;
 // Services
 import services.CRUD_Hash;
+import services.LZW;
 import services.Sorting;
 
 /**
@@ -16,10 +17,12 @@ public class App {
     public static void main(String[] args) {
 
         // *.new()
+
         boolean isRunning = true;
         Scanner scanner = new Scanner(System.in);
         String fileTree = "src/database/billionairesTree.db";
         String fileHash = "src/database/billionairesHash.db";
+
         // Start
 
         while (isRunning) {
@@ -115,6 +118,19 @@ public class App {
                     DAO_InvertedList.searchIL(palavra, code);
                     break;
 
+                case 8: // LZW
+
+                    algoritmo = selectAlgorithm(scanner);
+                    if (algoritmo == 1) {
+                        LZW.compress();
+                        LZW.extrair();
+                    } else if (algoritmo == 2) {
+                        LZW.compress();
+                        LZW.extrair();
+                    }
+
+                    break;
+
                 default:
                     break;
             }
@@ -145,7 +161,9 @@ public class App {
         System.out.println("|———|————————————————————————————————————————|");
         System.out.println("| 7 | Procurar Palavra nas Listas Invertidas |");
         System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 8 | Exit                                   |");
+        System.out.println("| 8 | Comprimir                              |");
+        System.out.println("|———|————————————————————————————————————————|");
+        System.out.println("| 0 | Exit                                   |");
         System.out.println("|———|————————————————————————————————————————|");
         System.out.print("| Opção: ");
         int res = scanner.nextInt();
