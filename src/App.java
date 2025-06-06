@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.Scanner;
 import services.CRUD_BTree;
 import services.CRUD_Hash;
+import services.Huffman;
 import services.Sorting;
 
 public class App {
@@ -107,8 +108,42 @@ public class App {
                     int code = scan.nextInt();
                     DAO_InvertedList.searchIL(palavra, code);
                     break;
-
+                
                 case 8:
+                    clearScreen();
+                    algoritmo = selectAlgorithm(scan);
+                    String fileCompactada;
+                    try{
+                        if(algoritmo == 1) {
+                            fileCompactada = Huffman.comprimir(fileTree);
+                            Huffman.taxaCompressao(fileTree, fileCompactada);
+                        } else if (algoritmo == 2){
+                            fileCompactada = Huffman.comprimir(fileHash);
+                            Huffman.taxaCompressao(fileHash, fileCompactada);
+                        }
+                    } catch(ClassNotFoundException e){
+                        System.err.println(e.getMessage());
+                    }
+                    break;
+                
+                case 9: 
+                    clearScreen();
+                    algoritmo = selectAlgorithm(scan);
+                    String fileDescompactada;
+                    try{
+                        if(algoritmo == 1){
+                            fileDescompactada = Huffman.descomprimir(fileTree);
+                            Huffman.compararRecuperado(fileTree, fileDescompactada);
+                        } else if (algoritmo == 2){
+                            fileDescompactada = Huffman.descomprimir(fileHash);
+                            Huffman.compararRecuperado(fileTree, fileDescompactada);
+                        }
+                    } catch(ClassNotFoundException e){
+                        System.err.println(e.getMessage());
+                    }
+                    break;
+
+                case 10:
                     clearScreen();
                     System.out.println("Programa Encerrado!");
                     isRunning = false;
@@ -135,7 +170,9 @@ public class App {
         System.out.println("5. Delete");
         System.out.println("6. Sort");
         System.out.println("7. Procurar Palavra nas Listas Invertidas");
-        System.out.println("8. Exit");
+        System.out.println("8. Compactar Huffman");
+        System.out.println("9. Descompactar Huffman");
+        System.out.println("10. Exit");
         System.out.println("----------------------------------");
     }
 

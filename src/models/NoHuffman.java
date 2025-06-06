@@ -1,12 +1,16 @@
 package models;
 
-public class NoHuffman {
+import java.io.Serializable;
+
+public class NoHuffman implements Serializable{
+    private static final long serialVersionUID = 1L;
+
     private int num;
-    private char symbol;
+    private byte symbol;
     private NoHuffman esq;
     private NoHuffman dir;
 
-    public NoHuffman(int num, char symbol) {
+    public NoHuffman(int num, byte symbol) {
         this.setNum(num);
         this.setSymbol(symbol);
         this.setEsq(null);
@@ -22,11 +26,11 @@ public class NoHuffman {
         this.num = num;
     }
 
-    public char getSymbol() {
+    public byte getSymbol() {
         return symbol;
     }
 
-    public void setSymbol(char symbol) {
+    public void setSymbol(byte symbol) {
         this.symbol = symbol;
     }
 
