@@ -150,7 +150,7 @@ public class Huffman {
 
     public static String comprimir (String file) throws IOException, ClassNotFoundException{
         // Escolhe se usará o arquivo de hash ou árvore
-        String compactado = file.equals("src/database/billionairesHash.db") ? "src/database/billionairesHashCompactada.db" : "src/database/billionairesTreeCompactada.db";
+        String compactado = file.equals("src/database/billionairesHash.db") ? "src/database/billionairesHashHuffmanCompactada.db" : "src/database/billionairesTreeHuffmanCompactada.db";
         String arvoreDB = file.equals("src/database/billionairesHash.db") ? "src/database/arvoreHuffmanHash.db" : "src/database/arvoreHuffmanTree.db";
 
         Map<Byte, Integer> freq = contarBytes(file); // Conta os bytes e sua frequência
@@ -165,7 +165,7 @@ public class Huffman {
 
     public static String descomprimir (String file) throws IOException, ClassNotFoundException {
         // Escolhe se usará o arquivo de hash ou árvore
-        String compactado = file.equals("src/database/billionairesHash.db") ? "src/database/billionairesHashCompactada.db" : "src/database/billionairesTreeCompactada.db";
+        String compactado = file.equals("src/database/billionairesHash.db") ? "src/database/billionairesHashHuffmanCompactada.db" : "src/database/billionairesTreeHuffmanCompactada.db";
         String descompactado = file.equals("src/database/billionairesHash.db") ? "src/database/billionairesHashHuffman_recuperado.db" : "src/database/billionairesTreeHufman_recuperado.db";
         String arvoreDB = file.equals("src/database/billionairesHash.db") ? "src/database/arvoreHuffmanHash.db" : "src/database/arvoreHuffmanTree.db";
 

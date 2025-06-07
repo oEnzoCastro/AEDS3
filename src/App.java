@@ -4,6 +4,7 @@ import java.util.Scanner;
 import services.CRUD_BTree;
 import services.CRUD_Hash;
 import services.Huffman;
+import services.KMP;
 import services.Sorting;
 
 public class App {
@@ -136,14 +137,31 @@ public class App {
                             Huffman.compararRecuperado(fileTree, fileDescompactada);
                         } else if (algoritmo == 2){
                             fileDescompactada = Huffman.descomprimir(fileHash);
-                            Huffman.compararRecuperado(fileTree, fileDescompactada);
+                            Huffman.compararRecuperado(fileHash, fileDescompactada);
                         }
                     } catch(ClassNotFoundException e){
                         System.err.println(e.getMessage());
                     }
                     break;
-
+                
                 case 10:
+                    int resp = 0;
+                    algoritmo = selectAlgorithm(scan);
+                    System.out.println("Digite o padrão a ser procurado: ");
+                    scan.nextLine();
+                    String padrao = scan.nextLine();
+                    if(algoritmo == 1){
+                        resp = KMP.buscarKMP(padrao, fileTree);
+                    } else if (algoritmo == 2){
+                        resp = KMP.buscarKMP(padrao, fileHash);
+                    }
+                    if(resp != 0){
+                        System.out.println("Padrão encontrado " + resp + " vez(es)!");
+                    } else {
+                        System.out.println("Padrão não encontrado");
+                    }
+                    break;
+                case 11:
                     clearScreen();
                     System.out.println("Programa Encerrado!");
                     isRunning = false;
@@ -172,7 +190,8 @@ public class App {
         System.out.println("7. Procurar Palavra nas Listas Invertidas");
         System.out.println("8. Compactar Huffman");
         System.out.println("9. Descompactar Huffman");
-        System.out.println("10. Exit");
+        System.out.println("10. Busca KMP");
+        System.out.println("11. Exit");
         System.out.println("----------------------------------");
     }
 
