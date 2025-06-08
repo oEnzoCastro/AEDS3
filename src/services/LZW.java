@@ -51,16 +51,17 @@ public class LZW {
             byte[] msgCodificada = encode(data); // Vetor de bits que contém os índices
             RandomAccessFile randomAccessFileCompressed = new RandomAccessFile(fileCompressed, "rw");
 
-            float newSize = randomAccessFileCompressed.length() / 1000;
-
-            System.out.println("Tamanho antigo: " + oldSize + "Mb");
-            System.out.println("Tamanho compactado: " + newSize + "Mb");
-            System.out.println("Porcentagem de compactação: " + ((newSize / oldSize) * 100) + "%");
-
             randomAccessFileCompressed.write(msgCodificada);
 
+            float newSize = randomAccessFileCompressed.length() / 1000;
+            
+            System.out.println("Tamanho antigo: " + oldSize + "Kb");
+            System.out.println("Tamanho compactado: " + newSize + "Kb");
+            System.out.println("Porcentagem de compactação: " + ((newSize / oldSize) * 100) + "%");
+            
             randomAccessFileCompressed.close();
             randomAccessFile.close();
+
 
         } catch (Exception e) {
             System.err.println("ERRO: " + e);
