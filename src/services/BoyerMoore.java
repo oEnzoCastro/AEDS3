@@ -101,82 +101,64 @@ public class BoyerMoore {
     
     */
 
-    private static int[] sufixoBom(String pattern) {
+ private static int[] sufixoBom(String pattern) {
 
         int m = pattern.length();
+        // Cria a tabela de deslocamento do sufixo bom.
         int[] goodSuffixShift = new int[m];
+        // Array auxiliar para armazenar o comprimento dos sufixos.
         int[] suffixes = new int[m];
 
         suffixes[m - 1] = m;
 
+        // Loop para pré-processar e encontrar os sufixos que correspondem ao final do padrão.
         for (int i = m - 2; i >= 0; i--) {
-
             int j = i;
-
+            // Compara o sufixo de pattern[0...i] com o sufixo do padrão completo.
             while (j >= 0 && pattern.charAt(j) == pattern.charAt(m - 1 - i + j)) {
-
                 j--;
-
             }
-
+            // Armazena o comprimento do sufixo correspondente.
             suffixes[i] = i - j;
-
         }
 
+        // Inicializa a tabela de deslocamento com o valor máximo (comprimento do padrão).
         for (int i = 0; i < m; i++) {
-
             goodSuffixShift[i] = m;
-
         }
 
         int j = 0;
-
+        // Caso 1: Preenche a tabela para sufixos que também são prefixos do padrão.
         for (int i = m - 1; i >= 0; i--) {
-
             if (i + 1 == suffixes[i]) {
-
                 for (; j < m - 1 - i; j++) {
-
                     if (goodSuffixShift[j] == m) {
-
                         goodSuffixShift[j] = m - 1 - i;
-
                     }
-
                 }
-
             }
-
         }
 
+        // Caso 2: Define o deslocamento para a última ocorrência de cada sufixo no padrão.
         for (int i = 0; i <= m - 2; i++) {
-
             goodSuffixShift[m - 1 - suffixes[i]] = m - 1 - i;
-
         }
 
         return goodSuffixShift;
-
     }
 
     /**
-    
-    * Caractere Ruim
-    
-    */
-
+     * Pré-processamento para a regra do Caractere Ruim.
+     */
     private static Map<Character, Integer> caractereRuim(String pattern) {
-
+        // Cria a tabela para a regra do caractere ruim.
         Map<Character, Integer> badChar = new HashMap<>();
         int patternLength = pattern.length();
 
         for (int i = 0; i < patternLength - 1; i++) {
-
             badChar.put(pattern.charAt(i), i);
-
         }
 
         return badChar;
-
     }
 }
