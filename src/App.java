@@ -1,55 +1,72 @@
-import DAO.DAO_InvertedList;
-import java.io.IOException;
+
+// Java
 import java.util.Scanner;
+
+import DAO.DAO_InvertedList;
+import services.BoyerMoore;
 import services.CRUD_BTree;
+// Services
 import services.CRUD_Hash;
+import services.LZW;
 import services.Huffman;
 import services.KMP;
 import services.Sorting;
 
+/**
+ * 
+ */
 public class App {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+
+        // *.new()
 
         boolean isRunning = true;
-        Scanner scan = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         String fileTree = "src/database/billionairesTree.db";
         String fileHash = "src/database/billionairesHash.db";
+        String fileTreeCompressed = "src/database/billionairesTreeCompressed.db";
+        String fileHashCompressed = "src/database/billionairesHashCompressed.db";
+
+        // Start
 
         while (isRunning) {
-            printMenu();
-            int option = scan.nextInt();
+
             int id;
             int algoritmo;
             String key;
 
-            switch (option) {
+            switch (printMenu(scanner)) {
+                case 0: // Exit
+
+                    System.out.println("Exiting the application...");
+                    isRunning = false;
+                    break;
+
                 case 1: // Create All
-                    algoritmo = selectAlgorithm(scan);
+
+                    algoritmo = selectAlgorithm(scanner);
                     if (algoritmo == 1) {
                         CRUD_BTree.createAll();
                     } else if (algoritmo == 2) {
                         DAO_InvertedList.limparLista();
                         CRUD_Hash.createAll();
                     }
-                    clearScreen();
                     break;
 
-                case 2: // Create
-                    algoritmo = selectAlgorithm(scan);
+                case 2: // Create One
+                    algoritmo = selectAlgorithm(scanner);
                     if (algoritmo == 1) {
                         CRUD_BTree.create(fileTree);
                     } else if (algoritmo == 2) {
                         CRUD_Hash.create(fileHash);
                     }
                     break;
-
                 case 3: // Read
-                    algoritmo = selectAlgorithm(scan);
+                    algoritmo = selectAlgorithm(scanner);
                     System.out.print("Chave: ");
-                    clearInputBuffer(scan);
-                    id = scan.nextInt();
-                    clearScreen();
+                    clearInputBuffer(scanner);
+                    id = scanner.nextInt();
                     if (algoritmo == 1) {
                         CRUD_BTree.getIndex(id);
                     } else if (algoritmo == 2) {
@@ -58,11 +75,10 @@ public class App {
                     break;
 
                 case 4: // Update
-                    algoritmo = selectAlgorithm(scan);
+                    algoritmo = selectAlgorithm(scanner);
                     System.out.print("Chave: ");
-                    clearInputBuffer(scan);
-                    key = scan.nextLine();
-                    clearScreen();
+                    clearInputBuffer(scanner);
+                    key = scanner.nextLine();
                     if (algoritmo == 1) {
                         CRUD_BTree.update(key, fileTree);
                     } else if (algoritmo == 2) {
@@ -72,11 +88,10 @@ public class App {
 
                 case 5: // Delete
 
-                    algoritmo = selectAlgorithm(scan);
+                    algoritmo = selectAlgorithm(scanner);
                     System.out.print("ID: ");
-                    clearInputBuffer(scan);
-                    id = scan.nextInt();
-                    clearScreen();
+                    clearInputBuffer(scanner);
+                    id = scanner.nextInt();
                     if (algoritmo == 1)
                         CRUD_BTree.delete(id, fileTree);
                     else if (algoritmo == 2) {
@@ -88,31 +103,29 @@ public class App {
                     break;
 
                 case 6: // Sort
-                    clearScreen();
                     System.out.print("Registros: ");
-                    int registros = scan.nextInt();
-                    clearInputBuffer(scan);
+                    int registros = scanner.nextInt();
+                    clearInputBuffer(scanner);
                     System.out.print("Caminhos: ");
-                    int caminhos = scan.nextInt();
+                    int caminhos = scanner.nextInt();
                     Sorting.sort(fileTree, registros, caminhos);
                     Sorting.sort(fileHash, registros, caminhos);
                     break;
 
                 case 7: // Lista Invertida
-                    clearScreen();
-                    scan.nextLine();
+                    scanner.nextLine();
                     System.out.print("Palavra a ser pesquisada: ");
-                    String palavra = scan.nextLine();
+                    String palavra = scanner.nextLine();
                     System.out.println("Escolha a lista a ser pesquisada:");
                     System.out.println("1. Para coluna Source");
                     System.out.println("2. Para coluna Country");
-                    int code = scan.nextInt();
+                    int code = scanner.nextInt();
                     DAO_InvertedList.searchIL(palavra, code);
                     break;
-                
-                case 8:
-                    clearScreen();
-                    algoritmo = selectAlgorithm(scan);
+
+                case 8: // Compactar Huffman
+                    algoritmo = selectAlgorithm(scanner);
+
                     String fileCompactada;
                     try{
                         if(algoritmo == 1) {
@@ -126,73 +139,121 @@ public class App {
                         System.err.println(e.getMessage());
                     }
                     break;
-                
-                case 9: 
-                    clearScreen();
-                    algoritmo = selectAlgorithm(scan);
+
+                case 9: // Decompactar Huffman
+                    algoritmo = selectAlgorithm(scanner);
                     String fileDescompactada;
-                    try{
-                        if(algoritmo == 1){
+                    try {
+                        if (algoritmo == 1) {
                             fileDescompactada = Huffman.descomprimir(fileTree);
                             Huffman.compararRecuperado(fileTree, fileDescompactada);
-                        } else if (algoritmo == 2){
+                        } else if (algoritmo == 2) {
                             fileDescompactada = Huffman.descomprimir(fileHash);
                             Huffman.compararRecuperado(fileHash, fileDescompactada);
                         }
-                    } catch(ClassNotFoundException e){
+                    } catch (ClassNotFoundException e) {
                         System.err.println(e.getMessage());
                     }
                     break;
-                
-                case 10:
-                    int resp = 0;
-                    algoritmo = selectAlgorithm(scan);
-                    System.out.println("Digite o padrão a ser procurado: ");
-                    scan.nextLine();
-                    String padrao = scan.nextLine();
-                    if(algoritmo == 1){
-                        resp = KMP.buscarKMP(padrao, fileTree);
-                    } else if (algoritmo == 2){
-                        resp = KMP.buscarKMP(padrao, fileHash);
+
+                case 10: // Compactar LZW
+
+                    algoritmo = selectAlgorithm(scanner);
+
+                    if (algoritmo == 1) {
+                        LZW.compactar(fileTree, fileTreeCompressed);
+                    } else if (algoritmo == 2) {
+                        LZW.compactar(fileHash, fileHashCompressed);
                     }
-                    if(resp != 0){
-                        System.out.println("Padrão encontrado " + resp + " vez(es)!");
-                    } else {
-                        System.out.println("Padrão não encontrado");
-                    }
+
                     break;
-                case 11:
-                    clearScreen();
-                    System.out.println("Programa Encerrado!");
-                    isRunning = false;
+                case 11: // Descompactar LZW
+
+                    algoritmo = selectAlgorithm(scanner);
+
+                    if (algoritmo == 1) {
+                        LZW.extrair(fileTree, fileTreeCompressed);
+                    } else if (algoritmo == 2) {
+                        LZW.extrair(fileHash, fileHashCompressed);
+                    }
+
+                    break;
+
+                 case 12: // Busca KMP
+                    int resp = 0;
+                    algoritmo = selectAlgorithm(scanner);
+                    System.out.println("Digite o padrão a ser procurado: ");
+                    scanner.nextLine();
+                    String padrao = scanner.nextLine();
+
+                case 13: // Busca Boyer-Moore
+
+                    algoritmo = selectAlgorithm(scanner);
+
+                    System.out.println("Digite o padrão a ser procurado: ");
+                    scanner.nextLine();
+                    String padrao = scanner.nextLine();
+
+                    if (algoritmo == 1) {
+                        BoyerMoore.pesquisar(padrao, fileTree);
+                    } else if (algoritmo == 2) {
+                        BoyerMoore.pesquisar(padrao, fileHash);
+
+                    }
                     break;
 
                 default:
-                    clearScreen();
-                    System.err.println("Opção Inválida");
                     break;
             }
-        }
 
-        scan.close();
+        }
+        // End
+
+        // *.close()
+
     }
 
-    public static void printMenu() {
-        System.out.println("----------------------------------");
-        System.out.println("Select your options:");
-        System.out.println("----------------------------------");
-        System.out.println("1. Create from CSV");
-        System.out.println("2. Create");
-        System.out.println("3. Read");
-        System.out.println("4. Update");
-        System.out.println("5. Delete");
-        System.out.println("6. Sort");
-        System.out.println("7. Procurar Palavra nas Listas Invertidas");
-        System.out.println("8. Compactar Huffman");
-        System.out.println("9. Descompactar Huffman");
-        System.out.println("10. Busca KMP");
-        System.out.println("11. Exit");
-        System.out.println("----------------------------------");
+    public static int printMenu(Scanner scanner) {
+
+        System.out.println("|---------------------------------------------|");
+        System.out.println("|            Select your option:              |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 1  | Create from CSV                        |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 2  | Create                                 |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 3  | Read                                   |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 4  | Update                                 |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 5  | Delete                                 |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 6  | Sort                                   |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 7  | Procurar Palavra nas Listas Invertidas |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 8  | Compactar Huffman                      |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 9  | Descompactar Huffman                   |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 10 | Compactar LZW                          |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 11 | Descompactar LZW                       |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 12 | Busca KMP                              |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 13 | Busca Boyer-Moore                      |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 0  | Exit                                   |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.print("| Opção: ");
+        int res = scanner.nextInt();
+        System.out.println("|---------------------------------------------|");
+        // scanner.close();
+
+        return res;
+
+
     }
 
     public static int selectAlgorithm(Scanner scan) {
@@ -218,8 +279,4 @@ public class App {
         scan.nextLine(); // Clear buffer
     }
 
-    public static void clearScreen() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
 }
