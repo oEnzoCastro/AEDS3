@@ -12,13 +12,10 @@ public class LZW {
     public static final int BITS_PER_CODE = 12;
     private static final int MAX_DICT_SIZE = 1 << BITS_PER_CODE;
 
-    public static final String fileTree = "src/database/billionairesTree.db";
-    public static final String fileTreeCompressed = "src/database/billionairesTreeCompressed.db";
-
-    public static void extrair() {
+    public static void extrair(String file, String fileCompressed) {
         try {
 
-            RandomAccessFile randomAccessFileDecode = new RandomAccessFile(fileTreeCompressed, "rw");
+            RandomAccessFile randomAccessFileDecode = new RandomAccessFile(fileCompressed, "rw");
 
             long fileSizeDecode = randomAccessFileDecode.length();
 
@@ -27,7 +24,7 @@ public class LZW {
 
             // Decodificação - Cria uma nova string
             byte[] msgDecodeBytes = decode(data2);
-            RandomAccessFile randomAccessFile = new RandomAccessFile(fileTree, "rw");
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
 
             randomAccessFile.write(msgDecodeBytes);
 
@@ -39,10 +36,10 @@ public class LZW {
         }
     }
 
-    public static void compress() {
+    public static void compactar(String file, String fileCompressed) {
       try {
 
-            RandomAccessFile randomAccessFile = new RandomAccessFile(fileTree, "rw");
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
 
             long fileSize = randomAccessFile.length();
 
@@ -50,7 +47,7 @@ public class LZW {
             randomAccessFile.readFully(data); // Read all bytes from the file
 
             byte[] msgCodificada = encode(data); // Vetor de bits que contém os índices
-            RandomAccessFile randomAccessFileCompressed = new RandomAccessFile(fileTreeCompressed, "rw");
+            RandomAccessFile randomAccessFileCompressed = new RandomAccessFile(fileCompressed, "rw");
 
             randomAccessFileCompressed.write(msgCodificada);
 

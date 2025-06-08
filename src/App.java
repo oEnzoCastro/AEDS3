@@ -3,6 +3,7 @@
 import java.util.Scanner;
 
 import DAO.DAO_InvertedList;
+import services.BoyerMoore;
 import services.CRUD_BTree;
 // Services
 import services.CRUD_Hash;
@@ -22,6 +23,8 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         String fileTree = "src/database/billionairesTree.db";
         String fileHash = "src/database/billionairesHash.db";
+        String fileTreeCompressed = "src/database/billionairesTreeCompressed.db";
+        String fileHashCompressed = "src/database/billionairesHashCompressed.db";
 
         // Start
 
@@ -118,15 +121,92 @@ public class App {
                     DAO_InvertedList.searchIL(palavra, code);
                     break;
 
-                case 8: // LZW
+                case 8: // Compactar Huffman
+                    algoritmo = selectAlgorithm(scanner);
+                    String fileCompactada;
+                    try{
+                        if(algoritmo == 1) {
+                            fileCompactada = Huffman.comprimir(fileTree);
+                            Huffman.taxaCompressao(fileTree, fileCompactada);
+                        } else if (algoritmo == 2){
+                            fileCompactada = Huffman.comprimir(fileHash);
+                            Huffman.taxaCompressao(fileHash, fileCompactada);
+                        }
+                    } catch(ClassNotFoundException e){
+                        System.err.println(e.getMessage());
+                    }
+                    break;
+
+                case 9: // Decompactar Huffman
+                    algoritmo = selectAlgorithm(scanner);
+                    String fileDescompactada;
+                    try {
+                        if (algoritmo == 1) {
+                            fileDescompactada = Huffman.descomprimir(fileTree);
+                            Huffman.compararRecuperado(fileTree, fileDescompactada);
+                        } else if (algoritmo == 2) {
+                            fileDescompactada = Huffman.descomprimir(fileHash);
+                            Huffman.compararRecuperado(fileHash, fileDescompactada);
+                        }
+                    } catch (ClassNotFoundException e) {
+                        System.err.println(e.getMessage());
+                    }
+                    break;
+
+                case 10: // Compactar LZW
 
                     algoritmo = selectAlgorithm(scanner);
+
                     if (algoritmo == 1) {
-                        LZW.compress();
-                        LZW.extrair();
+                        LZW.compactar(fileTree, fileTreeCompressed);
                     } else if (algoritmo == 2) {
-                        LZW.compress();
-                        LZW.extrair();
+                        LZW.compactar(fileHash, fileHashCompressed);
+                    }
+
+                    break;
+                case 11: // Descompactar LZW
+
+                    algoritmo = selectAlgorithm(scanner);
+
+                    if (algoritmo == 1) {
+                        LZW.extrair(fileTree, fileTreeCompressed);
+                    } else if (algoritmo == 2) {
+                        LZW.extrair(fileHash, fileHashCompressed);
+                    }
+
+                    break;
+
+                 case 12: // Busca KMP
+                    int resp = 0;
+                    algoritmo = selectAlgorithm(scanner);
+                    System.out.println("Digite o padrão a ser procurado: ");
+                    scanner.nextLine();
+                    String padrao = scanner.nextLine();
+                    if(algoritmo == 1){
+                        resp = KMP.buscarKMP(padrao, fileTree);
+                    } else if (algoritmo == 2){
+                        resp = KMP.buscarKMP(padrao, fileHash);
+                    }
+                    if(resp != 0){
+                        System.out.println("Padrão encontrado " + resp + " vez(es)!");
+                    } else {
+                        System.out.println("Padrão não encontrado");
+                    }
+                    break;
+
+                case 13: // Busca Boyer-Moore
+
+                    algoritmo = selectAlgorithm(scanner);
+
+                    System.out.println("Digite o padrão a ser procurado: ");
+                    scanner.nextLine();
+                    String padrao = scanner.nextLine();
+
+                    if (algoritmo == 1) {
+                        BoyerMoore.pesquisar(padrao, fileTree);
+                    } else if (algoritmo == 2) {
+                        BoyerMoore.pesquisar(padrao, fileHash);
+
                     }
 
                     break;
@@ -144,30 +224,40 @@ public class App {
 
     public static int printMenu(Scanner scanner) {
 
-        System.out.println("|————————————————————————————————————————————|");
-        System.out.println("|            Select your option:             |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 1 | Create from CSV                        |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 2 | Create                                 |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 3 | Read                                   |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 4 | Update                                 |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 5 | Delete                                 |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 6 | Sort                                   |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 7 | Procurar Palavra nas Listas Invertidas |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 8 | Comprimir                              |");
-        System.out.println("|———|————————————————————————————————————————|");
-        System.out.println("| 0 | Exit                                   |");
-        System.out.println("|———|————————————————————————————————————————|");
+        System.out.println("|---------------------------------------------|");
+        System.out.println("|            Select your option:              |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 1  | Create from CSV                        |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 2  | Create                                 |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 3  | Read                                   |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 4  | Update                                 |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 5  | Delete                                 |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 6  | Sort                                   |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 7  | Procurar Palavra nas Listas Invertidas |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 8  | Compactar Huffman                      |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 9  | Descompactar Huffman                   |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 10 | Compactar LZW                          |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 11 | Descompactar LZW                       |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 12 | Busca KMP                              |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 13 | Busca Boyer-Moore                      |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 0  | Exit                                   |");
+        System.out.println("|----|----------------------------------------|");
         System.out.print("| Opção: ");
         int res = scanner.nextInt();
-        System.out.println("|————————————————————————————————————————————|");
+        System.out.println("|---------------------------------------------|");
         // scanner.close();
 
         return res;
