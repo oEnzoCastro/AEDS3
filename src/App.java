@@ -8,6 +8,8 @@ import services.CRUD_BTree;
 // Services
 import services.CRUD_Hash;
 import services.LZW;
+import services.Huffman;
+import services.KMP;
 import services.Sorting;
 
 /**
@@ -123,6 +125,7 @@ public class App {
 
                 case 8: // Compactar Huffman
                     algoritmo = selectAlgorithm(scanner);
+
                     String fileCompactada;
                     try{
                         if(algoritmo == 1) {
@@ -182,17 +185,6 @@ public class App {
                     System.out.println("Digite o padrão a ser procurado: ");
                     scanner.nextLine();
                     String padrao = scanner.nextLine();
-                    if(algoritmo == 1){
-                        resp = KMP.buscarKMP(padrao, fileTree);
-                    } else if (algoritmo == 2){
-                        resp = KMP.buscarKMP(padrao, fileHash);
-                    }
-                    if(resp != 0){
-                        System.out.println("Padrão encontrado " + resp + " vez(es)!");
-                    } else {
-                        System.out.println("Padrão não encontrado");
-                    }
-                    break;
 
                 case 13: // Busca Boyer-Moore
 
@@ -208,7 +200,6 @@ public class App {
                         BoyerMoore.pesquisar(padrao, fileHash);
 
                     }
-
                     break;
 
                 default:
@@ -261,6 +252,7 @@ public class App {
         // scanner.close();
 
         return res;
+
 
     }
 
