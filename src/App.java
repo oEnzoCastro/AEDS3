@@ -35,6 +35,7 @@ public class App {
             int id;
             int algoritmo;
             String key;
+            String padrao;
 
             switch (printMenu(scanner)) {
                 case 0: // Exit
@@ -127,15 +128,15 @@ public class App {
                     algoritmo = selectAlgorithm(scanner);
 
                     String fileCompactada;
-                    try{
-                        if(algoritmo == 1) {
+                    try {
+                        if (algoritmo == 1) {
                             fileCompactada = Huffman.comprimir(fileTree);
                             Huffman.taxaCompressao(fileTree, fileCompactada);
-                        } else if (algoritmo == 2){
+                        } else if (algoritmo == 2) {
                             fileCompactada = Huffman.comprimir(fileHash);
                             Huffman.taxaCompressao(fileHash, fileCompactada);
                         }
-                    } catch(ClassNotFoundException e){
+                    } catch (Exception e) {
                         System.err.println(e.getMessage());
                     }
                     break;
@@ -151,7 +152,7 @@ public class App {
                             fileDescompactada = Huffman.descomprimir(fileHash);
                             Huffman.compararRecuperado(fileHash, fileDescompactada);
                         }
-                    } catch (ClassNotFoundException e) {
+                    } catch (Exception e) {
                         System.err.println(e.getMessage());
                     }
                     break;
@@ -179,12 +180,30 @@ public class App {
 
                     break;
 
-                 case 12: // Busca KMP
+                case 12: // Busca KMP
                     int resp = 0;
                     algoritmo = selectAlgorithm(scanner);
                     System.out.println("Digite o padrão a ser procurado: ");
                     scanner.nextLine();
-                    String padrao = scanner.nextLine();
+                    padrao = scanner.nextLine();
+                    try {
+
+                        if (algoritmo == 1) {
+                            resp = KMP.buscarKMP(padrao, fileTree);
+                        } else if (algoritmo == 2) {
+                            resp = KMP.buscarKMP(padrao, fileHash);
+                        }
+
+                    } catch (Exception e) {
+                       System.err.println("ERRO: " + e);
+                    }
+
+                    if (resp != 0) {
+                        System.out.println("Padrão encontrado " + resp + " vez(es)!");
+                    } else {
+                        System.out.println("Padrão não encontrado");
+                    }
+                    break;
 
                 case 13: // Busca Boyer-Moore
 
@@ -192,7 +211,7 @@ public class App {
 
                     System.out.println("Digite o padrão a ser procurado: ");
                     scanner.nextLine();
-                    String padrao = scanner.nextLine();
+                    padrao = scanner.nextLine();
 
                     if (algoritmo == 1) {
                         BoyerMoore.pesquisar(padrao, fileTree);
@@ -252,7 +271,6 @@ public class App {
         // scanner.close();
 
         return res;
-
 
     }
 

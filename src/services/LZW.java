@@ -37,9 +37,11 @@ public class LZW {
     }
 
     public static void compactar(String file, String fileCompressed) {
-      try {
+        try {
 
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
+            float oldSize = randomAccessFile.length() / 1000;
 
             long fileSize = randomAccessFile.length();
 
@@ -48,6 +50,12 @@ public class LZW {
 
             byte[] msgCodificada = encode(data); // Vetor de bits que contém os índices
             RandomAccessFile randomAccessFileCompressed = new RandomAccessFile(fileCompressed, "rw");
+
+            float newSize = randomAccessFileCompressed.length() / 1000;
+
+            System.out.println("Tamanho antigo: " + oldSize + "Mb");
+            System.out.println("Tamanho compactado: " + newSize + "Mb");
+            System.out.println("Porcentagem de compactação: " + ((newSize / oldSize) * 100) + "%");
 
             randomAccessFileCompressed.write(msgCodificada);
 
