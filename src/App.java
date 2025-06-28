@@ -36,6 +36,8 @@ public class App {
 
             int id;
             int algoritmo;
+            int p;
+            int q;
             String key;
             String padrao;
 
@@ -251,24 +253,26 @@ public class App {
 
                     algoritmo = selectAlgorithm(scanner);
 
-                    System.out.println("Digite a chave: ");
-                    scanner.nextLine();
-                    key = scanner.nextLine();
+                    System.out.println("Digite a chave p: ");
+                    p = scanner.nextInt();
+                    System.out.println("Digite a chave q: ");
+                    q = scanner.nextInt();
 
                     if (algoritmo == 1) {
-                        RSA.encrypt(key, fileTree);
+                        RSA.encrypt(p, q, fileTree);
                     } else if (algoritmo == 2) {
-                        RSA.encrypt(key, fileHash);
+                        RSA.encrypt(p, q, fileHash);
                     }
                     break;
 
                 case 17: // Descriptografar RSA
 
-                    System.out.println("Digite a chave: ");
-                    scanner.nextLine();
-                    key = scanner.nextLine();
+                    System.out.println("Digite a chave p: ");
+                    p = scanner.nextInt();
+                    System.out.println("Digite a chave q: ");
+                    q = scanner.nextInt();
 
-                    RSA.decrypt(key);
+                    RSA.decrypt(p, q);
 
                     break;
 

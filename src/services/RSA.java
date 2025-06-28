@@ -8,24 +8,27 @@ public class RSA {
     static String fileEncrypted = "src/output/billionairesEncryptedRSA.db";
     static String fileDecrypted = "src/output/billionairesDecryptedRSA.db";
 
-    public static void encrypt(String key, String file) {
-        int p = 23;
-        int q = 53;
+    public static void encrypt(int p, int q, String file) {
 
         if (!isPrime(p) || !isPrime(q)) {
-            System.out.println("ERRO");
+            System.out.println("ERRO: As chaves deverão ser números primos!");
             return;
         }
 
+        // n = p * q
         int n = p * q;
 
         if (n < 255) {
-            System.out.println("ERRO");
+            System.out.println(
+                    "ERRO: Números inválidos, a multiplicação dos dois deverá ser maior do que o range de caracteres do banco!");
             return;
         }
 
+        // z = (p - 1) * (q - 1)
         int z = (p - 1) * (q - 1);
+        // d = primo em relação à z
         int d = nearPrime(z);
+        // (e * d) % z = 1
         int e = getE(d, z);
 
         try {
@@ -35,15 +38,15 @@ public class RSA {
 
             System.out.println("Criptografando " + randomAccessFile.length() + " tokens, aguarde...");
 
-
             for (int i = 0; i < randomAccessFile.length(); i++) {
 
                 BigInteger P = BigInteger.valueOf(randomAccessFile.read());
 
-                BigInteger big = P.pow(e);
+                BigInteger big = P.pow(e); // C = P^e
 
-                big = big.mod(BigInteger.valueOf(n));
+                big = big.mod(BigInteger.valueOf(n)); // C = (P ^ e) % n
 
+                // Armazena no formato Char para não acontecer overflow
                 randomAccessFileEncrypt.writeChar(big.intValue());
 
             }
@@ -110,24 +113,25 @@ public class RSA {
         return -1;
     }
 
-    public static void decrypt(String key) {
-
-        int p = 23;
-        int q = 53;
+    public static void decrypt(int p, int q) {
 
         if (!isPrime(p) || !isPrime(q)) {
-            System.out.println("ERRO");
+            System.out.println("ERRO: As chaves deverão ser números primos!");
             return;
         }
 
+        // n = p * q
         int n = p * q;
 
         if (n < 255) {
-            System.out.println("ERRO");
+            System.out.println(
+                    "ERRO: Números inválidos, a multiplicação dos dois deverá ser maior do que o range de caracteres do banco!");
             return;
         }
 
+        // z = (p - 1) * (q - 1)
         int z = (p - 1) * (q - 1);
+        // d = primo em relação à z
         int d = nearPrime(z);
         // int e = getE(d, z);
 
@@ -137,13 +141,14 @@ public class RSA {
             RandomAccessFile randomAccessFileDecrypt = new RandomAccessFile(fileDecrypted, "rw");
 
             System.out.println("Descriptografando " + randomAccessFileEncrypt.length() + " tokens, aguarde...");
-            for (int i = 0; i < randomAccessFileEncrypt.length()/2; i++) {
+            // Avança 2 bytes por vez, pois os elementos criptografados foram armazenados em char
+            for (int i = 0; i < randomAccessFileEncrypt.length() / 2; i++) {
 
                 BigInteger C = BigInteger.valueOf(randomAccessFileEncrypt.readChar());
 
-                BigInteger big = C.pow(d);
-                
-                int P = big.mod(BigInteger.valueOf(n)).intValue();
+                BigInteger big = C.pow(d); // P = C^d
+
+                int P = big.mod(BigInteger.valueOf(n)).intValue(); // P = (C ^ d) % n
 
                 randomAccessFileDecrypt.write(P);
 
