@@ -11,6 +11,7 @@ import services.LZW;
 import services.Huffman;
 import services.KMP;
 import services.Sorting;
+import services.Vigenere;
 
 /**
  * 
@@ -195,7 +196,7 @@ public class App {
                         }
 
                     } catch (Exception e) {
-                       System.err.println("ERRO: " + e);
+                        System.err.println("ERRO: " + e);
                     }
 
                     if (resp != 0) {
@@ -219,6 +220,29 @@ public class App {
                         BoyerMoore.pesquisar(padrao, fileHash);
 
                     }
+                    break;
+
+                case 14: // Criptografar Vigenére
+
+                    algoritmo = selectAlgorithm(scanner);
+
+                    System.out.println("Digite a chave: ");
+                    scanner.nextLine();
+                    key = scanner.nextLine();
+
+                    if (algoritmo == 1) {
+                        Vigenere.encrypt(key, fileTree);
+                    } else if (algoritmo == 2) {
+                        Vigenere.encrypt(key, fileHash);
+                    }
+                    break;
+                case 15: // Descriptografar Vigenére
+
+                    System.out.println("Digite a chave: ");
+                    scanner.nextLine();
+                    key = scanner.nextLine();
+
+                    Vigenere.decrypt(key);
                     break;
 
                 default:
@@ -262,6 +286,10 @@ public class App {
         System.out.println("| 12 | Busca KMP                              |");
         System.out.println("|----|----------------------------------------|");
         System.out.println("| 13 | Busca Boyer-Moore                      |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 14 | Criptografar Vigenére                  |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 15 | Descriptografar Vigenére               |");
         System.out.println("|----|----------------------------------------|");
         System.out.println("| 0  | Exit                                   |");
         System.out.println("|----|----------------------------------------|");
