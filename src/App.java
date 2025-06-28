@@ -8,6 +8,7 @@ import services.CRUD_BTree;
 // Services
 import services.CRUD_Hash;
 import services.LZW;
+import services.RSA;
 import services.Huffman;
 import services.KMP;
 import services.Sorting;
@@ -236,6 +237,7 @@ public class App {
                         Vigenere.encrypt(key, fileHash);
                     }
                     break;
+
                 case 15: // Descriptografar Vigenére
 
                     System.out.println("Digite a chave: ");
@@ -243,6 +245,31 @@ public class App {
                     key = scanner.nextLine();
 
                     Vigenere.decrypt(key);
+                    break;
+
+                case 16: // Criptografar RSA
+
+                    algoritmo = selectAlgorithm(scanner);
+
+                    System.out.println("Digite a chave: ");
+                    scanner.nextLine();
+                    key = scanner.nextLine();
+
+                    if (algoritmo == 1) {
+                        RSA.encrypt(key, fileTree);
+                    } else if (algoritmo == 2) {
+                        RSA.encrypt(key, fileHash);
+                    }
+                    break;
+
+                case 17: // Descriptografar RSA
+
+                    System.out.println("Digite a chave: ");
+                    scanner.nextLine();
+                    key = scanner.nextLine();
+
+                    RSA.decrypt(key);
+
                     break;
 
                 default:
@@ -290,6 +317,10 @@ public class App {
         System.out.println("| 14 | Criptografar Vigenére                  |");
         System.out.println("|----|----------------------------------------|");
         System.out.println("| 15 | Descriptografar Vigenére               |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 16 | Criptografar RSA                       |");
+        System.out.println("|----|----------------------------------------|");
+        System.out.println("| 17 | Descriptografar RSA                    |");
         System.out.println("|----|----------------------------------------|");
         System.out.println("| 0  | Exit                                   |");
         System.out.println("|----|----------------------------------------|");

@@ -14,8 +14,6 @@ public class Vigenere {
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
             RandomAccessFile randomAccessFileEncrypt = new RandomAccessFile(fileEncrypted, "rw");
 
-            // System.out.println(randomAccessFile.read());
-
             for (int i = 0; i < randomAccessFile.length(); i++) {
 
                 randomAccessFileEncrypt.write(randomAccessFile.read() + key.charAt(i%key.length()));
