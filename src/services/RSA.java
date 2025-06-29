@@ -1,5 +1,6 @@
 package services;
 
+import java.io.File;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
 
@@ -10,6 +11,8 @@ public class RSA {
 
     public static void encrypt(int p, int q, String file) {
 
+        new File(fileEncrypted).delete();
+
         if (!isPrime(p) || !isPrime(q)) {
             System.out.println("ERRO: As chaves deverão ser números primos!");
             return;
@@ -19,8 +22,7 @@ public class RSA {
         int n = p * q;
 
         if (n < 255) {
-            System.out.println(
-                    "ERRO: Números inválidos, a multiplicação dos dois deverá ser maior do que o range de caracteres do banco!");
+            System.out.println("ERRO: Números inválidos, a multiplicação dos dois deverá ser maior do que o range de caracteres do banco!");
             return;
         }
 
@@ -124,8 +126,7 @@ public class RSA {
         int n = p * q;
 
         if (n < 255) {
-            System.out.println(
-                    "ERRO: Números inválidos, a multiplicação dos dois deverá ser maior do que o range de caracteres do banco!");
+            System.out.println("ERRO: Números inválidos, a multiplicação dos dois deverá ser maior do que o range de caracteres do banco!");
             return;
         }
 
@@ -136,6 +137,8 @@ public class RSA {
         // int e = getE(d, z);
 
         try {
+
+            new File(fileDecrypted).delete();
 
             RandomAccessFile randomAccessFileEncrypt = new RandomAccessFile(fileEncrypted, "rw");
             RandomAccessFile randomAccessFileDecrypt = new RandomAccessFile(fileDecrypted, "rw");
